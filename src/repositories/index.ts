@@ -1,0 +1,5 @@
+export { BaseRepository } from './base.repository'
+export { userRepository } from './user.repository'
+export { semesterRepository } from './semester.repository'
+export { subjectRepository } from './subject.repository'
+export { gradeRepository } from './grade.repository'
