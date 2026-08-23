@@ -1,13 +1,23 @@
 import { defineStore } from 'pinia'
 
 import type { Semester } from '@/models'
-import { semesterRepository } from '@/repositories'
+import type { CreateSemesterDTO, UpdateSemesterDTO } from '@/dto/CreateSemesterDTO'
+import { semesterRepository, subjectRepository } from '@/repositories'
 import { useEntityCollection } from '@/composables/useEntityCollection'
 import type { EntityCollection } from '@/composables/useEntityCollection'
+import { validateSemesterInput } from '@/utils/dataValidators.utils'
 import { useSubjectStore } from './subject.store'
+
+export type SemesterMutationResult = { ok: true; semester: Semester } | { ok: false; error: string }
 
 interface SemesterStore extends EntityCollection<Semester> {
   listByUser: (userId: string) => Semester[]
+  countInProgressByUser: (userId: string) => number
+  countCompletedByUser: (userId: string) => number
+  countSubjectsBySemester: (semesterId: string) => number
+  createSemester: (input: CreateSemesterDTO) => SemesterMutationResult
+  updateSemester: (semesterId: string, input: UpdateSemesterDTO) => SemesterMutationResult
+  removeSemester: (semesterId: string) => boolean
   /** Elimina el semestre junto con sus materias y notas. */
   removeWithChildren: (semesterId: string) => boolean
   removeByUser: (userId: string) => number
@@ -28,6 +38,81 @@ export const useSemesterStore = defineStore('semesters', (): SemesterStore => {
       .sort(byMostRecent)
   }
 
+  function countInProgressByUser(userId: string): number {
+    return semesterRepository.countInProgressByUser(userId, collection.items.value)
+  }
+
+  function countCompletedByUser(userId: string): number {
+    return semesterRepository.countCompletedByUser(userId, collection.items.value)
+  }
+
+  function countSubjectsBySemester(semesterId: string): number {
+    return subjectRepository.countBySemester(semesterId, subjectStore.items)
+  }
+
+  function createSemester(input: CreateSemesterDTO): SemesterMutationResult {
+    const validationError = validateSemesterInput(input)
+    if (validationError !== null) {
+      return { ok: false, error: validationError }
+    }
+
+    const alreadyExists = listByUser(input.userId).some(
+      (semester) => semester.year === input.year && semester.period === input.period,
+    )
+    if (alreadyExists) {
+      return { ok: false, error: 'Ya existe un semestre para ese año y periodo.' }
+    }
+
+    const created = collection.create({
+      name: input.name.trim(),
+      year: input.year,
+      period: input.period,
+      status: input.status,
+      userId: input.userId,
+    })
+
+    return { ok: true, semester: created }
+  }
+
+  function updateSemester(semesterId: string, input: UpdateSemesterDTO): SemesterMutationResult {
+    const current = collection.findById(semesterId)
+    if (current === null) {
+      return { ok: false, error: 'El semestre ya no existe.' }
+    }
+
+    const validationError = validateSemesterInput(input)
+    if (validationError !== null) {
+      return { ok: false, error: validationError }
+    }
+
+    const duplicateForUser = listByUser(current.userId).some(
+      (semester) =>
+        semester.id !== semesterId &&
+        semester.year === input.year &&
+        semester.period === input.period,
+    )
+    if (duplicateForUser) {
+      return { ok: false, error: 'Ya existe otro semestre para ese ano y periodo.' }
+    }
+
+    const updated = collection.update(semesterId, {
+      name: input.name.trim(),
+      year: input.year,
+      period: input.period,
+      status: input.status,
+    })
+
+    if (updated === null) {
+      return { ok: false, error: 'No se pudo actualizar el semestre.' }
+    }
+
+    return { ok: true, semester: updated }
+  }
+
+  function removeSemester(semesterId: string): boolean {
+    return removeWithChildren(semesterId)
+  }
+
   function removeWithChildren(semesterId: string): boolean {
     subjectStore.removeBySemesters([semesterId])
     return collection.remove(semesterId)
@@ -39,5 +124,16 @@ export const useSemesterStore = defineStore('semesters', (): SemesterStore => {
     return collection.removeWhere((semester) => semester.userId === userId)
   }
 
-  return { ...collection, listByUser, removeWithChildren, removeByUser }
+  return {
+    ...collection,
+    listByUser,
+    countInProgressByUser,
+    countCompletedByUser,
+    countSubjectsBySemester,
+    createSemester,
+    updateSemester,
+    removeSemester,
+    removeWithChildren,
+    removeByUser,
+  }
 })

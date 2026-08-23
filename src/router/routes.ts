@@ -7,6 +7,8 @@ export const RouteName = {
   Home: 'home',
   Login: 'login',
   NotFound: 'not-found',
+  Dashboard: 'dashboard',
+  Semesters: 'semester',
 } as const
 
 export type RouteName = (typeof RouteName)[keyof typeof RouteName]
@@ -42,5 +44,17 @@ export const routes: readonly RouteRecordRaw[] = [
     name: RouteName.NotFound,
     component: () => import('@/views/NotFoundView.vue'),
     meta: { title: 'Pagina no encontrada' },
+  },
+  {
+    path: '/dashboard',
+    name: RouteName.Dashboard,
+    component: () => import('@/views/DashboardView.vue'),
+    meta: { title: 'Tu Dashboard', inSidebar: true, requiresAuth: true },
+  },
+  {
+    path: '/semestres',
+    name: RouteName.Semesters,
+    component: () => import('@/views/SemesterCRUDView.vue'),
+    meta: { title: 'Tus semestres', inSidebar: true, requiresAuth: true },
   },
 ]

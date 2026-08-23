@@ -51,7 +51,7 @@ async function submit(): Promise<void> {
 
   success(`Bienvenido, ${auth.displayName}.`)
   const redirect = route.query.redirect
-  await router.push(typeof redirect === 'string' ? redirect : { name: RouteName.Home })
+  await router.push(typeof redirect === 'string' ? redirect : { name: RouteName.Dashboard })
 }
 </script>
 

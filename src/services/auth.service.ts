@@ -33,9 +33,14 @@ export class AuthService {
     storage.remove(SESSION_COLLECTION)
   }
 
+  /** Lee unicamente el id de usuario guardado en la sesion local. */
+  getSessionUserId(): string | null {
+    return storage.read<string | null>(SESSION_COLLECTION, null)
+  }
+
   /** Recupera la sesion tras recargar la pagina. */
   restoreSession(): PublicUser | null {
-    const userId = storage.read<string | null>(SESSION_COLLECTION, null)
+    const userId = this.getSessionUserId()
     if (userId === null) {
       return null
     }

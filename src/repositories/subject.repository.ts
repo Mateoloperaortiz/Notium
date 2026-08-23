@@ -10,6 +10,11 @@ class SubjectRepository extends BaseRepository<Subject> {
     return this.findBy((subject) => subject.semesterId === semesterId)
   }
 
+  countBySemester(semesterId: string, source?: readonly Subject[]): number {
+    const items = source ?? this.listBySemester(semesterId)
+    return items.filter((subject) => subject.semesterId === semesterId).length
+  }
+
   listBySemesters(semesterIds: readonly string[]): Subject[] {
     const ids = new Set(semesterIds)
     return this.findBy((subject) => ids.has(subject.semesterId))
