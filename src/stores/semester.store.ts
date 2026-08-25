@@ -63,13 +63,15 @@ export const useSemesterStore = defineStore('semesters', (): SemesterStore => {
       return { ok: false, error: 'Ya existe un semestre para ese año y periodo.' }
     }
 
-    const created = collection.create({
+    const newSemester: CreateSemesterDTO = {
       name: input.name.trim(),
       year: input.year,
       period: input.period,
       status: input.status,
       userId: input.userId,
-    })
+    }
+
+    const created = collection.create(newSemester)
 
     return { ok: true, semester: created }
   }
@@ -95,12 +97,14 @@ export const useSemesterStore = defineStore('semesters', (): SemesterStore => {
       return { ok: false, error: 'Ya existe otro semestre para ese ano y periodo.' }
     }
 
-    const updated = collection.update(semesterId, {
+    const updatedSemester: UpdateSemesterDTO = {
       name: input.name.trim(),
       year: input.year,
       period: input.period,
       status: input.status,
-    })
+    }
+
+    const updated = collection.update(semesterId, updatedSemester)
 
     if (updated === null) {
       return { ok: false, error: 'No se pudo actualizar el semestre.' }

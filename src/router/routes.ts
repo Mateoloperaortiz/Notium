@@ -8,7 +8,8 @@ export const RouteName = {
   Login: 'login',
   NotFound: 'not-found',
   Dashboard: 'dashboard',
-  Semesters: 'semester',
+  Semesters: 'semesters',
+  Subjects: 'subjects'
 } as const
 
 export type RouteName = (typeof RouteName)[keyof typeof RouteName]
@@ -52,9 +53,15 @@ export const routes: readonly RouteRecordRaw[] = [
     meta: { title: 'Tu Dashboard', inSidebar: true, requiresAuth: true },
   },
   {
-    path: '/semestres',
+    path: '/semesters',
     name: RouteName.Semesters,
     component: () => import('@/views/SemesterCRUDView.vue'),
     meta: { title: 'Tus semestres', inSidebar: true, requiresAuth: true },
+  },
+  {
+    path: '/subjects',
+    name: RouteName.Subjects,
+    component: () => import('@/views/SubjectCRUDView.vue'),
+    meta: { title: 'Tus materias', inSidebar: true, requiresAuth: true },
   },
 ]

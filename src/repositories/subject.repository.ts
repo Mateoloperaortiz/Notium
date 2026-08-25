@@ -10,6 +10,14 @@ class SubjectRepository extends BaseRepository<Subject> {
     return this.findBy((subject) => subject.semesterId === semesterId)
   }
 
+  codeExists(code: string, semesterId: string, exceptSubjectId?: string): boolean {
+    const normalizedCode = code.trim().toLowerCase()
+    return this.listBySemester(semesterId).some(
+      (subject) =>
+        subject.id !== exceptSubjectId && subject.code.trim().toLowerCase() === normalizedCode,
+    )
+  }
+
   countBySemester(semesterId: string, source?: readonly Subject[]): number {
     const items = source ?? this.listBySemester(semesterId)
     return items.filter((subject) => subject.semesterId === semesterId).length
