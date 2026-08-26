@@ -1,6 +1,8 @@
 import type { CreateSemesterDTO, UpdateSemesterDTO } from '@/dto/CreateSemesterDTO'
+import type { CreateGradeDTO, UpdateGradeDTO } from '@/dto/CreateGradeDTO'
 import type { CreateSubjectDTO, UpdateSubjectDTO } from '@/dto/CreateSubjectDTO'
-import { SemesterStatus } from '@/models'
+import { GradeType, SemesterStatus } from '@/models'
+import { env } from '@/config/env'
 
 type SemesterInput = CreateSemesterDTO | UpdateSemesterDTO
 
@@ -51,6 +53,41 @@ export function validateSubjectInput(input: SubjectInput): string | null {
 
   if ('semesterId' in input && input.semesterId.trim() === '') {
     return 'El semestre de la materia es obligatorio.'
+  }
+
+  return null
+}
+
+type GradeInput = CreateGradeDTO | UpdateGradeDTO
+
+/** Devuelve el primer error de validacion de una nota, o null. */
+export function validateGradeInput(input: GradeInput): string | null {
+  if (input.title.trim() === '') {
+    return 'El titulo de la evaluacion es obligatorio.'
+  }
+
+  if (!Number.isFinite(input.value) || input.value < env.minGrade || input.value > env.maxGrade) {
+    return `La nota debe estar entre ${env.minGrade} y ${env.maxGrade}.`
+  }
+
+  if (!Number.isFinite(input.percentage) || input.percentage <= 0 || input.percentage > 100) {
+    return 'El porcentaje debe ser mayor que 0 y menor o igual a 100.'
+  }
+
+  if (!Object.values(GradeType).includes(input.type)) {
+    return 'El tipo de evaluacion no es valido.'
+  }
+
+  if (input.date.trim() === '') {
+    return 'La fecha de la evaluacion es obligatoria.'
+  }
+
+  if (Number.isNaN(new Date(input.date).getTime())) {
+    return 'La fecha de la evaluacion no es valida.'
+  }
+
+  if (input.subjectId.trim() === '') {
+    return 'La materia de la evaluacion es obligatoria.'
   }
 
   return null

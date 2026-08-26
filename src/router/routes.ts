@@ -9,7 +9,8 @@ export const RouteName = {
   NotFound: 'not-found',
   Dashboard: 'dashboard',
   Semesters: 'semesters',
-  Subjects: 'subjects'
+  Subjects: 'subjects',
+  Grades: 'grades',
 } as const
 
 export type RouteName = (typeof RouteName)[keyof typeof RouteName]
@@ -63,5 +64,11 @@ export const routes: readonly RouteRecordRaw[] = [
     name: RouteName.Subjects,
     component: () => import('@/views/SubjectCRUDView.vue'),
     meta: { title: 'Tus materias', inSidebar: true, requiresAuth: true },
+  },
+  {
+    path: '/grades',
+    name: RouteName.Grades,
+    component: () => import('@/views/GradesCRUDView.vue'),
+    meta: { title: 'Tus notas', inSidebar: true, requiresAuth: true },
   },
 ]

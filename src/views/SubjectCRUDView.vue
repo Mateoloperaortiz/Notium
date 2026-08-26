@@ -9,28 +9,28 @@ const creating = ref(false)
 const editing = ref<Subject | null>(null)
 
 function showCreateSubject(): void {
-	 editing.value = null
-	 creating.value = true
+  editing.value = null
+  creating.value = true
 }
 
 function showEditSubject(subject: Subject): void {
-	 editing.value = subject
-	 creating.value = false
+  editing.value = subject
+  creating.value = false
 }
 
 function showOverview(): void {
-	creating.value = false
-	 editing.value = null
+  creating.value = false
+  editing.value = null
 }
 </script>
 
 <template>
-	<EditSubject
-		v-if="creating || editing !== null"
-		:subject="editing"
-		@cancel="showOverview"
-		@created="showOverview"
-		@updated="showOverview"
-	/>
-	<SubjectsOverview v-else @create="showCreateSubject" @edit="showEditSubject" />
+  <EditSubject
+    v-if="creating || editing !== null"
+    :subject="editing"
+    @cancel="showOverview"
+    @created="showOverview"
+    @updated="showOverview"
+  />
+  <SubjectsOverview v-else @create="showCreateSubject" @edit="showEditSubject" />
 </template>

@@ -57,9 +57,10 @@ function submit(): void {
     semesterId: semesterId.value,
   }
 
-  const result = isEditing && props.subject !== null
-    ? subjectStore.updateSubject(props.subject.id, commonData satisfies UpdateSubjectDTO)
-    : subjectStore.createSubject(commonData satisfies CreateSubjectDTO)
+  const result =
+    isEditing && props.subject !== null
+      ? subjectStore.updateSubject(props.subject.id, commonData satisfies UpdateSubjectDTO)
+      : subjectStore.createSubject(commonData satisfies CreateSubjectDTO)
 
   isSubmitting.value = false
   if (!result.ok) {
@@ -79,7 +80,9 @@ function submit(): void {
 <template>
   <div class="space-y-6">
     <div class="flex items-center gap-3">
-      <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-50 text-brand-700">
+      <span
+        class="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-50 text-brand-700"
+      >
         <AppIcon name="book" />
       </span>
       <div>
@@ -87,12 +90,19 @@ function submit(): void {
           {{ isEditing ? 'Editar materia' : 'Nueva materia' }}
         </h1>
         <p class="mt-1 text-sm text-ink-500">
-          {{ isEditing ? 'Actualiza los datos de esta materia.' : 'Registra una materia dentro de uno de tus semestres.' }}
+          {{
+            isEditing
+              ? 'Actualiza los datos de esta materia.'
+              : 'Registra una materia dentro de uno de tus semestres.'
+          }}
         </p>
       </div>
     </div>
 
-    <BaseCard title="Informacion de la materia" description="Completa los datos principales de la materia.">
+    <BaseCard
+      title="Informacion de la materia"
+      description="Completa los datos principales de la materia."
+    >
       <form class="space-y-5" @submit.prevent="submit">
         <div class="grid gap-5 sm:grid-cols-2">
           <BaseField label="Codigo" hint="Por ejemplo: MAT-101" required>
@@ -168,9 +178,20 @@ function submit(): void {
           <BaseButton type="button" variant="secondary" :disabled="isSubmitting" @click="cancel">
             Cancelar
           </BaseButton>
-          <BaseButton type="submit" :disabled="isSubmitting || (!isEditing && userSemesters.length === 0)">
+          <BaseButton
+            type="submit"
+            :disabled="isSubmitting || (!isEditing && userSemesters.length === 0)"
+          >
             <AppIcon :name="isEditing ? 'pencil' : 'plus'" :size="16" />
-            {{ isSubmitting ? (isEditing ? 'Guardando...' : 'Creando...') : (isEditing ? 'Guardar cambios' : 'Crear materia') }}
+            {{
+              isSubmitting
+                ? isEditing
+                  ? 'Guardando...'
+                  : 'Creando...'
+                : isEditing
+                  ? 'Guardar cambios'
+                  : 'Crear materia'
+            }}
           </BaseButton>
         </div>
       </form>
