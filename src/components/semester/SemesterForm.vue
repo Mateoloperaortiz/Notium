@@ -1,6 +1,8 @@
 <script setup lang="ts">
-import type CreateSemesterDTO from '@/dtos/CreateSemesterDTO';
-import type Semester from '@/models/Semester';
+import type CreateSemesterDTO from '@/dtos/CreateSemesterDTO.js';
+import type SemesterValidationErrorsDTO from '@/dtos/SemesterValidationErrorsDTO.js';
+import type Semester from '@/models/Semester.js';
+import { semesterService } from '@/services/SemesterService.js';
 import { computed, reactive, ref, useId, watch } from 'vue';
 
 interface Props {
@@ -8,16 +10,18 @@ interface Props {
   semester?: Semester;
 }
 
-type FormField = 'endDate' | 'name' | 'startDate';
+interface Emits {
+  cancel: [];
+  submit: [semester: CreateSemesterDTO];
+}
+
+type FormField = keyof SemesterValidationErrorsDTO;
 
 const props = withDefaults(defineProps<Props>(), {
   loading: false,
 });
 
-const emit = defineEmits<{
-  cancel: [];
-  submit: [semester: CreateSemesterDTO];
-}>();
+const emit = defineEmits<Emits>();
 
 const fieldOrder: FormField[] = ['name', 'startDate', 'endDate'];
 const formId = useId();
@@ -32,7 +36,7 @@ const nameInputId = `${formId}-name`;
 const startDateInputId = `${formId}-start-date`;
 const submissionAttempted = ref<boolean>(false);
 
-const errors = reactive<Record<FormField, string>>({
+const errors = reactive<SemesterValidationErrorsDTO>({
   endDate: '',
   name: '',
   startDate: '',
@@ -44,76 +48,24 @@ const touched = reactive<Record<FormField, boolean>>({
   startDate: false,
 });
 
-const hasValidationErrors = computed<boolean>(() =>
+const hasValidationErrors = computed<boolean>((): boolean =>
   fieldOrder.some((field: FormField): boolean => errors[field] !== ''),
 );
 
-const isEditing = computed<boolean>(() => props.semester !== undefined);
+const isEditing = computed<boolean>((): boolean => props.semester !== undefined);
 
-const isValidDate = (value: string): boolean => {
-  const datePattern = /^\d{4}-\d{2}-\d{2}$/;
-
-  if (!datePattern.test(value)) {
-    return false;
-  }
-
-  const parsedDate = new Date(`${value}T00:00:00Z`);
-
-  return !Number.isNaN(parsedDate.getTime()) && parsedDate.toISOString().slice(0, 10) === value;
-};
-
-const getNameError = (): string => {
-  const normalizedName = name.value.trim();
-
-  if (normalizedName.length === 0) {
-    return 'Escribe un nombre para identificar el semestre.';
-  }
-
-  if (normalizedName.length > 80) {
-    return 'El nombre no puede superar los 80 caracteres.';
-  }
-
-  return '';
-};
-
-const getStartDateError = (): string => {
-  if (startDate.value.length === 0) {
-    return 'Selecciona la fecha de inicio.';
-  }
-
-  if (!isValidDate(startDate.value)) {
-    return 'Ingresa una fecha de inicio válida.';
-  }
-
-  return '';
-};
-
-const getEndDateError = (): string => {
-  if (endDate.value.length === 0) {
-    return 'Selecciona la fecha de finalización.';
-  }
-
-  if (!isValidDate(endDate.value)) {
-    return 'Ingresa una fecha de finalización válida.';
-  }
-
-  if (isValidDate(startDate.value) && endDate.value <= startDate.value) {
-    return 'La fecha de finalización debe ser posterior a la fecha de inicio.';
-  }
-
-  return '';
-};
+const getSemesterDTO = (): CreateSemesterDTO => ({
+  endDate: endDate.value,
+  name: name.value,
+  startDate: startDate.value,
+});
 
 const validateField = (field: FormField): boolean => {
   touched[field] = true;
 
-  if (field === 'name') {
-    errors.name = getNameError();
-  } else if (field === 'startDate') {
-    errors.startDate = getStartDateError();
-  } else {
-    errors.endDate = getEndDateError();
-  }
+  const semesterDTO: CreateSemesterDTO = getSemesterDTO();
+  const validationErrors: SemesterValidationErrorsDTO = semesterService.validateFields(semesterDTO);
+  errors[field] = validationErrors[field];
 
   return errors[field] === '';
 };
@@ -174,11 +126,7 @@ const handleSubmit = (): void => {
     return;
   }
 
-  const semesterDTO: CreateSemesterDTO = {
-    endDate: endDate.value,
-    name: name.value.trim(),
-    startDate: startDate.value,
-  };
+  const semesterDTO: CreateSemesterDTO = getSemesterDTO();
 
   emit('submit', semesterDTO);
 };
@@ -193,7 +141,7 @@ watch(
     props.semester?.getStartDate() ?? '',
     props.semester?.getEndDate() ?? '',
   ],
-  ([semesterName, semesterStartDate, semesterEndDate]): void => {
+  ([semesterName, semesterStartDate, semesterEndDate]: readonly [string, string, string]): void => {
     name.value = semesterName;
     startDate.value = semesterStartDate;
     endDate.value = semesterEndDate;

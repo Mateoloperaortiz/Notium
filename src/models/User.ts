@@ -1,4 +1,4 @@
-import type Semester from '@/models/Semester';
+import type Semester from '@/models/Semester.js';
 
 export default class User {
   private email: string;

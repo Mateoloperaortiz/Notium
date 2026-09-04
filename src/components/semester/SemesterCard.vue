@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type Semester from '@/models/Semester';
-import DateFormatUtil from '@/utils/DateFormatUtil';
+import type Semester from '@/models/Semester.js';
+import DateFormatUtil from '@/utils/DateFormatUtil.js';
 import { RouterLink } from 'vue-router';
 
 interface Props {
@@ -9,10 +9,12 @@ interface Props {
 
 const props = defineProps<Props>();
 
-const emit = defineEmits<{
+interface Emits {
   delete: [semesterId: string];
   edit: [semester: Semester];
-}>();
+}
+
+const emit = defineEmits<Emits>();
 
 const handleDelete = (): void => {
   emit('delete', props.semester.getId());

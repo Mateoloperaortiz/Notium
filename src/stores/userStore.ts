@@ -1,10 +1,16 @@
+import type User from '@/models/User.js';
+import { userService } from '@/services/UserService.js';
 import { defineStore } from 'pinia';
-import { ref, shallowRef } from 'vue';
+import { ref, type Ref, shallowRef, type ShallowRef } from 'vue';
 
-import type User from '@/models/User';
-import { userService } from '@/services/UserService';
+interface UserStoreSetup {
+  activeUser: ShallowRef<User | undefined>;
+  errorMessage: Ref<string>;
+  initialize(): Promise<void>;
+  isLoading: Ref<boolean>;
+}
 
-export const useUserStore = defineStore('user', () => {
+export const useUserStore = defineStore('user', (): UserStoreSetup => {
   const activeUser = shallowRef<User>();
   const errorMessage = ref<string>('');
   const isLoading = ref<boolean>(false);

@@ -1,4 +1,4 @@
-import type Grade from '@/models/Grade';
+import type Grade from '@/models/Grade.js';
 
 export default class Subject {
   private credits: number;

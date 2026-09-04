@@ -1,5 +1,5 @@
-import { mockSubjects } from '@/data/mockData';
-import type Subject from '@/models/Subject';
+import { mockSubjects } from '@/data/mockData.js';
+import type Subject from '@/models/Subject.js';
 
 export class SubjectService {
   private readonly subjects: Subject[];
@@ -17,6 +17,6 @@ export class SubjectService {
   }
 }
 
-export const subjectService = new SubjectService();
+export const subjectService: SubjectService = new SubjectService();
 
 export default subjectService;

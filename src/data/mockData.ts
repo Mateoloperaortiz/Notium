@@ -1,7 +1,7 @@
-import Grade from '@/models/Grade';
-import Semester from '@/models/Semester';
-import Subject from '@/models/Subject';
-import User from '@/models/User';
+import Grade from '@/models/Grade.js';
+import Semester from '@/models/Semester.js';
+import Subject from '@/models/Subject.js';
+import User from '@/models/User.js';
 
 const softwareEngineeringGrades: Grade[] = [
   new Grade('grade-1', 'Primer parcial', 4.2, 30),

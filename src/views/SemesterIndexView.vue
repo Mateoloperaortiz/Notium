@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, shallowRef } from 'vue';
-
 import SemesterCard from '@/components/semester/SemesterCard.vue';
 import SemesterForm from '@/components/semester/SemesterForm.vue';
-import type CreateSemesterDTO from '@/dtos/CreateSemesterDTO';
-import type Semester from '@/models/Semester';
-import { semesterService } from '@/services/SemesterService';
+import type CreateSemesterDTO from '@/dtos/CreateSemesterDTO.js';
+import type UpdateSemesterDTO from '@/dtos/UpdateSemesterDTO.js';
+import type Semester from '@/models/Semester.js';
+import { semesterService } from '@/services/SemesterService.js';
+import { computed, onMounted, ref, shallowRef } from 'vue';
 
 const semesters = shallowRef<Semester[]>([]);
 const editingSemester = shallowRef<Semester>();
@@ -14,13 +14,13 @@ const isFormOpen = ref<boolean>(false);
 const isLoading = ref<boolean>(true);
 const isSubmitting = ref<boolean>(false);
 
-const semesterCountLabel = computed<string>(() => {
+const semesterCountLabel = computed<string>((): string => {
   const count = semesters.value.length;
 
   return count === 1 ? '1 semestre registrado' : `${count} semestres registrados`;
 });
 
-const formTitle = computed<string>(() =>
+const formTitle = computed<string>((): string =>
   editingSemester.value ? 'Editar semestre' : 'Crear semestre',
 );
 
@@ -62,7 +62,15 @@ async function saveSemester(dto: CreateSemesterDTO): Promise<void> {
 
   try {
     if (editingSemester.value) {
-      const updatedSemester = await semesterService.update(editingSemester.value.getId(), dto);
+      const updateDTO: UpdateSemesterDTO = {
+        endDate: dto.endDate,
+        name: dto.name,
+        startDate: dto.startDate,
+      };
+      const updatedSemester = await semesterService.update(
+        editingSemester.value.getId(),
+        updateDTO,
+      );
 
       if (!updatedSemester) {
         throw new Error('El semestre que intentas editar ya no existe.');

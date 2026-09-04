@@ -1,4 +1,4 @@
-import type Subject from '@/models/Subject';
+import type Subject from '@/models/Subject.js';
 
 export default class Semester {
   private endDate: string;

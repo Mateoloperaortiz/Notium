@@ -1,7 +1,8 @@
-import { mockSemesters } from '@/data/mockData';
-import type CreateSemesterDTO from '@/dtos/CreateSemesterDTO';
-import type UpdateSemesterDTO from '@/dtos/UpdateSemesterDTO';
-import Semester from '@/models/Semester';
+import { mockSemesters } from '@/data/mockData.js';
+import type CreateSemesterDTO from '@/dtos/CreateSemesterDTO.js';
+import type SemesterValidationErrorsDTO from '@/dtos/SemesterValidationErrorsDTO.js';
+import type UpdateSemesterDTO from '@/dtos/UpdateSemesterDTO.js';
+import Semester from '@/models/Semester.js';
 
 const generateSemesterId = (): string => globalThis.crypto.randomUUID();
 
@@ -26,7 +27,7 @@ export class SemesterService {
   }
 
   public async create(dto: CreateSemesterDTO): Promise<Semester> {
-    const validatedDto = this.validate(dto);
+    const validatedDto: CreateSemesterDTO = this.validate(dto);
     const semester = new Semester(
       this.generateId(),
       validatedDto.name,
@@ -46,11 +47,12 @@ export class SemesterService {
       return undefined;
     }
 
-    const validatedDto = this.validate({
+    const mergedDto: CreateSemesterDTO = {
       endDate: dto.endDate ?? semester.getEndDate(),
       name: dto.name ?? semester.getName(),
       startDate: dto.startDate ?? semester.getStartDate(),
-    });
+    };
+    const validatedDto: CreateSemesterDTO = this.validate(mergedDto);
 
     semester.setEndDate(validatedDto.endDate);
     semester.setName(validatedDto.name);
@@ -73,6 +75,37 @@ export class SemesterService {
     return true;
   }
 
+  public validateFields(dto: CreateSemesterDTO): SemesterValidationErrorsDTO {
+    const errors: SemesterValidationErrorsDTO = {
+      endDate: '',
+      name: '',
+      startDate: '',
+    };
+    const name = dto.name.trim();
+
+    if (name.length === 0) {
+      errors.name = 'Escribe un nombre para identificar el semestre.';
+    } else if (name.length > 80) {
+      errors.name = 'El nombre no puede superar los 80 caracteres.';
+    }
+
+    if (dto.startDate.length === 0) {
+      errors.startDate = 'Selecciona la fecha de inicio.';
+    } else if (!this.isValidIsoDate(dto.startDate)) {
+      errors.startDate = 'Ingresa una fecha de inicio válida.';
+    }
+
+    if (dto.endDate.length === 0) {
+      errors.endDate = 'Selecciona la fecha de finalización.';
+    } else if (!this.isValidIsoDate(dto.endDate)) {
+      errors.endDate = 'Ingresa una fecha de finalización válida.';
+    } else if (errors.startDate === '' && dto.endDate <= dto.startDate) {
+      errors.endDate = 'La fecha de finalización debe ser posterior a la fecha de inicio.';
+    }
+
+    return errors;
+  }
+
   private isValidIsoDate(value: string): boolean {
     const normalizedDate = value.slice(0, 10);
     const date = new Date(`${normalizedDate}T00:00:00Z`);
@@ -85,32 +118,21 @@ export class SemesterService {
   }
 
   private validate(dto: CreateSemesterDTO): CreateSemesterDTO {
-    const name = dto.name.trim();
+    const errors: SemesterValidationErrorsDTO = this.validateFields(dto);
+    const firstError = errors.name || errors.startDate || errors.endDate;
 
-    if (name.length === 0) {
-      throw new Error('El semestre debe tener un nombre.');
-    }
-
-    if (name.length > 80) {
-      throw new Error('El nombre del semestre no puede superar los 80 caracteres.');
-    }
-
-    if (!this.isValidIsoDate(dto.startDate) || !this.isValidIsoDate(dto.endDate)) {
-      throw new Error('Las fechas del semestre no son válidas.');
-    }
-
-    if (dto.endDate <= dto.startDate) {
-      throw new Error('La fecha de finalización debe ser posterior a la fecha de inicio.');
+    if (firstError !== '') {
+      throw new Error(firstError);
     }
 
     return {
       endDate: dto.endDate,
-      name,
+      name: dto.name.trim(),
       startDate: dto.startDate,
     };
   }
 }
 
-export const semesterService = new SemesterService();
+export const semesterService: SemesterService = new SemesterService();
 
 export default semesterService;

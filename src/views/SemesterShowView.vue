@@ -1,10 +1,9 @@
 <script setup lang="ts">
+import type Semester from '@/models/Semester.js';
+import { semesterService } from '@/services/SemesterService.js';
+import DateFormatUtil from '@/utils/DateFormatUtil.js';
 import { computed, ref, shallowRef, watch } from 'vue';
 import { RouterLink } from 'vue-router';
-
-import type Semester from '@/models/Semester';
-import { semesterService } from '@/services/SemesterService';
-import DateFormatUtil from '@/utils/DateFormatUtil';
 
 interface Props {
   id: string;
@@ -16,7 +15,7 @@ const semester = shallowRef<Semester>();
 const errorMessage = ref<string>('');
 const isLoading = ref<boolean>(true);
 
-const subjectCount = computed<number>(() => semester.value?.getSubjects().length ?? 0);
+const subjectCount = computed<number>((): number => semester.value?.getSubjects().length ?? 0);
 
 async function loadSemester(semesterId: string): Promise<void> {
   isLoading.value = true;
@@ -34,7 +33,7 @@ async function loadSemester(semesterId: string): Promise<void> {
 }
 
 watch(
-  () => props.id,
+  (): string => props.id,
   (semesterId: string): void => {
     void loadSemester(semesterId);
   },

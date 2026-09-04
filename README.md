@@ -15,8 +15,7 @@ dashboard quedan preparados para que el equipo los desarrolle después con las m
 ```bash
 npm install
 npm run dev
-npm run lint
-npm run build
+npm run check
 ```
 
 Para comprobar el formato sin modificar archivos:
@@ -24,6 +23,25 @@ Para comprobar el formato sin modificar archivos:
 ```bash
 npm run format:check
 ```
+
+## Cumplimiento de AGENTS.md
+
+Antes de entregar cambios, ejecutar `npm run check`: ESLint sin advertencias, Prettier,
+verificación de tipos y compilación de producción. El workflow `.github/workflows/check.yml`
+ejecuta el mismo comando en los pushes y pull requests cuando estos archivos estén en GitHub.
+
+ESLint exige tipos explícitos en parámetros, retornos y atributos, evita `any`, usa `interface`
+para objetos, ordena imports por ruta y comprueba convenciones de Vue, Setup Stores y separación
+de la UI respecto a infraestructura. Las variables locales simples pueden mantener inferencia.
+Los miembros de cada import también se ordenan alfabéticamente, sin distinguir mayúsculas.
+
+Los módulos TypeScript locales se importan con `.js`; los recursos conservan `.vue`, `.css`, etc.
+Esta convención es compatible con Vite y mantiene consistencia con ESM. La obligación de `.js`
+en `AGENTS.md` está formulada específicamente para proyectos Node con ESM.
+
+Los controles automáticos complementan la revisión del checklist de `AGENTS.md`: SRP,
+responsabilidades de negocio, contratos DTO y facilidad de mocking requieren revisar el diseño.
+Consulta el [resultado de la auditoría](docs/agents-audit.md) para conocer su alcance.
 
 ## Arquitectura
 

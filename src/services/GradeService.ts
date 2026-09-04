@@ -1,5 +1,5 @@
-import { mockGrades } from '@/data/mockData';
-import type Grade from '@/models/Grade';
+import { mockGrades } from '@/data/mockData.js';
+import type Grade from '@/models/Grade.js';
 
 export class GradeService {
   private readonly grades: Grade[];
@@ -17,6 +17,6 @@ export class GradeService {
   }
 }
 
-export const gradeService = new GradeService();
+export const gradeService: GradeService = new GradeService();
 
 export default gradeService;

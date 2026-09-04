@@ -1,5 +1,5 @@
-import { mockUsers } from '@/data/mockData';
-import type User from '@/models/User';
+import { mockUsers } from '@/data/mockData.js';
+import type User from '@/models/User.js';
 
 export class UserService {
   private readonly currentUserId: string | undefined;
@@ -30,6 +30,6 @@ export class UserService {
   }
 }
 
-export const userService = new UserService();
+export const userService: UserService = new UserService();
 
 export default userService;

@@ -1,13 +1,13 @@
 <script setup lang="ts">
+import { useUserStore } from '@/stores/userStore.js';
 import { storeToRefs } from 'pinia';
 import { computed, onMounted } from 'vue';
-
-import { useUserStore } from '@/stores/userStore';
+import { RouterLink, RouterView } from 'vue-router';
 
 const userStore = useUserStore();
 const { activeUser } = storeToRefs(userStore);
 
-const userInitials = computed<string>(() => {
+const userInitials = computed<string>((): string => {
   const name = activeUser.value?.getName() ?? 'Usuario';
 
   return name
