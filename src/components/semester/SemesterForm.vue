@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import type CreateSemesterDTO from '@/dtos/CreateSemesterDTO.js';
-import type SemesterValidationErrorsDTO from '@/dtos/SemesterValidationErrorsDTO.js';
-import type Semester from '@/models/Semester.js';
-import { semesterService } from '@/services/SemesterService.js';
+import type { CreateSemesterDTO, SemesterValidationErrorsDTO } from '@/dtos/SemesterDTOs.js';
+import { StatusSemester } from '@/interfaces/SemesterInterface.js';
+import type { SemesterInterface } from '@/interfaces/SemesterInterface.js';
+import { SemesterService } from '@/services/SemesterService.js';
 import { computed, reactive, ref, useId, watch } from 'vue';
 
 interface Props {
   loading?: boolean;
-  semester?: Semester;
+  semester?: SemesterInterface;
 }
 
 interface Emits {
@@ -23,29 +23,31 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<Emits>();
 
-const fieldOrder: FormField[] = ['name', 'startDate', 'endDate'];
+const fieldOrder: FormField[] = ['name', 'year', 'period', 'status'];
 const formId = useId();
-const endDateInput = ref<HTMLInputElement | null>(null);
 const name = ref<string>('');
 const nameInput = ref<HTMLInputElement | null>(null);
-const startDate = ref<string>('');
-const startDateInput = ref<HTMLInputElement | null>(null);
-const endDate = ref<string>('');
-const endDateInputId = `${formId}-end-date`;
+const year = ref<number>(new Date().getFullYear());
+const period = ref<number>(1);
+const status = ref<StatusSemester>(StatusSemester.inComing);
 const nameInputId = `${formId}-name`;
-const startDateInputId = `${formId}-start-date`;
+const yearInputId = `${formId}-year`;
+const periodInputId = `${formId}-period`;
+const statusInputId = `${formId}-status`;
 const submissionAttempted = ref<boolean>(false);
 
 const errors = reactive<SemesterValidationErrorsDTO>({
-  endDate: '',
   name: '',
-  startDate: '',
+  period: '',
+  status: '',
+  year: '',
 });
 
 const touched = reactive<Record<FormField, boolean>>({
-  endDate: false,
   name: false,
-  startDate: false,
+  period: false,
+  status: false,
+  year: false,
 });
 
 const hasValidationErrors = computed<boolean>((): boolean =>
@@ -55,16 +57,17 @@ const hasValidationErrors = computed<boolean>((): boolean =>
 const isEditing = computed<boolean>((): boolean => props.semester !== undefined);
 
 const getSemesterDTO = (): CreateSemesterDTO => ({
-  endDate: endDate.value,
   name: name.value,
-  startDate: startDate.value,
+  period: period.value,
+  status: status.value,
+  year: year.value,
 });
 
 const validateField = (field: FormField): boolean => {
   touched[field] = true;
 
   const semesterDTO: CreateSemesterDTO = getSemesterDTO();
-  const validationErrors: SemesterValidationErrorsDTO = semesterService.validateFields(semesterDTO);
+  const validationErrors: SemesterValidationErrorsDTO = SemesterService.validateFields(semesterDTO);
   errors[field] = validationErrors[field];
 
   return errors[field] === '';
@@ -73,14 +76,6 @@ const validateField = (field: FormField): boolean => {
 const revalidateField = (field: FormField): void => {
   if (touched[field] || submissionAttempted.value) {
     validateField(field);
-  }
-};
-
-const handleStartDateInput = (): void => {
-  revalidateField('startDate');
-
-  if (touched.endDate || submissionAttempted.value) {
-    validateField('endDate');
   }
 };
 
@@ -93,10 +88,6 @@ const validateForm = (): boolean => {
 const focusField = (field: FormField): void => {
   if (field === 'name') {
     nameInput.value?.focus();
-  } else if (field === 'startDate') {
-    startDateInput.value?.focus();
-  } else {
-    endDateInput.value?.focus();
   }
 };
 
@@ -136,15 +127,22 @@ const handleCancel = (): void => {
 };
 
 watch(
-  (): readonly [string, string, string] => [
-    props.semester?.getName() ?? '',
-    props.semester?.getStartDate() ?? '',
-    props.semester?.getEndDate() ?? '',
+  (): readonly [string, number, number, StatusSemester] => [
+    props.semester?.name ?? '',
+    props.semester?.year ?? new Date().getFullYear(),
+    props.semester?.period ?? 1,
+    props.semester?.status ?? StatusSemester.inComing,
   ],
-  ([semesterName, semesterStartDate, semesterEndDate]: readonly [string, string, string]): void => {
+  ([semesterName, semesterYear, semesterPeriod, semesterStatus]: readonly [
+    string,
+    number,
+    number,
+    StatusSemester,
+  ]): void => {
     name.value = semesterName;
-    startDate.value = semesterStartDate;
-    endDate.value = semesterEndDate;
+    year.value = semesterYear;
+    period.value = semesterPeriod;
+    status.value = semesterStatus;
     resetValidation();
   },
   { immediate: true },
@@ -208,29 +206,29 @@ watch(
 
     <div class="semester-form__date-grid">
       <div class="semester-form__field">
-        <label :for="startDateInputId">Fecha de inicio</label>
-        <div class="semester-form__input-wrap" :class="{ 'is-invalid': errors.startDate }">
+        <label :for="yearInputId">Año</label>
+        <div class="semester-form__input-wrap" :class="{ 'is-invalid': errors.year }">
           <input
-            :id="startDateInputId"
-            ref="startDateInput"
-            v-model="startDate"
-            type="date"
-            name="semester-start-date"
+            :id="yearInputId"
+            v-model.number="year"
+            type="number"
+            name="semester-year"
+            min="2000"
             required
-            :aria-describedby="errors.startDate ? `${startDateInputId}-error` : undefined"
-            :aria-invalid="errors.startDate !== ''"
+            :aria-describedby="errors.year ? `${yearInputId}-error` : undefined"
+            :aria-invalid="errors.year !== ''"
             :disabled="loading"
-            @blur="validateField('startDate')"
-            @input="handleStartDateInput"
+            @blur="validateField('year')"
+            @input="revalidateField('year')"
           />
         </div>
         <p
-          v-if="errors.startDate"
-          :id="`${startDateInputId}-error`"
+          v-if="errors.year"
+          :id="`${yearInputId}-error`"
           class="semester-form__error"
           role="alert"
         >
-          {{ errors.startDate }}
+          {{ errors.year }}
         </p>
       </div>
 
@@ -241,32 +239,61 @@ watch(
       </div>
 
       <div class="semester-form__field">
-        <label :for="endDateInputId">Fecha de finalización</label>
-        <div class="semester-form__input-wrap" :class="{ 'is-invalid': errors.endDate }">
-          <input
-            :id="endDateInputId"
-            ref="endDateInput"
-            v-model="endDate"
-            type="date"
-            name="semester-end-date"
+        <label :for="periodInputId">Periodo</label>
+        <div class="semester-form__input-wrap" :class="{ 'is-invalid': errors.period }">
+          <select
+            :id="periodInputId"
+            v-model.number="period"
+            name="semester-period"
             required
-            :min="startDate || undefined"
-            :aria-describedby="errors.endDate ? `${endDateInputId}-error` : undefined"
-            :aria-invalid="errors.endDate !== ''"
+            :aria-describedby="errors.period ? `${periodInputId}-error` : undefined"
+            :aria-invalid="errors.period !== ''"
             :disabled="loading"
-            @blur="validateField('endDate')"
-            @input="revalidateField('endDate')"
-          />
+            @blur="validateField('period')"
+            @change="revalidateField('period')"
+          >
+            <option :value="1">1</option>
+            <option :value="2">2</option>
+          </select>
         </div>
         <p
-          v-if="errors.endDate"
-          :id="`${endDateInputId}-error`"
+          v-if="errors.period"
+          :id="`${periodInputId}-error`"
           class="semester-form__error"
           role="alert"
         >
-          {{ errors.endDate }}
+          {{ errors.period }}
         </p>
       </div>
+    </div>
+
+    <div class="semester-form__field">
+      <label :for="statusInputId">Estado</label>
+      <div class="semester-form__input-wrap" :class="{ 'is-invalid': errors.status }">
+        <select
+          :id="statusInputId"
+          v-model="status"
+          name="semester-status"
+          required
+          :aria-describedby="errors.status ? `${statusInputId}-error` : undefined"
+          :aria-invalid="errors.status !== ''"
+          :disabled="loading"
+          @blur="validateField('status')"
+          @change="revalidateField('status')"
+        >
+          <option :value="StatusSemester.inComing">{{ StatusSemester.inComing }}</option>
+          <option :value="StatusSemester.inProgress">{{ StatusSemester.inProgress }}</option>
+          <option :value="StatusSemester.ended">{{ StatusSemester.ended }}</option>
+        </select>
+      </div>
+      <p
+        v-if="errors.status"
+        :id="`${statusInputId}-error`"
+        class="semester-form__error"
+        role="alert"
+      >
+        {{ errors.status }}
+      </p>
     </div>
 
     <div class="semester-form__note">

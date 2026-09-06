@@ -1,22 +1,14 @@
-import { mockSubjects } from '@/data/mockData.js';
-import type Subject from '@/models/Subject.js';
+import type { SubjectInterface } from '@/interfaces/SubjectInterface.js';
+import { useSubjectStore } from '@/stores/SubjectStore.js';
 
 export class SubjectService {
-  private readonly subjects: Subject[];
-
-  public constructor(subjects: Subject[] = mockSubjects) {
-    this.subjects = subjects;
+  public static async findAll(): Promise<SubjectInterface[]> {
+    return [...useSubjectStore().subject];
   }
 
-  public async findAll(): Promise<Subject[]> {
-    return [...this.subjects];
-  }
-
-  public async findById(id: string): Promise<Subject | undefined> {
-    return this.subjects.find((subject: Subject): boolean => subject.getId() === id);
+  public static async findById(id: string): Promise<SubjectInterface | undefined> {
+    return useSubjectStore().subject.find(
+      (subject: SubjectInterface): boolean => subject.id === id,
+    );
   }
 }
-
-export const subjectService: SubjectService = new SubjectService();
-
-export default subjectService;

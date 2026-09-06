@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import { useUserStore } from '@/stores/userStore.js';
+import { useAuthStore } from '@/stores/AuthStore.js';
 import { storeToRefs } from 'pinia';
-import { computed, onMounted } from 'vue';
+import { computed } from 'vue';
 import { RouterLink, RouterView } from 'vue-router';
 
-const userStore = useUserStore();
-const { activeUser } = storeToRefs(userStore);
+const authStore = useAuthStore();
+const { currentUser } = storeToRefs(authStore);
 
 const userInitials = computed<string>((): string => {
-  const name = activeUser.value?.getName() ?? 'Usuario';
+  const name = currentUser.value?.name ?? 'Usuario';
 
   return name
     .split(' ')
@@ -16,10 +16,6 @@ const userInitials = computed<string>((): string => {
     .slice(0, 2)
     .map((part: string): string => part.charAt(0).toUpperCase())
     .join('');
-});
-
-onMounted((): void => {
-  void userStore.initialize();
 });
 </script>
 
@@ -43,11 +39,11 @@ onMounted((): void => {
           </RouterLink>
         </nav>
 
-        <div class="user-chip" :title="activeUser?.getEmail() ?? 'Usuario activo'">
+        <div class="user-chip" :title="currentUser?.email ?? 'Usuario activo'">
           <span class="user-chip__avatar" aria-hidden="true">{{ userInitials }}</span>
           <span class="user-chip__content">
             <span class="user-chip__eyebrow">Sesión académica</span>
-            <span class="user-chip__name">{{ activeUser?.getName() ?? 'Cargando…' }}</span>
+            <span class="user-chip__name">{{ currentUser?.name ?? 'Cargando…' }}</span>
           </span>
         </div>
       </div>

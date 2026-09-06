@@ -1,22 +1,12 @@
-import { mockGrades } from '@/data/mockData.js';
-import type Grade from '@/models/Grade.js';
+import type { GradeInterface } from '@/interfaces/GradeInterface.js';
+import { useGradeStore } from '@/stores/GradeStore.js';
 
 export class GradeService {
-  private readonly grades: Grade[];
-
-  public constructor(grades: Grade[] = mockGrades) {
-    this.grades = grades;
+  public static async findAll(): Promise<GradeInterface[]> {
+    return [...useGradeStore().grade];
   }
 
-  public async findAll(): Promise<Grade[]> {
-    return [...this.grades];
-  }
-
-  public async findById(id: string): Promise<Grade | undefined> {
-    return this.grades.find((grade: Grade): boolean => grade.getId() === id);
+  public static async findById(id: string): Promise<GradeInterface | undefined> {
+    return useGradeStore().grade.find((grade: GradeInterface): boolean => grade.id === id);
   }
 }
-
-export const gradeService: GradeService = new GradeService();
-
-export default gradeService;

@@ -1,35 +1,17 @@
-import { mockUsers } from '@/data/mockData.js';
-import type User from '@/models/User.js';
+import type { UserInterface } from '@/interfaces/UserInterface.js';
+import { useAuthStore } from '@/stores/AuthStore.js';
+import { useUserStore } from '@/stores/UserStore.js';
 
 export class UserService {
-  private readonly currentUserId: string | undefined;
-  private readonly users: User[];
-
-  public constructor(
-    users: User[] = mockUsers,
-    currentUserId: string | undefined = users[0]?.getId(),
-  ) {
-    this.users = users;
-    this.currentUserId = currentUserId;
+  public static async findAll(): Promise<UserInterface[]> {
+    return [...useUserStore().users];
   }
 
-  public async findAll(): Promise<User[]> {
-    return [...this.users];
+  public static async findById(id: string): Promise<UserInterface | undefined> {
+    return useUserStore().users.find((user: UserInterface): boolean => user.id === id);
   }
 
-  public async findById(id: string): Promise<User | undefined> {
-    return this.users.find((user: User): boolean => user.getId() === id);
-  }
-
-  public async findCurrent(): Promise<User | undefined> {
-    if (this.currentUserId === undefined) {
-      return undefined;
-    }
-
-    return this.findById(this.currentUserId);
+  public static async findCurrent(): Promise<UserInterface | undefined> {
+    return useAuthStore().currentUser ?? undefined;
   }
 }
-
-export const userService: UserService = new UserService();
-
-export default userService;

@@ -1,23 +1,22 @@
 <script setup lang="ts">
-import type Semester from '@/models/Semester.js';
-import DateFormatUtil from '@/utils/DateFormatUtil.js';
+import type { SemesterInterface } from '@/interfaces/SemesterInterface.js';
 import { RouterLink } from 'vue-router';
 
 interface Props {
-  semester: Semester;
+  semester: SemesterInterface;
 }
 
 const props = defineProps<Props>();
 
 interface Emits {
   delete: [semesterId: string];
-  edit: [semester: Semester];
+  edit: [semester: SemesterInterface];
 }
 
 const emit = defineEmits<Emits>();
 
 const handleDelete = (): void => {
-  emit('delete', props.semester.getId());
+  emit('delete', props.semester.id);
 };
 
 const handleEdit = (): void => {
@@ -41,7 +40,7 @@ const handleEdit = (): void => {
 
         <div>
           <p class="semester-card__eyebrow">Periodo académico</p>
-          <h2 class="semester-card__title">{{ semester.getName() }}</h2>
+          <h2 class="semester-card__title">{{ semester.name }}</h2>
         </div>
       </div>
 
@@ -51,14 +50,10 @@ const handleEdit = (): void => {
       </span>
     </header>
 
-    <dl class="semester-card__dates" aria-label="Fechas del semestre">
+    <dl class="semester-card__dates" aria-label="Información del semestre">
       <div class="semester-card__date">
-        <dt>Inicio</dt>
-        <dd>
-          <time :datetime="semester.getStartDate()">
-            {{ DateFormatUtil.formatDate(semester.getStartDate()) }}
-          </time>
-        </dd>
+        <dt>Año</dt>
+        <dd>{{ semester.year }}</dd>
       </div>
 
       <div class="semester-card__date-divider" aria-hidden="true">
@@ -68,20 +63,16 @@ const handleEdit = (): void => {
       </div>
 
       <div class="semester-card__date">
-        <dt>Finalización</dt>
-        <dd>
-          <time :datetime="semester.getEndDate()">
-            {{ DateFormatUtil.formatDate(semester.getEndDate()) }}
-          </time>
-        </dd>
+        <dt>Periodo</dt>
+        <dd>{{ semester.period }}</dd>
       </div>
     </dl>
 
     <footer class="semester-card__actions">
       <RouterLink
         class="semester-card__action semester-card__action--primary"
-        :to="{ name: 'semester-show', params: { id: semester.getId() } }"
-        :aria-label="`Ver detalle de ${semester.getName()}`"
+        :to="{ name: 'semester-show', params: { id: semester.id } }"
+        :aria-label="`Ver detalle de ${semester.name}`"
       >
         Ver detalle
         <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
@@ -93,7 +84,7 @@ const handleEdit = (): void => {
         <button
           class="semester-card__icon-button"
           type="button"
-          :aria-label="`Editar ${semester.getName()}`"
+          :aria-label="`Editar ${semester.name}`"
           @click="handleEdit"
         >
           <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
@@ -104,7 +95,7 @@ const handleEdit = (): void => {
         <button
           class="semester-card__icon-button semester-card__icon-button--danger"
           type="button"
-          :aria-label="`Eliminar ${semester.getName()}`"
+          :aria-label="`Eliminar ${semester.name}`"
           @click="handleDelete"
         >
           <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">

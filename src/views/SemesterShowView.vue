@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import type Semester from '@/models/Semester.js';
-import { semesterService } from '@/services/SemesterService.js';
-import DateFormatUtil from '@/utils/DateFormatUtil.js';
+import type { SemesterInterface } from '@/interfaces/SemesterInterface.js';
+import { SemesterService } from '@/services/SemesterService.js';
 import { computed, ref, shallowRef, watch } from 'vue';
 import { RouterLink } from 'vue-router';
 
@@ -11,18 +10,18 @@ interface Props {
 
 const props = defineProps<Props>();
 
-const semester = shallowRef<Semester>();
+const semester = shallowRef<SemesterInterface>();
 const errorMessage = ref<string>('');
 const isLoading = ref<boolean>(true);
 
-const subjectCount = computed<number>((): number => semester.value?.getSubjects().length ?? 0);
+const subjectCount = computed<number>((): number => semester.value?.subjects.length ?? 0);
 
 async function loadSemester(semesterId: string): Promise<void> {
   isLoading.value = true;
   errorMessage.value = '';
 
   try {
-    semester.value = await semesterService.findById(semesterId);
+    semester.value = await SemesterService.findById(semesterId);
   } catch (error: unknown) {
     errorMessage.value =
       error instanceof Error ? error.message : 'No fue posible cargar el semestre.';
@@ -58,9 +57,9 @@ watch(
       <header class="semester-detail__hero">
         <div>
           <p class="eyebrow">Detalle del semestre</p>
-          <h1 id="semester-detail-title" class="page-title">{{ semester.getName() }}</h1>
+          <h1 id="semester-detail-title" class="page-title">{{ semester.name }}</h1>
           <p class="semester-detail__dates">
-            {{ DateFormatUtil.formatRange(semester.getStartDate(), semester.getEndDate()) }}
+            Año {{ semester.year }} · Periodo {{ semester.period }}
           </p>
         </div>
 

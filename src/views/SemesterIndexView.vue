@@ -1,14 +1,13 @@
 <script setup lang="ts">
 import SemesterCard from '@/components/semester/SemesterCard.vue';
 import SemesterForm from '@/components/semester/SemesterForm.vue';
-import type CreateSemesterDTO from '@/dtos/CreateSemesterDTO.js';
-import type UpdateSemesterDTO from '@/dtos/UpdateSemesterDTO.js';
-import type Semester from '@/models/Semester.js';
-import { semesterService } from '@/services/SemesterService.js';
+import type { CreateSemesterDTO, UpdateSemesterDTO } from '@/dtos/SemesterDTOs.js';
+import type { SemesterInterface } from '@/interfaces/SemesterInterface.js';
+import { SemesterService } from '@/services/SemesterService.js';
 import { computed, onMounted, ref, shallowRef } from 'vue';
 
-const semesters = shallowRef<Semester[]>([]);
-const editingSemester = shallowRef<Semester>();
+const semesters = shallowRef<SemesterInterface[]>([]);
+const editingSemester = shallowRef<SemesterInterface>();
 const errorMessage = ref<string>('');
 const isFormOpen = ref<boolean>(false);
 const isLoading = ref<boolean>(true);
@@ -33,7 +32,7 @@ async function loadSemesters(): Promise<void> {
   errorMessage.value = '';
 
   try {
-    semesters.value = await semesterService.findAll();
+    semesters.value = await SemesterService.findAll();
   } catch (error: unknown) {
     errorMessage.value = getErrorMessage(error);
   } finally {
@@ -46,7 +45,7 @@ function openCreateForm(): void {
   isFormOpen.value = true;
 }
 
-function openEditForm(semester: Semester): void {
+function openEditForm(semester: SemesterInterface): void {
   editingSemester.value = semester;
   isFormOpen.value = true;
 }
@@ -63,20 +62,18 @@ async function saveSemester(dto: CreateSemesterDTO): Promise<void> {
   try {
     if (editingSemester.value) {
       const updateDTO: UpdateSemesterDTO = {
-        endDate: dto.endDate,
         name: dto.name,
-        startDate: dto.startDate,
+        period: dto.period,
+        status: dto.status,
+        year: dto.year,
       };
-      const updatedSemester = await semesterService.update(
-        editingSemester.value.getId(),
-        updateDTO,
-      );
+      const updatedSemester = await SemesterService.update(editingSemester.value.id, updateDTO);
 
       if (!updatedSemester) {
         throw new Error('El semestre que intentas editar ya no existe.');
       }
     } else {
-      await semesterService.create(dto);
+      await SemesterService.create(dto);
     }
 
     await loadSemesters();
@@ -90,9 +87,9 @@ async function saveSemester(dto: CreateSemesterDTO): Promise<void> {
 
 async function deleteSemester(semesterId: string): Promise<void> {
   const semester = semesters.value.find(
-    (currentSemester: Semester): boolean => currentSemester.getId() === semesterId,
+    (currentSemester: SemesterInterface): boolean => currentSemester.id === semesterId,
   );
-  const semesterName = semester?.getName() ?? 'este semestre';
+  const semesterName = semester?.name ?? 'este semestre';
 
   if (!window.confirm(`¿Eliminar ${semesterName}? Esta acción no se puede deshacer.`)) {
     return;
@@ -101,7 +98,7 @@ async function deleteSemester(semesterId: string): Promise<void> {
   errorMessage.value = '';
 
   try {
-    const wasDeleted = await semesterService.delete(semesterId);
+    const wasDeleted = await SemesterService.delete(semesterId);
 
     if (!wasDeleted) {
       throw new Error('El semestre que intentas eliminar ya no existe.');
@@ -109,7 +106,7 @@ async function deleteSemester(semesterId: string): Promise<void> {
 
     await loadSemesters();
 
-    if (editingSemester.value?.getId() === semesterId) {
+    if (editingSemester.value?.id === semesterId) {
       closeForm();
     }
   } catch (error: unknown) {
@@ -158,7 +155,7 @@ onMounted(loadSemesters);
       </div>
 
       <SemesterForm
-        :key="editingSemester?.getId() ?? 'new-semester'"
+        :key="editingSemester?.id ?? 'new-semester'"
         :loading="isSubmitting"
         :semester="editingSemester"
         @cancel="closeForm"
@@ -178,7 +175,7 @@ onMounted(loadSemesters);
     <div v-else-if="semesters.length" class="semester-grid">
       <SemesterCard
         v-for="semester in semesters"
-        :key="semester.getId()"
+        :key="semester.id"
         :semester="semester"
         @delete="deleteSemester"
         @edit="openEditForm"
