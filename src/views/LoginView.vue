@@ -22,7 +22,8 @@ const submitLogin = (): void => {
     return;
   }
 
-  const redirectPath = typeof route.query.redirect === 'string' ? route.query.redirect : '/';
+  const redirectPath =
+    typeof route.query.redirect === 'string' ? route.query.redirect : '/dashboard';
   void router.push(redirectPath);
 };
 </script>

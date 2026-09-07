@@ -1,6 +1,7 @@
 // internal imports
 import { configureRouterGuards } from './accessControl.js';
 import DashboardView from '@/views/DashboardView.vue';
+import HomeView from '@/views/HomeView.vue';
 import LoginView from '@/views/LoginView.vue';
 import NotFoundView from '@/views/NotFoundView.vue';
 import SemesterIndexView from '@/views/SemesterIndexView.vue';
@@ -13,8 +14,14 @@ const router = createRouter({
   routes: [
     {
       path: '/',
+      name: 'home',
+      component: HomeView,
+    },
+    {
+      path: '/dashboard',
       name: 'dashboard',
       component: DashboardView,
+      meta: { requiresAuth: true },
     },
     {
       path: '/login',

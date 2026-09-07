@@ -8,7 +8,7 @@ import { RouterLink } from 'vue-router';
     <p class="eyebrow">Página no encontrada</p>
     <h1 class="page-title">Parece que esta nota se perdió.</h1>
     <p class="page-description">La dirección no existe, pero puedes volver a un lugar conocido.</p>
-    <RouterLink class="button button--primary" :to="{ name: 'dashboard' }">Ir al inicio</RouterLink>
+    <RouterLink class="button button--primary" :to="{ name: 'home' }">Ir al inicio</RouterLink>
   </section>
 </template>
 

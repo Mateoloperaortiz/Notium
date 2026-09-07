@@ -25,14 +25,15 @@ const userInitials = computed<string>((): string => {
 
     <header class="app-header">
       <div class="app-header__content">
-        <RouterLink class="brand" :to="{ name: 'dashboard' }" aria-label="Ir al inicio de Notium">
+        <RouterLink class="brand" :to="{ name: 'home' }" aria-label="Ir al inicio de Notium">
           <span class="brand__mark" aria-hidden="true">N</span>
           <span class="brand__wordmark">Notium</span>
         </RouterLink>
 
         <nav class="main-navigation" aria-label="Navegación principal">
-          <RouterLink class="main-navigation__link" :to="{ name: 'dashboard' }">
-            Inicio
+          <RouterLink class="main-navigation__link" :to="{ name: 'home' }"> Inicio </RouterLink>
+          <RouterLink v-if="currentUser" class="main-navigation__link" :to="{ name: 'dashboard' }">
+            Mi dashboard
           </RouterLink>
           <RouterLink class="main-navigation__link" :to="{ name: 'semester-index' }">
             Semestres
