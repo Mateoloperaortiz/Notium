@@ -37,9 +37,12 @@ const userInitials = computed<string>((): string => {
           <RouterLink class="main-navigation__link" :to="{ name: 'semester-index' }">
             Semestres
           </RouterLink>
+          <RouterLink v-if="!currentUser" class="main-navigation__link" :to="{ name: 'login' }">
+            Iniciar sesión
+          </RouterLink>
         </nav>
 
-        <div class="user-chip" :title="currentUser?.email ?? 'Usuario activo'">
+        <div v-if="currentUser" class="user-chip" :title="currentUser.email">
           <span class="user-chip__avatar" aria-hidden="true">{{ userInitials }}</span>
           <span class="user-chip__content">
             <span class="user-chip__eyebrow">Sesión académica</span>

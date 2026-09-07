@@ -1,6 +1,7 @@
 // internal imports
 import { configureRouterGuards } from './accessControl.js';
 import DashboardView from '@/views/DashboardView.vue';
+import LoginView from '@/views/LoginView.vue';
 import NotFoundView from '@/views/NotFoundView.vue';
 import SemesterIndexView from '@/views/SemesterIndexView.vue';
 import SemesterShowView from '@/views/SemesterShowView.vue';
@@ -14,6 +15,11 @@ const router = createRouter({
       path: '/',
       name: 'dashboard',
       component: DashboardView,
+    },
+    {
+      path: '/login',
+      name: 'login',
+      component: LoginView,
     },
     {
       path: '/semesters',

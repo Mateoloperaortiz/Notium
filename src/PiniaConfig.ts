@@ -2,6 +2,7 @@ import { gradeSeeder } from './seeders/gradeseeder.js';
 import { semesterSeeder } from './seeders/semesterseeder.js';
 import { subjectSeeder } from './seeders/subjectseeder.js';
 import { userSeeder } from './seeders/userseeder.js';
+import { parse, stringify } from 'flatted';
 import { createPinia, type Pinia } from 'pinia';
 import { watch } from 'vue';
 
@@ -11,7 +12,7 @@ export default class PiniaConfig {
 
     const savedState = localStorage.getItem('piniaState');
     if (savedState) {
-      pinia.state.value = JSON.parse(savedState);
+      pinia.state.value = parse(savedState);
     } else {
       // initialize the state with the seeders
       pinia.state.value = {
@@ -30,14 +31,14 @@ export default class PiniaConfig {
       };
 
       // save the initial state to localStorage
-      localStorage.setItem('piniaState', JSON.stringify(pinia.state.value));
+      localStorage.setItem('piniaState', stringify(pinia.state.value));
     }
 
     // watch for changes and save to localStorage
     watch(
       pinia.state,
       (state: typeof pinia.state.value): void => {
-        localStorage.setItem('piniaState', JSON.stringify(state));
+        localStorage.setItem('piniaState', stringify(state));
       },
       { deep: true },
     );

@@ -6,6 +6,10 @@ export const configureRouterGuards = (router: Router): void => {
     const authStore = useAuthStore();
 
     if (to.meta.requiresAuth && !authStore.isAuthenticated()) {
+      return { name: 'login', query: { redirect: to.fullPath } };
+    }
+
+    if (to.name === 'login' && authStore.isAuthenticated()) {
       return { name: 'dashboard' };
     }
 
