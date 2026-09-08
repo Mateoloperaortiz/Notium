@@ -1,6 +1,8 @@
 // internal imports
 import { configureRouterGuards } from './accessControl.js';
 import DashboardView from '@/views/DashboardView.vue';
+import GradeIndexView from '@/views/grade/GradeIndexView.vue';
+import GradeShowView from '@/views/grade/GradeShowView.vue';
 import HomeView from '@/views/HomeView.vue';
 import LoginView from '@/views/LoginView.vue';
 import NotFoundView from '@/views/NotFoundView.vue';
@@ -52,6 +54,19 @@ const router = createRouter({
       path: '/semesters/:semesterId/subjects/:subjectId',
       name: 'subject-show',
       component: SubjectShowView,
+      meta: { requiresAuth: true },
+      props: true,
+    },
+    {
+      path: '/grades',
+      name: 'grade-index',
+      component: GradeIndexView,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/subjects/:subjectId/grades/:gradeId',
+      name: 'grade-show',
+      component: GradeShowView,
       meta: { requiresAuth: true },
       props: true,
     },

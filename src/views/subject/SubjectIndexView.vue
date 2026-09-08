@@ -38,13 +38,6 @@ const formTitle = computed<string>((): string =>
   editingSubject.value ? 'Editar materia' : 'Crear materia',
 );
 
-const selectedSemester = computed<SemesterInterface | undefined>(
-  (): SemesterInterface | undefined =>
-    semesters.value.find(
-      (semester: SemesterInterface): boolean => semester.id === selectedSemesterId.value,
-    ),
-);
-
 // Error handling
 function getErrorMessage(error: unknown): string {
   return error instanceof Error ? error.message : 'Ocurrió un error inesperado.';
@@ -90,7 +83,7 @@ function closeForm(): void {
   isFormOpen.value = false;
 }
 
-async function saveSubject(dto: CreateSubjectDTO): Promise<void> {
+async function saveSubject(dto: CreateSubjectDTO, semesterId: string): Promise<void> {
   isSubmitting.value = true;
   errorMessage.value = '';
 
@@ -102,10 +95,7 @@ async function saveSubject(dto: CreateSubjectDTO): Promise<void> {
         throw new Error('La materia que intentas editar ya no existe.');
       }
     } else {
-      if (selectedSemester.value === undefined) {
-        throw new Error('Selecciona un semestre antes de crear la materia.');
-      }
-      await SubjectService.create(dto, selectedSemester.value.id);
+      await SubjectService.create(dto, semesterId);
     }
 
     await loadData();
@@ -192,6 +182,7 @@ onMounted(loadData);
       <SubjectForm
         :key="editingSubject?.id ?? 'new-subject'"
         :loading="isSubmitting"
+        :semesters="semesters"
         :subject="editingSubject"
         @cancel="closeForm"
         @submit="saveSubject"

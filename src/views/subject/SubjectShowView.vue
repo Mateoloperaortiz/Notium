@@ -1,6 +1,9 @@
 <script setup lang="ts">
 // Internal imports
+import GradeCard from '@/components/grade/GradeCard.vue';
+import type { GradeInterface } from '@/interfaces/GradeInterface.js';
 import type { SubjectInterface } from '@/interfaces/SubjectInterface.js';
+import { GradeService } from '@/services/GradeService.js';
 import { SubjectService } from '@/services/SubjectService.js';
 // External imports
 import { computed, ref, shallowRef, watch } from 'vue';
@@ -17,9 +20,10 @@ const props = defineProps<Props>();
 
 // View state
 const subject = shallowRef<SubjectInterface>();
+const grades = shallowRef<GradeInterface[]>([]);
 const errorMessage = ref<string>('');
 const isLoading = ref<boolean>(true);
-const gradeCount = computed<number>((): number => subject.value?.grades.length ?? 0);
+const gradeCount = computed<number>((): number => grades.value.length);
 
 // Data loading
 async function loadSubject(subjectId: string): Promise<void> {
@@ -28,10 +32,12 @@ async function loadSubject(subjectId: string): Promise<void> {
 
   try {
     subject.value = await SubjectService.findById(subjectId);
+    grades.value = subject.value ? await GradeService.findBySubjectId(subjectId) : [];
   } catch (error: unknown) {
     errorMessage.value =
       error instanceof Error ? error.message : 'No fue posible cargar la materia.';
     subject.value = undefined;
+    grades.value = [];
   } finally {
     isLoading.value = false;
   }
@@ -75,10 +81,16 @@ watch(
       </header>
 
       <section class="subject-detail__grades" aria-labelledby="grades-title">
-        <p class="eyebrow">Siguiente módulo</p>
+        <p class="eyebrow">Evaluación</p>
         <h2 id="grades-title">Notas de la materia</h2>
         <p>{{ gradeCount }} {{ gradeCount === 1 ? 'nota registrada' : 'notas registradas' }}.</p>
-        <span>La gestión de notas estará disponible próximamente.</span>
+        <div v-if="grades.length" class="subject-detail__grade-list">
+          <GradeCard v-for="grade in grades" :key="grade.id" :grade="grade" :show-actions="false" />
+        </div>
+        <p v-else class="subject-detail__empty-grades">Aún no hay notas registradas.</p>
+        <RouterLink class="button button--primary" :to="{ name: 'grade-index' }">
+          Ver todas las notas
+        </RouterLink>
       </section>
     </div>
 

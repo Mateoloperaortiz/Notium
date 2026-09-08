@@ -1,8 +1,8 @@
-import type { CreateGradeDTO, UpdateGradeDTO } from '@/dtos/GradeDTOs.js';
+import type { CreateGradeDTO, GradeValidationErrorsDTO, UpdateGradeDTO } from '@/dtos/GradeDTOs.js';
 import type { GradeInterface } from '@/interfaces/GradeInterface.js';
-import type { SubjectInterface } from '@/interfaces/SubjectInterface.js';
+import { SubjectService } from '@/services/SubjectService.js';
+import { useAuthStore } from '@/stores/AuthStore.js';
 import { useGradeStore } from '@/stores/GradeStore.js';
-import { useSubjectStore } from '@/stores/SubjectStore.js';
 
 const generateGradeId = (): string => globalThis.crypto.randomUUID();
 
@@ -11,14 +11,32 @@ export class GradeService {
     return [...useGradeStore().grade];
   }
 
+  public static async findAllByCurrentUser(): Promise<GradeInterface[]> {
+    const currentUser = useAuthStore().currentUser;
+
+    if (currentUser === null) {
+      return [];
+    }
+
+    return (await GradeService.findAll()).filter(
+      (grade: GradeInterface): boolean => grade.subject.semester.user.id === currentUser.id,
+    );
+  }
+
+  public static async findBySubjectId(subjectId: string): Promise<GradeInterface[]> {
+    const grades = await GradeService.findAllByCurrentUser();
+
+    return grades.filter((grade: GradeInterface): boolean => grade.subject.id === subjectId);
+  }
+
   public static async findById(id: string): Promise<GradeInterface | undefined> {
-    return useGradeStore().grade.find((grade: GradeInterface): boolean => grade.id === id);
+    const grades = await GradeService.findAllByCurrentUser();
+
+    return grades.find((grade: GradeInterface): boolean => grade.id === id);
   }
 
   public static async create(dto: CreateGradeDTO, subjectId: string): Promise<GradeInterface> {
-    const subject = useSubjectStore().subject.find(
-      (currentSubject: SubjectInterface): boolean => currentSubject.id === subjectId,
-    );
+    const subject = await SubjectService.findById(subjectId);
 
     if (subject === undefined) {
       throw new Error('La materia no existe.');
@@ -53,19 +71,33 @@ export class GradeService {
 
   public static async delete(id: string): Promise<boolean> {
     const grades = useGradeStore().grade;
-    const gradeIndex = grades.findIndex((grade: GradeInterface): boolean => grade.id === id);
+    const grade = await GradeService.findById(id);
+    const gradeIndex = grade === undefined ? -1 : grades.indexOf(grade);
 
     if (gradeIndex === -1) {
       return false;
     }
 
-    const [grade] = grades.splice(gradeIndex, 1);
-    const subjectGradeIndex = grade?.subject.grades.indexOf(grade) ?? -1;
+    const [removedGrade] = grades.splice(gradeIndex, 1);
+    const subjectGradeIndex = removedGrade?.subject.grades.indexOf(removedGrade) ?? -1;
 
     if (subjectGradeIndex >= 0) {
-      grade?.subject.grades.splice(subjectGradeIndex, 1);
+      removedGrade?.subject.grades.splice(subjectGradeIndex, 1);
     }
 
     return true;
+  }
+
+  public static validateFields(dto: CreateGradeDTO): GradeValidationErrorsDTO {
+    return {
+      date: Number.isNaN(dto.date.getTime()) ? 'Ingresa una fecha válida.' : '',
+      percentage:
+        Number.isInteger(dto.percentage) && dto.percentage > 0 && dto.percentage <= 100
+          ? ''
+          : 'El porcentaje debe estar entre 1 y 100.',
+      title: dto.title.trim() ? '' : 'El título es obligatorio.',
+      type: dto.type.trim() ? '' : 'El tipo es obligatorio.',
+      value: dto.value >= 0 && dto.value <= 5 ? '' : 'La nota debe estar entre 0 y 5.',
+    };
   }
 }

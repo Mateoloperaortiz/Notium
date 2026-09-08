@@ -1,6 +1,7 @@
 <script setup lang="ts">
 // Internal imports
 import type { CreateSubjectDTO, SubjectValidationErrorsDTO } from '@/dtos/SubjectDTOs.js';
+import type { SemesterInterface } from '@/interfaces/SemesterInterface.js';
 import type { SubjectInterface } from '@/interfaces/SubjectInterface.js';
 import { SubjectService } from '@/services/SubjectService.js';
 // External imports
@@ -9,12 +10,13 @@ import { computed, reactive, ref, useId, watch } from 'vue';
 // Interfaces and types
 interface Props {
   loading?: boolean;
+  semesters: SemesterInterface[];
   subject?: SubjectInterface;
 }
 
 interface Emits {
   cancel: [];
-  submit: [subject: CreateSubjectDTO];
+  submit: [subject: CreateSubjectDTO, semesterId: string];
 }
 
 type FormField = keyof SubjectValidationErrorsDTO;
@@ -31,6 +33,8 @@ const form = reactive<CreateSubjectDTO>({
   name: '',
   professor: '',
 });
+const semesterId = ref<string>('');
+const associationError = ref<string>('');
 const codeInputId = `${formId}-code`;
 const nameInputId = `${formId}-name`;
 const creditsInputId = `${formId}-credits`;
@@ -85,10 +89,11 @@ const resetValidation = (): void => {
 // Form handlers
 const handleSubmit = (): void => {
   if (props.loading) return;
+  associationError.value = semesterId.value ? '' : 'Selecciona un semestre.';
   submissionAttempted.value = true;
 
-  if (!validateForm()) return;
-  emit('submit', { ...form });
+  if (!validateForm() || associationError.value) return;
+  emit('submit', { ...form }, semesterId.value);
 };
 
 const handleCancel = (): void => emit('cancel');
@@ -101,6 +106,8 @@ watch(
     form.credits = subject?.credits ?? 3;
     form.name = subject?.name ?? '';
     form.professor = subject?.professor ?? '';
+    semesterId.value = subject?.semester.id ?? '';
+    associationError.value = '';
     resetValidation();
   },
   { immediate: true },
@@ -118,6 +125,17 @@ watch(
     <div v-if="submissionAttempted && hasValidationErrors" class="subject-form__alert" role="alert">
       Revisa los datos de la materia antes de continuar.
     </div>
+
+    <label class="subject-form__field">
+      <span>Semestre</span>
+      <select v-model="semesterId" required :disabled="loading || isEditing">
+        <option value="">Selecciona un semestre</option>
+        <option v-for="semester in semesters" :key="semester.id" :value="semester.id">
+          {{ semester.name }}
+        </option>
+      </select>
+      <small v-if="associationError">{{ associationError }}</small>
+    </label>
 
     <div class="subject-form__grid">
       <label class="subject-form__field">

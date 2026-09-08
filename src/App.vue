@@ -45,6 +45,13 @@ const userInitials = computed<string>((): string => {
           >
             Materias
           </RouterLink>
+          <RouterLink
+            v-if="currentUser"
+            class="main-navigation__link"
+            :to="{ name: 'grade-index' }"
+          >
+            Notas
+          </RouterLink>
           <RouterLink v-if="!currentUser" class="main-navigation__link" :to="{ name: 'login' }">
             Iniciar sesión
           </RouterLink>
