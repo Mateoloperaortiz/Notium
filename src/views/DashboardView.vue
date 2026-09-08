@@ -1,5 +1,10 @@
 <script setup lang="ts">
 // Internal imports
+import AssessmentCoverageChart from '@/components/graphs/AssessmentCoverageChart.vue';
+import AverageBySemesterChart from '@/components/graphs/AverageBySemesterChart.vue';
+import AverageBySubjectChart from '@/components/graphs/AverageBySubjectChart.vue';
+import CreditsBySemesterChart from '@/components/graphs/CreditsBySemesterChart.vue';
+import GradeTypeDistributionChart from '@/components/graphs/GradeTypeDistributionChart.vue';
 import { useAuthStore } from '@/stores/AuthStore.js';
 // External imports
 import { storeToRefs } from 'pinia';
@@ -51,6 +56,25 @@ const semesterCountLabel = computed<string>((): string =>
         <p>Registra tus periodos y mantén tu avance en un solo lugar.</p>
       </article>
     </div>
+
+    <section class="dashboard-page__graphs" aria-labelledby="dashboard-graphs-title">
+      <div class="dashboard-page__section-heading">
+        <div>
+          <p class="eyebrow">Lectura rápida</p>
+          <h2 id="dashboard-graphs-title">Tu recorrido en datos</h2>
+        </div>
+      </div>
+
+      <div class="dashboard-page__charts dashboard-page__charts--wide">
+        <AverageBySemesterChart />
+        <AverageBySubjectChart />
+      </div>
+      <div class="dashboard-page__charts">
+        <CreditsBySemesterChart />
+        <GradeTypeDistributionChart />
+        <AssessmentCoverageChart />
+      </div>
+    </section>
   </section>
 </template>
 
@@ -72,6 +96,27 @@ const semesterCountLabel = computed<string>((): string =>
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 1.15rem;
   margin-top: 3rem;
+}
+
+.dashboard-page__graphs {
+  margin-top: 3rem;
+}
+
+.dashboard-page__section-heading h2 {
+  margin: 0.2rem 0 0;
+  font-family: var(--font-display);
+  font-size: 1.55rem;
+}
+
+.dashboard-page__charts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.15rem;
+  margin-top: 1.15rem;
+}
+
+.dashboard-page__charts--wide {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .dashboard-stat {
@@ -126,6 +171,11 @@ const semesterCountLabel = computed<string>((): string =>
   }
 
   .dashboard-page__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-page__charts,
+  .dashboard-page__charts--wide {
     grid-template-columns: 1fr;
   }
 }
