@@ -1,9 +1,10 @@
 <script setup lang="ts">
-// External imports
+// Internal imports
 import type { CreateSemesterDTO, SemesterValidationErrorsDTO } from '@/dtos/SemesterDTOs.js';
 import { StatusSemester } from '@/interfaces/SemesterInterface.js';
 import type { SemesterInterface } from '@/interfaces/SemesterInterface.js';
 import { SemesterService } from '@/services/SemesterService.js';
+// External imports
 import { computed, reactive, ref, useId, watch } from 'vue';
 
 // Interfaces and types
@@ -29,17 +30,16 @@ const emit = defineEmits<Emits>();
 // Form variables
 const fieldOrder: FormField[] = ['name', 'year', 'period', 'status'];
 const formId = useId();
-const form = reactive<CreateSemesterDTO>({
-  name: '',
-  period: 1,
-  status: StatusSemester.inComing,
-  year: new Date().getFullYear(),
-});
+const name = ref<string>('');
 const nameInput = ref<HTMLInputElement | null>(null);
+const year = ref<number>(new Date().getFullYear());
+const period = ref<number>(1);
+const status = ref<StatusSemester>(StatusSemester.inComing);
 const nameInputId = `${formId}-name`;
 const yearInputId = `${formId}-year`;
 const periodInputId = `${formId}-period`;
 const statusInputId = `${formId}-status`;
+const submissionAttempted = ref<boolean>(false);
 
 // Error control variables
 const errors = reactive<SemesterValidationErrorsDTO>({
@@ -56,16 +56,19 @@ const touched = reactive<Record<FormField, boolean>>({
   year: false,
 });
 
-const submissionAttempted = ref<boolean>(false);
-
-// Derived form state
 const hasValidationErrors = computed<boolean>((): boolean =>
   fieldOrder.some((field: FormField): boolean => errors[field] !== ''),
 );
 
 const isEditing = computed<boolean>((): boolean => props.semester !== undefined);
 
-const getSemesterDTO = (): CreateSemesterDTO => ({ ...form });
+// Form data mapping
+const getSemesterDTO = (): CreateSemesterDTO => ({
+  name: name.value,
+  period: period.value,
+  status: status.value,
+  year: year.value,
+});
 
 // Error control functions
 const validateField = (field: FormField): boolean => {
@@ -132,7 +135,6 @@ const handleCancel = (): void => {
   emit('cancel');
 };
 
-// Synchronize form data with the selected semester
 watch(
   (): readonly [string, number, number, StatusSemester] => [
     props.semester?.name ?? '',
@@ -146,10 +148,10 @@ watch(
     number,
     StatusSemester,
   ]): void => {
-    form.name = semesterName;
-    form.year = semesterYear;
-    form.period = semesterPeriod;
-    form.status = semesterStatus;
+    name.value = semesterName;
+    year.value = semesterYear;
+    period.value = semesterPeriod;
+    status.value = semesterStatus;
     resetValidation();
   },
   { immediate: true },
@@ -187,7 +189,7 @@ watch(
         <input
           :id="nameInputId"
           ref="nameInput"
-          v-model="form.name"
+          v-model="name"
           type="text"
           name="semester-name"
           maxlength="80"
@@ -217,7 +219,7 @@ watch(
         <div class="semester-form__input-wrap" :class="{ 'is-invalid': errors.year }">
           <input
             :id="yearInputId"
-            v-model.number="form.year"
+            v-model.number="year"
             type="number"
             name="semester-year"
             min="2000"
@@ -250,7 +252,7 @@ watch(
         <div class="semester-form__input-wrap" :class="{ 'is-invalid': errors.period }">
           <select
             :id="periodInputId"
-            v-model.number="form.period"
+            v-model.number="period"
             name="semester-period"
             required
             :aria-describedby="errors.period ? `${periodInputId}-error` : undefined"
@@ -279,7 +281,7 @@ watch(
       <div class="semester-form__input-wrap" :class="{ 'is-invalid': errors.status }">
         <select
           :id="statusInputId"
-          v-model="form.status"
+          v-model="status"
           name="semester-status"
           required
           :aria-describedby="errors.status ? `${statusInputId}-error` : undefined"

@@ -1,11 +1,14 @@
 <script setup lang="ts">
+// Internal imports
 import SemesterCard from '@/components/semester/SemesterCard.vue';
 import SemesterForm from '@/components/semester/SemesterForm.vue';
 import type { CreateSemesterDTO, UpdateSemesterDTO } from '@/dtos/SemesterDTOs.js';
 import type { SemesterInterface } from '@/interfaces/SemesterInterface.js';
 import { SemesterService } from '@/services/SemesterService.js';
+// External imports
 import { computed, onMounted, ref, shallowRef } from 'vue';
 
+// View state
 const semesters = shallowRef<SemesterInterface[]>([]);
 const editingSemester = shallowRef<SemesterInterface>();
 const errorMessage = ref<string>('');
@@ -13,6 +16,7 @@ const isFormOpen = ref<boolean>(false);
 const isLoading = ref<boolean>(true);
 const isSubmitting = ref<boolean>(false);
 
+// Derived view state
 const semesterCountLabel = computed<string>((): string => {
   const count = semesters.value.length;
 
@@ -23,10 +27,12 @@ const formTitle = computed<string>((): string =>
   editingSemester.value ? 'Editar semestre' : 'Crear semestre',
 );
 
+// Error handling
 function getErrorMessage(error: unknown): string {
   return error instanceof Error ? error.message : 'Ocurrió un error inesperado.';
 }
 
+// Data loading
 async function loadSemesters(): Promise<void> {
   isLoading.value = true;
   errorMessage.value = '';
@@ -40,6 +46,7 @@ async function loadSemesters(): Promise<void> {
   }
 }
 
+// Form handlers
 function openCreateForm(): void {
   editingSemester.value = undefined;
   isFormOpen.value = true;

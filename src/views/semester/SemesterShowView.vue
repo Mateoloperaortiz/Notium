@@ -1,21 +1,27 @@
 <script setup lang="ts">
+// Internal imports
 import type { SemesterInterface } from '@/interfaces/SemesterInterface.js';
 import { SemesterService } from '@/services/SemesterService.js';
+// External imports
 import { computed, ref, shallowRef, watch } from 'vue';
 import { RouterLink } from 'vue-router';
 
+// Interfaces and types
 interface Props {
   id: string;
 }
 
+// Props
 const props = defineProps<Props>();
 
+// View state
 const semester = shallowRef<SemesterInterface>();
 const errorMessage = ref<string>('');
 const isLoading = ref<boolean>(true);
 
 const subjectCount = computed<number>((): number => semester.value?.subjects.length ?? 0);
 
+// Data loading
 async function loadSemester(semesterId: string): Promise<void> {
   isLoading.value = true;
   errorMessage.value = '';

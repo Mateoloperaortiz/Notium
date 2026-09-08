@@ -4,8 +4,8 @@ import DashboardView from '@/views/DashboardView.vue';
 import HomeView from '@/views/HomeView.vue';
 import LoginView from '@/views/LoginView.vue';
 import NotFoundView from '@/views/NotFoundView.vue';
-import SemesterIndexView from '@/views/SemesterIndexView.vue';
-import SemesterShowView from '@/views/SemesterShowView.vue';
+import SemesterIndexView from '@/views/semester/SemesterIndexView.vue';
+import SemesterShowView from '@/views/semester/SemesterShowView.vue';
 import SubjectShowPlaceholderView from '@/views/SubjectShowPlaceholderView.vue';
 import { createRouter, createWebHistory } from 'vue-router';
 

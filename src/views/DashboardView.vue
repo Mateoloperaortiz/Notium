@@ -1,9 +1,12 @@
 <script setup lang="ts">
+// Internal imports
 import { useAuthStore } from '@/stores/AuthStore.js';
+// External imports
 import { storeToRefs } from 'pinia';
 import { computed } from 'vue';
 import { RouterLink } from 'vue-router';
 
+// Store state
 const authStore = useAuthStore();
 const { currentUser } = storeToRefs(authStore);
 

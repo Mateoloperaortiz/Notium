@@ -1,24 +1,30 @@
 <script setup lang="ts">
+// Internal imports
 import { AuthService } from '@/services/AuthService.js';
-import { ref } from 'vue';
+// External imports
+import { reactive } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
-const email = ref<string>('mateo@example.com');
-const password = ref<string>('mateo-password');
-const errorMessage = ref<string>('');
+// Form variables
+const form = reactive({
+  email: 'mateo@example.com',
+  password: 'mateo-password',
+  errorMessage: '',
+});
 const route = useRoute();
 const router = useRouter();
 
+// Form handlers
 const submitLogin = (): void => {
-  errorMessage.value = '';
+  form.errorMessage = '';
 
   const user = AuthService.login({
-    email: email.value,
-    password: password.value,
+    email: form.email,
+    password: form.password,
   });
 
   if (user === null) {
-    errorMessage.value = 'El correo o la contraseña no son correctos.';
+    form.errorMessage = 'El correo o la contraseña no son correctos.';
     return;
   }
 
@@ -38,15 +44,22 @@ const submitLogin = (): void => {
       <form class="login-form" @submit.prevent="submitLogin">
         <label class="login-form__field">
           <span>Correo electrónico</span>
-          <input v-model="email" type="email" autocomplete="email" required />
+          <input v-model="form.email" type="email" autocomplete="email" required />
         </label>
 
         <label class="login-form__field">
           <span>Contraseña</span>
-          <input v-model="password" type="password" autocomplete="current-password" required />
+          <input
+            v-model="form.password"
+            type="password"
+            autocomplete="current-password"
+            required
+          />
         </label>
 
-        <p v-if="errorMessage" class="login-form__error" role="alert">{{ errorMessage }}</p>
+        <p v-if="form.errorMessage" class="login-form__error" role="alert">
+          {{ form.errorMessage }}
+        </p>
 
         <button class="button button--primary" type="submit">Entrar</button>
       </form>

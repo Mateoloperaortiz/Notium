@@ -1,11 +1,14 @@
 <script setup lang="ts">
+// External imports
 import { RouterLink } from 'vue-router';
 
+// Interfaces and types
 interface Props {
   semesterId: string;
   subjectId: string;
 }
 
+// Props
 defineProps<Props>();
 </script>
 
