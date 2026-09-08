@@ -19,9 +19,7 @@ export class GradeService {
     }
 
     return (await GradeService.findAll())
-      .filter(
-      (grade: GradeInterface): boolean => grade.subject.semester.user.id === currentUser.id,
-      )
+      .filter((grade: GradeInterface): boolean => grade.subject.semester.user.id === currentUser.id)
       .map((grade: GradeInterface): GradeInterface => {
         grade.date = new Date(grade.date);
         return grade;
