@@ -49,12 +49,7 @@ const submitLogin = (): void => {
 
         <label class="login-form__field">
           <span>Contraseña</span>
-          <input
-            v-model="form.password"
-            type="password"
-            autocomplete="current-password"
-            required
-          />
+          <input v-model="form.password" type="password" autocomplete="current-password" required />
         </label>
 
         <p v-if="form.errorMessage" class="login-form__error" role="alert">
