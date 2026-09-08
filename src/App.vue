@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Role } from '@/interfaces/UserInterface.js';
 import { useAuthStore } from '@/stores/AuthStore.js';
 import { storeToRefs } from 'pinia';
 import { computed } from 'vue';
@@ -6,6 +7,8 @@ import { RouterLink, RouterView } from 'vue-router';
 
 const authStore = useAuthStore();
 const { currentUser } = storeToRefs(authStore);
+
+const isAdmin = computed<boolean>((): boolean => currentUser.value?.role === Role.Admin);
 
 const userInitials = computed<string>((): string => {
   const name = currentUser.value?.name ?? 'Usuario';
@@ -51,6 +54,15 @@ const userInitials = computed<string>((): string => {
             :to="{ name: 'grade-index' }"
           >
             Notas
+          </RouterLink>
+          <RouterLink v-if="currentUser" class="main-navigation__link" :to="{ name: 'analytics' }">
+            Analíticas
+          </RouterLink>
+          <RouterLink v-if="isAdmin" class="main-navigation__link" :to="{ name: 'admin-users' }">
+            Usuarios
+          </RouterLink>
+          <RouterLink v-if="isAdmin" class="main-navigation__link" :to="{ name: 'admin-reports' }">
+            Reportes
           </RouterLink>
           <RouterLink v-if="!currentUser" class="main-navigation__link" :to="{ name: 'login' }">
             Iniciar sesión

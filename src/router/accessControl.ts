@@ -13,6 +13,13 @@ export const configureRouterGuards = (router: Router): void => {
       return { name: 'dashboard' };
     }
 
+    const allowedRoles = to.meta.roles;
+    const currentRole = authStore.currentUser?.role;
+
+    if (allowedRoles && (currentRole === undefined || !allowedRoles.includes(currentRole))) {
+      return { name: 'dashboard' };
+    }
+
     return true;
   });
 };

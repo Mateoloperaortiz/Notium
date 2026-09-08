@@ -25,6 +25,17 @@ const lucia: UserInterface = {
   semesters: [],
 };
 
+const admin: UserInterface = {
+  id: 'user-3',
+  name: 'Administrador',
+  email: 'admin@example.com',
+  password: 'admin-password',
+  role: Role.Admin,
+  createdAt: Date.parse('2026-01-03T08:00:00Z'),
+  updatedAt: Date.parse('2026-01-03T08:00:00Z'),
+  semesters: [],
+};
+
 const semesterOne: SemesterInterface = {
   id: 'semester-1',
   name: '2026-1',
@@ -309,4 +320,4 @@ export const seedSemesters: SemesterInterface[] = [
   semesterFour,
 ];
 
-export const seedUsers: UserInterface[] = [mateo, lucia];
+export const seedUsers: UserInterface[] = [mateo, lucia, admin];
