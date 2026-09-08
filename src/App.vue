@@ -38,6 +38,13 @@ const userInitials = computed<string>((): string => {
           <RouterLink class="main-navigation__link" :to="{ name: 'semester-index' }">
             Semestres
           </RouterLink>
+          <RouterLink
+            v-if="currentUser"
+            class="main-navigation__link"
+            :to="{ name: 'subject-index' }"
+          >
+            Materias
+          </RouterLink>
           <RouterLink v-if="!currentUser" class="main-navigation__link" :to="{ name: 'login' }">
             Iniciar sesión
           </RouterLink>

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 // Internal imports
+import SubjectCard from '@/components/subject/SubjectCard.vue';
 import type { SemesterInterface } from '@/interfaces/SemesterInterface.js';
 import { SemesterService } from '@/services/SemesterService.js';
 // External imports
@@ -78,20 +79,27 @@ watch(
       <section class="semester-detail__subjects" aria-labelledby="subjects-title">
         <div class="semester-detail__section-heading">
           <div>
-            <p class="eyebrow">Siguiente módulo</p>
+            <p class="eyebrow">Organización académica</p>
             <h2 id="subjects-title">Materias del semestre</h2>
           </div>
-          <span>Próximamente</span>
+          <RouterLink class="semester-detail__subjects-link" :to="{ name: 'subject-index' }">
+            Ver todas
+          </RouterLink>
         </div>
 
-        <div class="semester-detail__placeholder">
+        <div v-if="semester.subjects.length" class="semester-detail__subject-list">
+          <SubjectCard
+            v-for="subject in semester.subjects"
+            :key="subject.id"
+            :subject="subject"
+            :show-actions="false"
+          />
+        </div>
+        <div v-else class="semester-detail__placeholder">
           <span aria-hidden="true">＋</span>
           <div>
-            <h3>El módulo Subject está preparado para crecer aquí</h3>
-            <p>
-              La relación ya existe en el dominio. La creación y gestión de materias se implementará
-              en la siguiente etapa sin cambiar este módulo.
-            </p>
+            <h3>No hay materias registradas</h3>
+            <p>Las materias asociadas a este semestre aparecerán aquí.</p>
           </div>
         </div>
       </section>

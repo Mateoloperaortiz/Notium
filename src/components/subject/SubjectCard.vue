@@ -1,32 +1,35 @@
 <script setup lang="ts">
 // Internal imports
-import type { SemesterInterface } from '@/interfaces/SemesterInterface.js';
+import type { SubjectInterface } from '@/interfaces/SubjectInterface.js';
 // External imports
 import { RouterLink } from 'vue-router';
 
 // Interfaces and types
 interface Props {
-  semester: SemesterInterface;
+  showActions?: boolean;
+  subject: SubjectInterface;
 }
 
 // Props
-const props = defineProps<Props>();
+const props = withDefaults(defineProps<Props>(), {
+  showActions: true,
+});
 
 // Emits
 interface Emits {
-  delete: [semesterId: string];
-  edit: [semester: SemesterInterface];
+  delete: [subjectId: string];
+  edit: [subject: SubjectInterface];
 }
 
 const emit = defineEmits<Emits>();
 
 // Event handlers
 const handleDelete = (): void => {
-  emit('delete', props.semester.id);
+  emit('delete', props.subject.id);
 };
 
 const handleEdit = (): void => {
-  emit('edit', props.semester);
+  emit('edit', props.subject);
 };
 </script>
 
@@ -45,21 +48,21 @@ const handleEdit = (): void => {
         </span>
 
         <div>
-          <p class="semester-card__eyebrow">Periodo académico</p>
-          <h2 class="semester-card__title">{{ semester.name }}</h2>
+          <p class="semester-card__eyebrow">{{ subject.code }}</p>
+          <h2 class="semester-card__title">{{ subject.name }}</h2>
         </div>
       </div>
 
       <span class="semester-card__status">
         <span class="semester-card__status-dot" aria-hidden="true"></span>
-        Registrado
+        {{ subject.credits }} créditos
       </span>
     </header>
 
     <dl class="semester-card__dates" aria-label="Información del semestre">
       <div class="semester-card__date">
-        <dt>Año</dt>
-        <dd>{{ semester.year }}</dd>
+        <dt>Profesor</dt>
+        <dd>{{ subject.professor }}</dd>
       </div>
 
       <div class="semester-card__date-divider" aria-hidden="true">
@@ -69,16 +72,19 @@ const handleEdit = (): void => {
       </div>
 
       <div class="semester-card__date">
-        <dt>Periodo</dt>
-        <dd>{{ semester.period }}</dd>
+        <dt>Notas</dt>
+        <dd>{{ subject.grades.length }}</dd>
       </div>
     </dl>
 
     <footer class="semester-card__actions">
       <RouterLink
         class="semester-card__action semester-card__action--primary"
-        :to="{ name: 'semester-show', params: { id: semester.id } }"
-        :aria-label="`Ver detalle de ${semester.name}`"
+        :to="{
+          name: 'subject-show',
+          params: { semesterId: subject.semester.id, subjectId: subject.id },
+        }"
+        :aria-label="`Ver detalle de ${subject.name}`"
       >
         Ver detalle
         <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
@@ -86,11 +92,11 @@ const handleEdit = (): void => {
         </svg>
       </RouterLink>
 
-      <div class="semester-card__secondary-actions">
+      <div v-if="showActions" class="semester-card__secondary-actions">
         <button
           class="semester-card__icon-button"
           type="button"
-          :aria-label="`Editar ${semester.name}`"
+          :aria-label="`Editar ${subject.name}`"
           @click="handleEdit"
         >
           <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
@@ -101,7 +107,7 @@ const handleEdit = (): void => {
         <button
           class="semester-card__icon-button semester-card__icon-button--danger"
           type="button"
-          :aria-label="`Eliminar ${semester.name}`"
+          :aria-label="`Eliminar ${subject.name}`"
           @click="handleDelete"
         >
           <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">

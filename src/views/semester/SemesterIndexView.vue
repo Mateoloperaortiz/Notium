@@ -38,7 +38,7 @@ async function loadSemesters(): Promise<void> {
   errorMessage.value = '';
 
   try {
-    semesters.value = await SemesterService.findAll();
+    semesters.value = await SemesterService.findAllByCurrentUser();
   } catch (error: unknown) {
     errorMessage.value = getErrorMessage(error);
   } finally {

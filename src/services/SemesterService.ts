@@ -14,10 +14,22 @@ export class SemesterService {
     return [...useSemesterStore().semester];
   }
 
-  public static async findById(id: string): Promise<SemesterInterface | undefined> {
-    return useSemesterStore().semester.find(
-      (semester: SemesterInterface): boolean => semester.id === id,
+  public static async findAllByCurrentUser(): Promise<SemesterInterface[]> {
+    const currentUser = useAuthStore().currentUser;
+
+    if (currentUser === null) {
+      return [];
+    }
+
+    return useSemesterStore().semester.filter(
+      (semester: SemesterInterface): boolean => semester.user.id === currentUser.id,
     );
+  }
+
+  public static async findById(id: string): Promise<SemesterInterface | undefined> {
+    const semesters = await SemesterService.findAllByCurrentUser();
+
+    return semesters.find((semester: SemesterInterface): boolean => semester.id === id);
   }
 
   public static async create(dto: CreateSemesterDTO): Promise<SemesterInterface> {
@@ -67,9 +79,9 @@ export class SemesterService {
   }
 
   public static async delete(id: string): Promise<boolean> {
-    const semesterIndex = useSemesterStore().semester.findIndex(
-      (semester: SemesterInterface): boolean => semester.id === id,
-    );
+    const semesters = useSemesterStore().semester;
+    const semester = await SemesterService.findById(id);
+    const semesterIndex = semester === undefined ? -1 : semesters.indexOf(semester);
 
     if (semesterIndex === -1) {
       return false;

@@ -6,7 +6,8 @@ import LoginView from '@/views/LoginView.vue';
 import NotFoundView from '@/views/NotFoundView.vue';
 import SemesterIndexView from '@/views/semester/SemesterIndexView.vue';
 import SemesterShowView from '@/views/semester/SemesterShowView.vue';
-import SubjectShowPlaceholderView from '@/views/SubjectShowPlaceholderView.vue';
+import SubjectIndexView from '@/views/subject/SubjectIndexView.vue';
+import SubjectShowView from '@/views/subject/SubjectShowView.vue';
 import { createRouter, createWebHistory } from 'vue-router';
 
 const router = createRouter({
@@ -42,9 +43,15 @@ const router = createRouter({
       props: true,
     },
     {
+      path: '/subjects',
+      name: 'subject-index',
+      component: SubjectIndexView,
+      meta: { requiresAuth: true },
+    },
+    {
       path: '/semesters/:semesterId/subjects/:subjectId',
       name: 'subject-show',
-      component: SubjectShowPlaceholderView,
+      component: SubjectShowView,
       meta: { requiresAuth: true },
       props: true,
     },
