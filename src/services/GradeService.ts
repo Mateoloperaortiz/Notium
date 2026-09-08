@@ -18,9 +18,14 @@ export class GradeService {
       return [];
     }
 
-    return (await GradeService.findAll()).filter(
+    return (await GradeService.findAll())
+      .filter(
       (grade: GradeInterface): boolean => grade.subject.semester.user.id === currentUser.id,
-    );
+      )
+      .map((grade: GradeInterface): GradeInterface => {
+        grade.date = new Date(grade.date);
+        return grade;
+      });
   }
 
   public static async findBySubjectId(subjectId: string): Promise<GradeInterface[]> {

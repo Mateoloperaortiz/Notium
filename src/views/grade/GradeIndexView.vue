@@ -1,6 +1,5 @@
 <script setup lang="ts">
 // Internal imports
-import GradeCard from '@/components/grade/GradeCard.vue';
 import GradeForm from '@/components/grade/GradeForm.vue';
 import type { CreateGradeDTO, UpdateGradeDTO } from '@/dtos/GradeDTOs.js';
 import type { GradeInterface } from '@/interfaces/GradeInterface.js';
@@ -8,7 +7,12 @@ import type { SubjectInterface } from '@/interfaces/SubjectInterface.js';
 import { GradeService } from '@/services/GradeService.js';
 import { SubjectService } from '@/services/SubjectService.js';
 // External imports
+import DataTablesCore from 'datatables.net-dt';
+import 'datatables.net-dt/css/dataTables.dataTables.css';
+import DataTable from 'datatables.net-vue3';
 import { computed, onMounted, ref, shallowRef } from 'vue';
+
+DataTable.use(DataTablesCore);
 
 // View state
 const subjects = shallowRef<SubjectInterface[]>([]);
@@ -35,6 +39,35 @@ const gradeCountLabel = computed<string>((): string => {
 const formTitle = computed<string>((): string =>
   editingGrade.value ? 'Editar nota' : 'Crear nota',
 );
+
+const tableColumns = [
+  { data: 'title', title: 'Título' },
+  { data: 'type', title: 'Tipo' },
+  { data: 'subject.name', title: 'Materia' },
+  { data: 'value', title: 'Nota' },
+  {
+    data: 'percentage',
+    render: (percentage: number): string => `${percentage}%`,
+    title: 'Porcentaje',
+  },
+  {
+    data: 'date',
+    render: (date: Date): string => new Date(date).toLocaleDateString('es-CO'),
+    title: 'Fecha',
+  },
+  {
+    data: null,
+    orderable: false,
+    render: (_data: null, _type: string, grade: GradeInterface): string => `
+      <div class="grade-table__actions">
+        <button type="button" data-action="edit" data-grade-id="${grade.id}">Editar</button>
+        <button type="button" data-action="delete" data-grade-id="${grade.id}">Eliminar</button>
+      </div>
+    `,
+    searchable: false,
+    title: 'Acciones',
+  },
+];
 // Error handling
 function getErrorMessage(error: unknown): string {
   return error instanceof Error ? error.message : 'Ocurrió un error inesperado.';
@@ -77,6 +110,27 @@ function openEditForm(grade: GradeInterface): void {
 function closeForm(): void {
   editingGrade.value = undefined;
   isFormOpen.value = false;
+}
+
+function handleTableClick(event: MouseEvent): void {
+  if (!(event.target instanceof Element)) return;
+
+  const actionButton = event.target.closest<HTMLButtonElement>('[data-action]');
+  const gradeId = actionButton?.dataset.gradeId;
+  const action = actionButton?.dataset.action;
+
+  if (!gradeId || !action) return;
+
+  if (action === 'edit') {
+    const grade = grades.value.find(
+      (currentGrade: GradeInterface): boolean => currentGrade.id === gradeId,
+    );
+    if (grade) openEditForm(grade);
+  }
+
+  if (action === 'delete') {
+    void deleteGrade(gradeId);
+  }
 }
 
 async function saveGrade(dto: CreateGradeDTO, subjectId: string): Promise<void> {
@@ -181,13 +235,23 @@ onMounted(loadData);
     <div v-if="isLoading" class="grade-grid" aria-label="Cargando notas" aria-busy="true">
       <div v-for="index in 2" :key="index" class="grade-skeleton"></div>
     </div>
-    <div v-else-if="filteredGrades.length" class="grade-grid">
-      <GradeCard
-        v-for="grade in filteredGrades"
-        :key="grade.id"
-        :grade="grade"
-        @delete="deleteGrade"
-        @edit="openEditForm"
+    <div v-else-if="filteredGrades.length" class="grade-table-wrap" @click="handleTableClick">
+      <DataTable
+        :data="filteredGrades"
+        :columns="tableColumns"
+        :options="{
+          language: {
+            emptyTable: 'No hay notas registradas.',
+            info: 'Mostrando _START_ a _END_ de _TOTAL_ notas',
+            infoEmpty: 'No hay notas para mostrar',
+            lengthMenu: 'Mostrar _MENU_ notas',
+            search: 'Buscar:',
+            zeroRecords: 'No se encontraron notas.',
+          },
+          order: [[5, 'desc']],
+          pageLength: 10,
+        }"
+        class="display grade-table"
       />
     </div>
     <div v-else class="grade-empty">
@@ -266,10 +330,25 @@ onMounted(loadData);
 .grade-page__summary p {
   margin: 0;
 }
-.grade-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 1.15rem;
+.grade-table-wrap {
+  overflow-x: auto;
+  padding: 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: 1rem;
+  background: var(--color-surface);
+  box-shadow: var(--shadow-soft);
+}
+.grade-table__actions {
+  display: flex;
+  gap: 0.45rem;
+}
+.grade-table__actions button {
+  padding: 0.4rem 0.6rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+  background: var(--color-surface);
+  color: var(--color-ink);
+  cursor: pointer;
 }
 .grade-skeleton {
   min-height: 16rem;
@@ -302,9 +381,6 @@ onMounted(loadData);
     align-items: start;
   }
   .grade-page__toolbar {
-    grid-template-columns: 1fr;
-  }
-  .grade-grid {
     grid-template-columns: 1fr;
   }
 }
