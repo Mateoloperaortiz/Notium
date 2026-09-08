@@ -36,8 +36,6 @@ const admin: UserInterface = {
   semesters: [],
 };
 
-
-
 const semesterOne: SemesterInterface = {
   id: 'semester-1',
   name: '2026-1',
