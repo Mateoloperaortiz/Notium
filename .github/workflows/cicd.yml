@@ -14,6 +14,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    # GitHub Pages publica el sitio bajo /Notium/, no en la raíz del dominio
+    env:
+      BASE_PATH: /Notium/
+
     steps:
       # 1. Checkout
       - name: Checkout código
@@ -42,11 +46,15 @@ jobs:
       - name: Build
         run: npm run build
 
-      # 7. Verificar carpeta dist
+      # 7. Fallback de SPA: Pages no reescribe rutas, así que 404.html sirve la app
+      - name: Preparar fallback de SPA
+        run: cp dist/index.html dist/404.html
+
+      # 8. Verificar carpeta dist
       - name: Verificar carpeta dist
         run: ls -R dist
 
-      # 8. Upload build artifact
+      # 9. Upload build artifact
       - name: Upload build artifact
         uses: actions/upload-artifact@v7
         with:
