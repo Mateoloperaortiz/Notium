@@ -17,11 +17,11 @@ jobs:
     steps:
       # 1. Checkout
       - name: Checkout código
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       # 2. Setup Node.js
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: '24'
           cache: npm
@@ -48,7 +48,7 @@ jobs:
 
       # 8. Upload build artifact
       - name: Upload build artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: sitio
           path: dist/
@@ -64,14 +64,14 @@ jobs:
     steps:
       # 1. Descargar artifact del job build
       - name: Download build artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: sitio
           path: dist/
 
       # 2. Deploy a GitHub Pages
       - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
+        uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./dist
