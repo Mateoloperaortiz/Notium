@@ -1,0 +1,1 @@
+var e={"&":`&amp;`,'"':`&quot;`,"'":`&#39;`,"<":`&lt;`,">":`&gt;`},t=class t{constructor(){}static escapeHtml(t){return t.replace(/[&"'<>]/g,t=>e[t]??t)}static renderText(e){return t.escapeHtml(String(e??``))}};export{t};

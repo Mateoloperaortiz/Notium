@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" role="img" aria-label="Notium">
+  <rect width="48" height="48" rx="14" fill="#173f35"/>
+  <path d="M14 34V14h5l10 12V14h5v20h-5L19 22v12h-5Z" fill="#f8f4e8"/>
+  <circle cx="36" cy="12" r="4" fill="#e9a23b"/>
+</svg>
