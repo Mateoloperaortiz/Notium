@@ -1,9 +1,10 @@
 # Notium
 
-Base inicial de una aplicación académica para organizar semestres, materias y calificaciones.
+Aplicación académica para organizar semestres, materias y calificaciones, con autenticación por
+roles, analítica visual y un panel de administración.
 
-Esta etapa implementa completamente el módulo `Semester` sobre datos mock. `Subject`, `Grade` y el
-dashboard quedan preparados para que el equipo los desarrolle después con las mismas convenciones.
+Los módulos `Semester`, `Subject` y `Grade` tienen CRUD completo. Los datos se siembran desde
+`src/seeders/` y persisten en el navegador mediante `localStorage`, sin backend.
 
 ## Requisitos
 
@@ -15,6 +16,7 @@ dashboard quedan preparados para que el equipo los desarrolle después con las m
 ```bash
 npm install
 npm run dev
+npm test
 npm run check
 ```
 
@@ -24,11 +26,21 @@ Para comprobar el formato sin modificar archivos:
 npm run format:check
 ```
 
+## Usuarios de prueba
+
+Las credenciales viven en `src/data/seedData.ts` y solo sirven para la demostración local.
+
+| Correo              | Contraseña       | Rol     |
+| ------------------- | ---------------- | ------- |
+| `mateo@example.com` | `mateo-password` | `user`  |
+| `lucia@example.com` | `lucia-password` | `user`  |
+| `admin@example.com` | `admin-password` | `admin` |
+
 ## Cumplimiento de AGENTS.md
 
 Antes de entregar cambios, ejecutar `npm run check`: ESLint sin advertencias, Prettier,
-verificación de tipos y compilación de producción. El workflow `.github/workflows/check.yml`
-ejecuta el mismo comando en los pushes y pull requests cuando estos archivos estén en GitHub.
+verificación de tipos y compilación de producción. El workflow `.github/workflows/cicd.yml`
+ejecuta las pruebas y el mismo comando en los pushes y pull requests contra `main`.
 
 ESLint exige tipos explícitos en parámetros, retornos y atributos, evita `any`, usa `interface`
 para objetos, ordena imports por ruta y comprueba convenciones de Vue, Setup Stores y separación
@@ -49,12 +61,19 @@ Consulta el [resultado de la auditoría](docs/agents-audit.md) para conocer su a
 src/
 ├── assets/                 # Estilos y recursos visuales
 ├── components/             # Piezas reutilizables por dominio
-├── data/                   # Infraestructura mock temporal
-├── dtos/                   # Contratos de creación y actualización
-├── models/                 # Entidades del dominio
-├── router/                 # Rutas de la SPA
-├── services/               # Acceso a datos y lógica de operaciones
-├── stores/                 # Estado verdaderamente global
+│   ├── admin/              # Formularios del panel de administración
+│   ├── common/             # Envoltorios compartidos, como ChartPanel
+│   ├── grade/              # Tarjeta y formulario de calificaciones
+│   ├── graphs/             # Gráficas de Chart.js por indicador
+│   ├── semester/           # Tarjeta y formulario de semestres
+│   └── subject/            # Tarjeta y formulario de materias
+├── data/                   # Datos semilla de la demostración
+├── dtos/                   # Contratos de entrada y salida
+├── interfaces/             # Entidades del dominio y enumeraciones
+├── router/                 # Rutas de la SPA y control de acceso
+├── seeders/                # Estado inicial que consume PiniaConfig
+├── services/               # Lógica de negocio y acceso a datos
+├── stores/                 # Estado global en Setup Stores
 ├── utils/                  # Utilidades puras y reutilizables
 └── views/                  # Pantallas asociadas a rutas
 ```
@@ -62,21 +81,34 @@ src/
 El acceso a datos sigue este flujo:
 
 ```text
-View / Component → Service → Mock data
+View / Component → Service → Store (Pinia) → localStorage
 ```
 
-Las vistas no dependen de la fuente concreta. Los métodos asíncronos de los servicios permiten
-reemplazar los mocks por una API posteriormente sin cambiar el contrato consumido por la UI.
+Las vistas no dependen de la fuente concreta: solo hablan con los servicios. `PiniaConfig` es el
+único punto que conoce el navegador, así que sustituir `localStorage` por una API posterior no
+cambia el contrato que consume la UI.
 
 ## Alcance actual
 
-- Modelos `User`, `Semester`, `Subject` y `Grade`.
-- DTOs base de creación y actualización.
-- Usuario y contenido académico mock.
-- `SemesterService` con `findAll`, `findById`, `create`, `update` y `delete`.
-- Router con dashboard, listado, detalle de semestre y ruta futura de materia.
-- Store Pinia de usuario activo mediante Setup Store.
-- CRUD de semestres en la interfaz.
+- Entidades `User`, `Semester`, `Subject` y `Grade` como interfaces, con el enum `Role`.
+- DTOs de creación, actualización, analítica y reportes de plataforma.
+- CRUD completo de semestres, materias y calificaciones, con validación en los servicios.
+- Autenticación con `AuthService` y guards de router: rutas protegidas y área `/admin`
+  restringida al rol `admin`.
+- `AnalyticsService` y cinco gráficas: promedio por semestre y por materia, créditos por
+  semestre, distribución por tipo de calificación y cobertura de evaluación.
+- Panel de administración con gestión de usuarios y reportes de plataforma.
+- Listados con DataTables y stores de Pinia persistidos en `localStorage`.
+- Pruebas unitarias de `SemesterService` con Vitest.
 
-Los datos viven en memoria: al recargar la página vuelven a su estado mock inicial. No se implementan
-backend, autenticación ni persistencia durante esta etapa.
+No hay backend ni base de datos: el estado vive en el navegador. Para volver a los datos semilla,
+borra la clave `piniaState` de `localStorage`.
+
+## Despliegue
+
+Cada push a `main` ejecuta `.github/workflows/cicd.yml`, que instala dependencias, corre las
+pruebas y `npm run check`, construye el sitio y lo publica en la rama `gh-pages`.
+
+El `Dockerfile` sirve el sitio con nginx y la configuración de `nginx.conf` para rutas de SPA.
+Copia la carpeta `dist/` ya construida en lugar de compilar dentro de la imagen, por eso `dist/`
+está versionada. Ejecuta `npm run build` antes de construir la imagen para que no quede desfasada.
