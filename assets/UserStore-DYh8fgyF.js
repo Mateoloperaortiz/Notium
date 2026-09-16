@@ -1,0 +1,1 @@
+import{B as e}from"./runtime-core.esm-bundler-BTpcir8I.js";import{o as t}from"./index-BW5gFkdt.js";var n=t(`user`,()=>({users:e([])}));export{n as t};
