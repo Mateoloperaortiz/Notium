@@ -109,6 +109,12 @@ borra la clave `piniaState` de `localStorage`.
 Cada push a `main` ejecuta `.github/workflows/cicd.yml`, que instala dependencias, corre las
 pruebas y `npm run check`, construye el sitio y lo publica en la rama `gh-pages`.
 
-El `Dockerfile` sirve el sitio con nginx y la configuración de `nginx.conf` para rutas de SPA.
-Copia la carpeta `dist/` ya construida en lugar de compilar dentro de la imagen, por eso `dist/`
-está versionada. Ejecuta `npm run build` antes de construir la imagen para que no quede desfasada.
+El `Dockerfile` usa una construcción multietapa. La primera etapa parte de `node:24-alpine`,
+instala las dependencias con `npm ci` y compila la SPA; la imagen final solo contiene nginx con
+los archivos estáticos y la configuración de `nginx.conf` para rutas de SPA. La carpeta `dist/`
+no está versionada porque la imagen se compila a partir del código fuente.
+
+```bash
+docker build -t notium .
+docker run --rm -p 8080:80 notium
+```
