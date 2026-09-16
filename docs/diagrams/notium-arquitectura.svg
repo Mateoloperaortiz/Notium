@@ -1,0 +1,411 @@
+<svg content="%3C%3Fxml%20version%3D%221.0%22%20encoding%3D%22UTF-8%22%3F%3E%0A%3Cmxfile%20host%3D%22app.diagrams.net%22%20agent%3D%22Claude%22%20version%3D%2224.7.17%22%20type%3D%22device%22%3E%0A%20%20%3Cdiagram%20id%3D%22notium-architecture%22%20name%3D%22Arquitectura%20actual%22%3E%0A%20%20%20%20%3CmxGraphModel%20dx%3D%221800%22%20dy%3D%221540%22%20grid%3D%221%22%20gridSize%3D%2210%22%20guides%3D%221%22%20tooltips%3D%221%22%20connect%3D%221%22%20arrows%3D%221%22%20fold%3D%221%22%20page%3D%221%22%20pageScale%3D%221%22%20pageWidth%3D%222260%22%20pageHeight%3D%221880%22%20math%3D%220%22%20shadow%3D%220%22%20background%3D%22%23ffffff%22%3E%0A%20%20%20%20%20%20%3Croot%3E%0A%20%20%20%20%20%20%20%20%3CmxCell%20id%3D%220%22%2F%3E%0A%20%20%20%20%20%20%20%20%3CmxCell%20id%3D%221%22%20parent%3D%220%22%2F%3E%0A%20%20%20%20%20%20%20%20%3CmxCell%20id%3D%22n11%22%20value%3D%22NOTIUM%22%20style%3D%22whiteSpace%3Dwrap%3Bhtml%3D0%3BstrokeWidth%3D1.5%3BfontFamily%3DArial%3BfontColor%3D%23263238%3Balign%3Dcenter%3BverticalAlign%3Dmiddle%3Bspacing%3D6%3Bshadow%3D0%3BfillColor%3D%23ffffff%3BstrokeColor%3D%23535b63%3BfontSize%3D30%3BfontStyle%3D1%3Brounded%3D1%3BarcSize%3D4%3BverticalAlign%3Dmiddle%3B%22%20vertex%3D%221%22%20parent%3D%221%22%3E%3CmxGeometry%20x%3D%2240%22%20y%3D%2230%22%20width%3D%22320%22%20height%3D%2252%22%20as%3D%22geometry%22%2F%3E%3C%2FmxCell%3E%0A%20%20%20%20%20%20%20%20%3CmxCell%20id%3D%22n12%22%20value%3D%22Arquitectura%20actual%20%C2%B7%20semestres%2C%20materias%2C%20calificaciones%2C%20anal%C3%ADtica%20y%20administraci%C3%B3n%22%20style%3D%22whiteSpace%3Dwrap%3Bhtml%3D0%3BstrokeWidth%3D1.5%3BfontFamily%3DArial%3BfontColor%3D%235c6875%3Balign%3Dcenter%3BverticalAlign%3Dmiddle%3Bspacing%3D6%3Bshadow%3D0%3BfillColor%3Dnone%3BstrokeColor%3Dnone%3BfontSize%3D19%3BfontStyle%3D0%3Balign%3Dleft%3B%22%20vertex%3D%221%22%20parent%3D%221%22%3E%3CmxGeometry%20x%3D%2240%22%20y%3D%2288%22%20width%3D%221300%22%20height%3D%2232%22%20as%3D%22geometry%22%2F%3E%3C%2FmxCell%3E%0A%20%20%20%20%20%20%20%20%3CmxCell%20id%3D%22n13%22%20value%3D%2215%20sep%202026%22%20style%3D%22whiteSpace%3Dwrap%3Bhtml%3D0%3BstrokeWidth%3D1.5%3BfontFamily%3DArial%3BfontColor%3D%23263238%3Balign%3Dcenter%3BverticalAlign%3Dmiddle%3Bspacing%3D6%3Bshadow%3D0%3BfillColor%3D%23dae8fc%3BstrokeColor%3Dnone%3BfontSize%3D17%3BfontStyle%3D0%3B%22%20vertex%3D%221%22%20parent%3D%221%22%3E%3CmxGeometry%20x%3D%221960%22%20y%3D%2240%22%20width%3D%22260%22%20height%3D%2236%22%20as%3D%22geometry%22%2F%3E%3C%2FmxCell%3E%0A%20%20%20%20%20%20%20%20%3CmxCell%20id%3D%22n14%22%20value%3D%22Proyecto%20Notium%22%20style%3D%22whiteSpace%3Dwrap%3Bhtml%3D0%3BstrokeWidth%3D1.5%3BfontFamily%3DArial%3BfontColor%3D%23263238%3Balign%3Dcenter%3BverticalAlign%3Dmiddle%3Bspacing%3D6%3Bshadow%3D0%3BfillColor%3D%23ffffff%3BstrokeColor%3D%23535b63%3BfontSize%3D20%3BfontStyle%3D1%3Brounded%3D1%3BarcSize%3D4%3BverticalAlign%3Dtop%3B%22%20vertex%3D%221%22%20parent%3D%221%22%3E%3CmxGeometry%20x%3D%22460%22%20y%3D%22170%22%20width%3D%221760%22%20height%3D%221600%22%20as%3D%22geometry%22%2F%3E%3C%2FmxCell%3E%0A%20%20%20%20%20%20%20%20%3CmxCell%20id%3D%22n15%22%20value%3D%22Servidor%20web%0AVite%20en%20desarrollo%20%C2%B7%20GitHub%20Pages%20con%20nginx%20en%20producci%C3%B3n.%20Entrega%20index.html%20y%20los%20assets%20est%C3%A1ticos.%22%20style%3D%22whiteSpace%3Dwrap%3Bhtml%3D0%3BstrokeWidth%3D1.5%3BfontFamily%3DArial%3BfontColor%3D%23263238%3Balign%3Dcenter%3BverticalAlign%3Dmiddle%3Bspacing%3D6%3Bshadow%3D0%3BfillColor%3D%23f5f5f5%3BstrokeColor%3D%238b939c%3BfontSize%3D19%3BfontStyle%3D1%3Brounded%3D1%3BarcSize%3D6%3BverticalAlign%3Dtop%3B%22%20vertex%3D%221%22%20parent%3D%221%22%3E%3CmxGeometry%20x%3D%22500%22%20y%3D%22230%22%20width%3D%221680%22%20height%3D%22100%22%20as%3D%22geometry%22%2F%3E%3C%2FmxCell%3E%0A%20%20%20%20%20%20%20%20%3CmxCell%20id%3D%22n16%22%20value%3D%22Frontend%20%C2%B7%20Vue%203%20%2B%20TypeScript%20%20%20%C2%B7%20%20%20SPA%20%2F%20CSR%20%C2%B7%20se%20ejecuta%20en%20el%20navegador%22%20style%3D%22whiteSpace%3Dwrap%3Bhtml%3D0%3BstrokeWidth%3D1.5%3BfontFamily%3DArial%3BfontColor%3D%23263238%3Balign%3Dcenter%3BverticalAlign%3Dmiddle%3Bspacing%3D6%3Bshadow%3D0%3BfillColor%3D%23ffffff%3BstrokeColor%3D%23535b63%3BfontSize%3D20%3BfontStyle%3D1%3Brounded%3D1%3BarcSize%3D4%3BverticalAlign%3Dtop%3B%22%20vertex%3D%221%22%20parent%3D%221%22%3E%3CmxGeometry%20x%3D%22520%22%20y%3D%22350%22%20width%3D%221680%22%20height%3D%221400%22%20as%3D%22geometry%22%2F%3E%3C%2FmxCell%3E%0A%20%20%20%20%20%20%20%20%3CmxCell%20id%3D%22n17%22%20value%3D%22Cliente%22%20style%3D%22whiteSpace%3Dwrap%3Bhtml%3D0%3BstrokeWidth%3D1.5%3BfontFamily%3DArial%3BfontColor%3D%23263238%3Balign%3Dcenter%3BverticalAlign%3Dmiddle%3Bspacing%3D6%3Bshadow%3D0%3BfillColor%3D%23f5f5f5%3BstrokeColor%3D%23535b63%3BfontSize%3D19%3BfontStyle%3D1%3Brounded%3D1%3BarcSize%3D8%3BverticalAlign%3Dtop%3B%22%20vertex%3D%221%22%20parent%3D%221%22%3E%3CmxGeometry%20x%3D%2240%22%20y%3D%22170%22%20width%3D%22280%22%20height%3D%22216%22%20as%3D%22geometry%22%2F%3E%3C%2FmxCell%3E%0A%20%20%20%20%20%20%20%20%3CmxCell%20id%3D%22n18%22%20value%3D%22Navegador%20web%0AM%C3%B3vil%20%C2%B7%20escritorio%22%20style%3D%22whiteSpace%3Dwrap%3Bhtml%3D0%3BstrokeWidth%3D1.5%3BfontFamily%3DArial%3BfontColor%3D%23263238%3Balign%3Dcenter%3BverticalAlign%3Dmiddle%3Bspacing%3D6%3Bshadow%3D0%3BfillColor%3D%23ffffff%3BstrokeColor%3D%238b939c%3BfontSize%3D17%3BfontStyle%3D0%3B%22%20vertex%3D%221%22%20parent%3D%22n17%22%3E%3CmxGeometry%20x%3D%2216%22%20y%3D%2260%22%20width%3D%22248%22%20height%3D%2260%22%20as%3D%22geometry%22%2F%3E%3C%2FmxCell%3E%0A%20%20%20%20%20%20%20%20%3CmxCell%20id%3D%22n19%22%20value%3D%22La%20SPA%20se%20ejecuta%20aqu%C3%AD.%0AEl%20estado%20queda%20en%20localStorage%0Adel%20propio%20navegador.%22%20style%3D%22whiteSpace%3Dwrap%3Bhtml%3D0%3BstrokeWidth%3D1.5%3BfontFamily%3DArial%3BfontColor%3D%235c6875%3Balign%3Dcenter%3BverticalAlign%3Dmiddle%3Bspacing%3D6%3Bshadow%3D0%3BfillColor%3D%23ffffff%3BstrokeColor%3D%238b939c%3BfontSize%3D15%3BfontStyle%3D0%3Bdashed%3D1%3B%22%20vertex%3D%221%22%20parent%3D%22n17%22%3E%3CmxGeometry%20x%3D%2216%22%20y%3D%22132%22%20width%3D%22248%22%20height%3D%2268%22%20as%3D%22geometry%22%2F%3E%3C%2FmxCell%3E%0A%20%20%20%20%20%20%20%20%3CmxCell%20id%3D%22n20%22%20value%3D%22Arranque%22%20style%3D%22whiteSpace%3Dwrap%3Bhtml%3D0%3BstrokeWidth%3D1.5%3BfontFamily%3DArial%3BfontColor%3D%23263238%3Balign%3Dcenter%3BverticalAlign%3Dmiddle%3Bspacing%3D6%3Bshadow%3D0%3BfillColor%3D%23f5f5f5%3BstrokeColor%3D%23535b63%3BfontSize%3D19%3BfontStyle%3D1%3Brounded%3D1%3BarcSize%3D8%3BverticalAlign%3Dtop%3B%22%20vertex%3D%221%22%20parent%3D%221%22%3E%3CmxGeometry%20x%3D%22560%22%20y%3D%22400%22%20width%3D%22650%22%20height%3D%22210%22%20as%3D%22geometry%22%2F%3E%3C%2FmxCell%3E%0A%20%20%20%20%20%20%20%20%3CmxCell%20id%3D%22n21%22%20value%3D%22src%2Fmain.ts%20%20%E2%86%92%20%20src%2FApp.vue%22%20style%3D%22whiteSpace%3Dwrap%3Bhtml%3D0%3BstrokeWidth%3D1.5%3BfontFamily%3DArial%3BfontColor%3D%23263238%3Balign%3Dcenter%3BverticalAlign%3Dmiddle%3Bspacing%3D6%3Bshadow%3D0%3BfillColor%3D%23ffffff%3BstrokeColor%3D%238b939c%3BfontSize%3D17%3BfontStyle%3D0%3B%22%20vertex%3D%221%22%20parent%3D%22n20%22%3E%3CmxGeometry%20x%3D%2216%22%20y%3D%2260%22%20width%3D%22618%22%20height%3D%2244%22%20as%3D%22geometry%22%2F%3E%3C%2FmxCell%3E%0A%20%20%20%20%20%20%20%20%3CmxCell%20id%3D%22n22%22%20value%3D%22src%2FPiniaConfig.ts%22%20style%3D%22whiteSpace%3Dwrap%3Bhtml%3D0%3BstrokeWidth%3D1.5%3BfontFamily%3DArial%3BfontColor%3D%23263238%3Balign%3Dcenter%3BverticalAlign%3Dmiddle%3Bspacing%3D6%3Bshadow%3D0%3BfillColor%3D%23ffffff%3BstrokeColor%3D%238b939c%3BfontSize%3D17%3BfontStyle%3D0%3B%22%20vertex%3D%221%22%20parent%3D%22n20%22%3E%3CmxGeometry%20x%3D%2216%22%20y%3D%22116%22%20width%3D%22618%22%20height%3D%2244%22%20as%3D%22geometry%22%2F%3E%3C%2FmxCell%3E%0A%20%20%20%20%20%20%20%20%3CmxCell%20id%3D%22n23%22%20value%3D%22Crea%20la%20app%2C%20siembra%20el%20estado%20e%20instala%20Pinia%20y%20el%20router%22%20style%3D%22whiteSpace%3Dwrap%3Bhtml%3D0%3BstrokeWidth%3D1.5%3BfontFamily%3DArial%3BfontColor%3D%235c6875%3Balign%3Dcenter%3BverticalAlign%3Dmiddle%3Bspacing%3D6%3Bshadow%3D0%3BfillColor%3Dnone%3BstrokeColor%3Dnone%3BfontSize%3D15%3BfontStyle%3D0%3B%22%20vertex%3D%221%22%20parent%3D%22n20%22%3E%3CmxGeometry%20x%3D%2216%22%20y%3D%22168%22%20width%3D%22618%22%20height%3D%2226%22%20as%3D%22geometry%22%2F%3E%3C%2FmxCell%3E%0A%20%20%20%20%20%20%20%20%3CmxCell%20id%3D%22n24%22%20value%3D%22src%2Frouter%2F%22%20style%3D%22whiteSpace%3Dwrap%3Bhtml%3D0%3BstrokeWidth%3D1.5%3BfontFamily%3DArial%3BfontColor%3D%23263238%3Balign%3Dcenter%3BverticalAlign%3Dmiddle%3Bspacing%3D6%3Bshadow%3D0%3BfillColor%3D%23f5f5f5%3BstrokeColor%3D%23535b63%3BfontSize%3D19%3BfontStyle%3D1%3Brounded%3D1%3BarcSize%3D8%3BverticalAlign%3Dtop%3B%22%20vertex%3D%221%22%20parent%3D%221%22%3E%3CmxGeometry%20x%3D%221360%22%20y%3D%22400%22%20width%3D%22800%22%20height%3D%22234%22%20as%3D%22geometry%22%2F%3E%3C%2FmxCell%3E%0A%20%20%20%20%20%20%20%20%3CmxCell%20id%3D%22n25%22%20value%3D%22index.ts%0A13%20rutas%20de%20la%20SPA%22%20style%3D%22whiteSpace%3Dwrap%3Bhtml%3D0%3BstrokeWidth%3D1.5%3BfontFamily%3DArial%3BfontColor%3D%23263238%3Balign%3Dcenter%3BverticalAlign%3Dmiddle%3Bspacing%3D6%3Bshadow%3D0%3BfillColor%3D%23ffffff%3BstrokeColor%3D%238b939c%3BfontSize%3D17%3BfontStyle%3D0%3B%22%20vertex%3D%221%22%20parent%3D%22n24%22%3E%3CmxGeometry%20x%3D%2216%22%20y%3D%2260%22%20width%3D%22768%22%20height%3D%2256%22%20as%3D%22geometry%22%2F%3E%3C%2FmxCell%3E%0A%20%20%20%20%20%20%20%20%3CmxCell%20id%3D%22n26%22%20value%3D%22accessControl.ts%0AGuards%3A%20requiresAuth%20y%20roles%22%20style%3D%22whiteSpace%3Dwrap%3Bhtml%3D0%3BstrokeWidth%3D1.5%3BfontFamily%3DArial%3BfontColor%3D%23263238%3Balign%3Dcenter%3BverticalAlign%3Dmiddle%3Bspacing%3D6%3Bshadow%3D0%3BfillColor%3D%23ffffff%3BstrokeColor%3D%238b939c%3BfontSize%3D17%3BfontStyle%3D0%3B%22%20vertex%3D%221%22%20parent%3D%22n24%22%3E%3CmxGeometry%20x%3D%2216%22%20y%3D%22128%22%20width%3D%22768%22%20height%3D%2256%22%20as%3D%22geometry%22%2F%3E%3C%2FmxCell%3E%0A%20%20%20%20%20%20%20%20%3CmxCell%20id%3D%22n27%22%20value%3D%22createWebHistory%28BASE_URL%29%22%20style%3D%22whiteSpace%3Dwrap%3Bhtml%3D0%3BstrokeWidth%3D1.5%3BfontFamily%3DArial%3BfontColor%3D%235c6875%3Balign%3Dcenter%3BverticalAlign%3Dmiddle%3Bspacing%3D6%3Bshadow%3D0%3BfillColor%3Dnone%3BstrokeColor%3Dnone%3BfontSize%3D15%3BfontStyle%3D0%3B%22%20vertex%3D%221%22%20parent%3D%22n24%22%3E%3CmxGeometry%20x%3D%2216%22%20y%3D%22192%22%20width%3D%22768%22%20height%3D%2226%22%20as%3D%22geometry%22%2F%3E%3C%2FmxCell%3E%0A%20%20%20%20%20%20%20%20%3CmxCell%20id%3D%22n28%22%20value%3D%22src%2Fviews%2F%20%28VM%20%2F%20V%29%22%20style%3D%22whiteSpace%3Dwrap%3Bhtml%3D0%3BstrokeWidth%3D1.5%3BfontFamily%3DArial%3BfontColor%3D%23263238%3Balign%3Dcenter%3BverticalAlign%3Dmiddle%3Bspacing%3D6%3Bshadow%3D0%3BfillColor%3D%23f5f5f5%3BstrokeColor%3D%23535b63%3BfontSize%3D19%3BfontStyle%3D1%3Brounded%3D1%3BarcSize%3D8%3BverticalAlign%3Dtop%3B%22%20vertex%3D%221%22%20parent%3D%221%22%3E%3CmxGeometry%20x%3D%22560%22%20y%3D%22700%22%20width%3D%22430%22%20height%3D%22450%22%20as%3D%22geometry%22%2F%3E%3C%2FmxCell%3E%0A%20%20%20%20%20%20%20%20%3CmxCell%20id%3D%22n29%22%20value%3D%22HomeView%20%C2%B7%20LoginView%0ADashboardView%20%C2%B7%20AnalyticsView%0ANotFoundView%22%20style%3D%22whiteSpace%3Dwrap%3Bhtml%3D0%3BstrokeWidth%3D1.5%3BfontFamily%3DArial%3BfontColor%3D%23263238%3Balign%3Dcenter%3BverticalAlign%3Dmiddle%3Bspacing%3D6%3Bshadow%3D0%3BfillColor%3D%23ffffff%3BstrokeColor%3D%238b939c%3BfontSize%3D17%3BfontStyle%3D0%3B%22%20vertex%3D%221%22%20parent%3D%22n28%22%3E%3CmxGeometry%20x%3D%2216%22%20y%3D%2260%22%20width%3D%22398%22%20height%3D%2268%22%20as%3D%22geometry%22%2F%3E%3C%2FmxCell%3E%0A%20%20%20%20%20%20%20%20%3CmxCell%20id%3D%22n30%22%20value%3D%22semester%2F%0AIndex%20%C2%B7%20Show%22%20style%3D%22whiteSpace%3Dwrap%3Bhtml%3D0%3BstrokeWidth%3D1.5%3BfontFamily%3DArial%3BfontColor%3D%23263238%3Balign%3Dcenter%3BverticalAlign%3Dmiddle%3Bspacing%3D6%3Bshadow%3D0%3BfillColor%3D%23ffffff%3BstrokeColor%3D%238b939c%3BfontSize%3D17%3BfontStyle%3D0%3B%22%20vertex%3D%221%22%20parent%3D%22n28%22%3E%3CmxGeometry%20x%3D%2216%22%20y%3D%22140%22%20width%3D%22398%22%20height%3D%2256%22%20as%3D%22geometry%22%2F%3E%3C%2FmxCell%3E%0A%20%20%20%20%20%20%20%20%3CmxCell%20id%3D%22n31%22%20value%3D%22subject%2F%0AIndex%20%C2%B7%20Show%22%20style%3D%22whiteSpace%3Dwrap%3Bhtml%3D0%3BstrokeWidth%3D1.5%3BfontFamily%3DArial%3BfontColor%3D%23263238%3Balign%3Dcenter%3BverticalAlign%3Dmiddle%3Bspacing%3D6%3Bshadow%3D0%3BfillColor%3D%23ffffff%3BstrokeColor%3D%238b939c%3BfontSize%3D17%3BfontStyle%3D0%3B%22%20vertex%3D%221%22%20parent%3D%22n28%22%3E%3CmxGeometry%20x%3D%2216%22%20y%3D%22208%22%20width%3D%22398%22%20height%3D%2256%22%20as%3D%22geometry%22%2F%3E%3C%2FmxCell%3E%0A%20%20%20%20%20%20%20%20%3CmxCell%20id%3D%22n32%22%20value%3D%22grade%2F%0AIndex%20%C2%B7%20Show%22%20style%3D%22whiteSpace%3Dwrap%3Bhtml%3D0%3BstrokeWidth%3D1.5%3BfontFamily%3DArial%3BfontColor%3D%23263238%3Balign%3Dcenter%3BverticalAlign%3Dmiddle%3Bspacing%3D6%3Bshadow%3D0%3BfillColor%3D%23ffffff%3BstrokeColor%3D%238b939c%3BfontSize%3D17%3BfontStyle%3D0%3B%22%20vertex%3D%221%22%20parent%3D%22n28%22%3E%3CmxGeometry%20x%3D%2216%22%20y%3D%22276%22%20width%3D%22398%22%20height%3D%2256%22%20as%3D%22geometry%22%2F%3E%3C%2FmxCell%3E%0A%20%20%20%20%20%20%20%20%3CmxCell%20id%3D%22n33%22%20value%3D%22admin%2F%0AAdminUsers%20%C2%B7%20AdminReports%22%20style%3D%22whiteSpace%3Dwrap%3Bhtml%3D0%3BstrokeWidth%3D1.5%3BfontFamily%3DArial%3BfontColor%3D%23263238%3Balign%3Dcenter%3BverticalAlign%3Dmiddle%3Bspacing%3D6%3Bshadow%3D0%3BfillColor%3D%23ffffff%3BstrokeColor%3D%238b939c%3BfontSize%3D17%3BfontStyle%3D0%3B%22%20vertex%3D%221%22%20parent%3D%22n28%22%3E%3CmxGeometry%20x%3D%2216%22%20y%3D%22344%22%20width%3D%22398%22%20height%3D%2256%22%20as%3D%22geometry%22%2F%3E%3C%2FmxCell%3E%0A%20%20%20%20%20%20%20%20%3CmxCell%20id%3D%22n34%22%20value%3D%22Pantallas%20asociadas%20a%20las%20rutas%22%20style%3D%22whiteSpace%3Dwrap%3Bhtml%3D0%3BstrokeWidth%3D1.5%3BfontFamily%3DArial%3BfontColor%3D%235c6875%3Balign%3Dcenter%3BverticalAlign%3Dmiddle%3Bspacing%3D6%3Bshadow%3D0%3BfillColor%3Dnone%3BstrokeColor%3Dnone%3BfontSize%3D15%3BfontStyle%3D0%3B%22%20vertex%3D%221%22%20parent%3D%22n28%22%3E%3CmxGeometry%20x%3D%2216%22%20y%3D%22408%22%20width%3D%22398%22%20height%3D%2226%22%20as%3D%22geometry%22%2F%3E%3C%2FmxCell%3E%0A%20%20%20%20%20%20%20%20%3CmxCell%20id%3D%22n35%22%20value%3D%22src%2Fcomponents%2F%20%28V%29%22%20style%3D%22whiteSpace%3Dwrap%3Bhtml%3D0%3BstrokeWidth%3D1.5%3BfontFamily%3DArial%3BfontColor%3D%23263238%3Balign%3Dcenter%3BverticalAlign%3Dmiddle%3Bspacing%3D6%3Bshadow%3D0%3BfillColor%3D%23f5f5f5%3BstrokeColor%3D%23535b63%3BfontSize%3D19%3BfontStyle%3D1%3Brounded%3D1%3BarcSize%3D8%3BverticalAlign%3Dtop%3B%22%20vertex%3D%221%22%20parent%3D%221%22%3E%3CmxGeometry%20x%3D%22560%22%20y%3D%221190%22%20width%3D%22430%22%20height%3D%22302%22%20as%3D%22geometry%22%2F%3E%3C%2FmxCell%3E%0A%20%20%20%20%20%20%20%20%3CmxCell%20id%3D%22n36%22%20value%3D%22semester%2F%20%C2%B7%20subject%2F%20%C2%B7%20grade%2F%0ACard%20y%20Form%20por%20dominio%22%20style%3D%22whiteSpace%3Dwrap%3Bhtml%3D0%3BstrokeWidth%3D1.5%3BfontFamily%3DArial%3BfontColor%3D%23263238%3Balign%3Dcenter%3BverticalAlign%3Dmiddle%3Bspacing%3D6%3Bshadow%3D0%3BfillColor%3D%23ffffff%3BstrokeColor%3D%238b939c%3BfontSize%3D17%3BfontStyle%3D0%3B%22%20vertex%3D%221%22%20parent%3D%22n35%22%3E%3CmxGeometry%20x%3D%2216%22%20y%3D%2260%22%20width%3D%22398%22%20height%3D%2256%22%20as%3D%22geometry%22%2F%3E%3C%2FmxCell%3E%0A%20%20%20%20%20%20%20%20%3CmxCell%20id%3D%22n37%22%20value%3D%22admin%2FUserForm%0Acommon%2FChartPanel%22%20style%3D%22whiteSpace%3Dwrap%3Bhtml%3D0%3BstrokeWidth%3D1.5%3BfontFamily%3DArial%3BfontColor%3D%23263238%3Balign%3Dcenter%3BverticalAlign%3Dmiddle%3Bspacing%3D6%3Bshadow%3D0%3BfillColor%3D%23ffffff%3BstrokeColor%3D%238b939c%3BfontSize%3D17%3BfontStyle%3D0%3B%22%20vertex%3D%221%22%20parent%3D%22n35%22%3E%3CmxGeometry%20x%3D%2216%22%20y%3D%22128%22%20width%3D%22398%22%20height%3D%2256%22%20as%3D%22geometry%22%2F%3E%3C%2FmxCell%3E%0A%20%20%20%20%20%20%20%20%3CmxCell%20id%3D%22n38%22%20value%3D%22graphs%2F%0A5%20gr%C3%A1ficas%20de%20Chart.js%22%20style%3D%22whiteSpace%3Dwrap%3Bhtml%3D0%3BstrokeWidth%3D1.5%3BfontFamily%3DArial%3BfontColor%3D%23263238%3Balign%3Dcenter%3BverticalAlign%3Dmiddle%3Bspacing%3D6%3Bshadow%3D0%3BfillColor%3D%23ffffff%3BstrokeColor%3D%238b939c%3BfontSize%3D17%3BfontStyle%3D0%3B%22%20vertex%3D%221%22%20parent%3D%22n35%22%3E%3CmxGeometry%20x%3D%2216%22%20y%3D%22196%22%20width%3D%22398%22%20height%3D%2256%22%20as%3D%22geometry%22%2F%3E%3C%2FmxCell%3E%0A%20%20%20%20%20%20%20%20%3CmxCell%20id%3D%22n39%22%20value%3D%22Reciben%20props%20y%20emiten%20eventos%22%20style%3D%22whiteSpace%3Dwrap%3Bhtml%3D0%3BstrokeWidth%3D1.5%3BfontFamily%3DArial%3BfontColor%3D%235c6875%3Balign%3Dcenter%3BverticalAlign%3Dmiddle%3Bspacing%3D6%3Bshadow%3D0%3BfillColor%3Dnone%3BstrokeColor%3Dnone%3BfontSize%3D15%3BfontStyle%3D0%3B%22%20vertex%3D%221%22%20parent%3D%22n35%22%3E%3CmxGeometry%20x%3D%2216%22%20y%3D%22260%22%20width%3D%22398%22%20height%3D%2226%22%20as%3D%22geometry%22%2F%3E%3C%2FmxCell%3E%0A%20%20%20%20%20%20%20%20%3CmxCell%20id%3D%22n40%22%20value%3D%22src%2Fservices%2F%20%28M%29%22%20style%3D%22whiteSpace%3Dwrap%3Bhtml%3D0%3BstrokeWidth%3D1.5%3BfontFamily%3DArial%3BfontColor%3D%23263238%3Balign%3Dcenter%3BverticalAlign%3Dmiddle%3Bspacing%3D6%3Bshadow%3D0%3BfillColor%3D%23f5f5f5%3BstrokeColor%3D%23535b63%3BfontSize%3D19%3BfontStyle%3D1%3Brounded%3D1%3BarcSize%3D8%3BverticalAlign%3Dtop%3B%22%20vertex%3D%221%22%20parent%3D%221%22%3E%3CmxGeometry%20x%3D%221140%22%20y%3D%22700%22%20width%3D%22430%22%20height%3D%22514%22%20as%3D%22geometry%22%2F%3E%3C%2FmxCell%3E%0A%20%20%20%20%20%20%20%20%3CmxCell%20id%3D%22n41%22%20value%3D%22AuthService.ts%22%20style%3D%22whiteSpace%3Dwrap%3Bhtml%3D0%3BstrokeWidth%3D1.5%3BfontFamily%3DArial%3BfontColor%3D%23263238%3Balign%3Dcenter%3BverticalAlign%3Dmiddle%3Bspacing%3D6%3Bshadow%3D0%3BfillColor%3D%23ffffff%3BstrokeColor%3D%238b939c%3BfontSize%3D17%3BfontStyle%3D0%3B%22%20vertex%3D%221%22%20parent%3D%22n40%22%3E%3CmxGeometry%20x%3D%2216%22%20y%3D%2260%22%20width%3D%22398%22%20height%3D%2244%22%20as%3D%22geometry%22%2F%3E%3C%2FmxCell%3E%0A%20%20%20%20%20%20%20%20%3CmxCell%20id%3D%22n42%22%20value%3D%22UserService.ts%22%20style%3D%22whiteSpace%3Dwrap%3Bhtml%3D0%3BstrokeWidth%3D1.5%3BfontFamily%3DArial%3BfontColor%3D%23263238%3Balign%3Dcenter%3BverticalAlign%3Dmiddle%3Bspacing%3D6%3Bshadow%3D0%3BfillColor%3D%23ffffff%3BstrokeColor%3D%238b939c%3BfontSize%3D17%3BfontStyle%3D0%3B%22%20vertex%3D%221%22%20parent%3D%22n40%22%3E%3CmxGeometry%20x%3D%2216%22%20y%3D%22116%22%20width%3D%22398%22%20height%3D%2244%22%20as%3D%22geometry%22%2F%3E%3C%2FmxCell%3E%0A%20%20%20%20%20%20%20%20%3CmxCell%20id%3D%22n43%22%20value%3D%22SemesterService.ts%22%20style%3D%22whiteSpace%3Dwrap%3Bhtml%3D0%3BstrokeWidth%3D1.5%3BfontFamily%3DArial%3BfontColor%3D%23263238%3Balign%3Dcenter%3BverticalAlign%3Dmiddle%3Bspacing%3D6%3Bshadow%3D0%3BfillColor%3D%23ffffff%3BstrokeColor%3D%238b939c%3BfontSize%3D17%3BfontStyle%3D0%3B%22%20vertex%3D%221%22%20parent%3D%22n40%22%3E%3CmxGeometry%20x%3D%2216%22%20y%3D%22172%22%20width%3D%22398%22%20height%3D%2244%22%20as%3D%22geometry%22%2F%3E%3C%2FmxCell%3E%0A%20%20%20%20%20%20%20%20%3CmxCell%20id%3D%22n44%22%20value%3D%22SubjectService.ts%22%20style%3D%22whiteSpace%3Dwrap%3Bhtml%3D0%3BstrokeWidth%3D1.5%3BfontFamily%3DArial%3BfontColor%3D%23263238%3Balign%3Dcenter%3BverticalAlign%3Dmiddle%3Bspacing%3D6%3Bshadow%3D0%3BfillColor%3D%23ffffff%3BstrokeColor%3D%238b939c%3BfontSize%3D17%3BfontStyle%3D0%3B%22%20vertex%3D%221%22%20parent%3D%22n40%22%3E%3CmxGeometry%20x%3D%2216%22%20y%3D%22228%22%20width%3D%22398%22%20height%3D%2244%22%20as%3D%22geometry%22%2F%3E%3C%2FmxCell%3E%0A%20%20%20%20%20%20%20%20%3CmxCell%20id%3D%22n45%22%20value%3D%22GradeService.ts%22%20style%3D%22whiteSpace%3Dwrap%3Bhtml%3D0%3BstrokeWidth%3D1.5%3BfontFamily%3DArial%3BfontColor%3D%23263238%3Balign%3Dcenter%3BverticalAlign%3Dmiddle%3Bspacing%3D6%3Bshadow%3D0%3BfillColor%3D%23ffffff%3BstrokeColor%3D%238b939c%3BfontSize%3D17%3BfontStyle%3D0%3B%22%20vertex%3D%221%22%20parent%3D%22n40%22%3E%3CmxGeometry%20x%3D%2216%22%20y%3D%22284%22%20width%3D%22398%22%20height%3D%2244%22%20as%3D%22geometry%22%2F%3E%3C%2FmxCell%3E%0A%20%20%20%20%20%20%20%20%3CmxCell%20id%3D%22n46%22%20value%3D%22AnalyticsService.ts%0APuro%3A%20no%20toca%20los%20stores%22%20style%3D%22whiteSpace%3Dwrap%3Bhtml%3D0%3BstrokeWidth%3D1.5%3BfontFamily%3DArial%3BfontColor%3D%23263238%3Balign%3Dcenter%3BverticalAlign%3Dmiddle%3Bspacing%3D6%3Bshadow%3D0%3BfillColor%3D%23fff4da%3BstrokeColor%3D%238b939c%3BfontSize%3D17%3BfontStyle%3D0%3B%22%20vertex%3D%221%22%20parent%3D%22n40%22%3E%3CmxGeometry%20x%3D%2216%22%20y%3D%22340%22%20width%3D%22398%22%20height%3D%2256%22%20as%3D%22geometry%22%2F%3E%3C%2FmxCell%3E%0A%20%20%20%20%20%20%20%20%3CmxCell%20id%3D%22n47%22%20value%3D%22PlatformReportService.ts%0APuro%3A%20no%20toca%20los%20stores%22%20style%3D%22whiteSpace%3Dwrap%3Bhtml%3D0%3BstrokeWidth%3D1.5%3BfontFamily%3DArial%3BfontColor%3D%23263238%3Balign%3Dcenter%3BverticalAlign%3Dmiddle%3Bspacing%3D6%3Bshadow%3D0%3BfillColor%3D%23fff4da%3BstrokeColor%3D%238b939c%3BfontSize%3D17%3BfontStyle%3D0%3B%22%20vertex%3D%221%22%20parent%3D%22n40%22%3E%3CmxGeometry%20x%3D%2216%22%20y%3D%22408%22%20width%3D%22398%22%20height%3D%2256%22%20as%3D%22geometry%22%2F%3E%3C%2FmxCell%3E%0A%20%20%20%20%20%20%20%20%3CmxCell%20id%3D%22n48%22%20value%3D%22Validaci%C3%B3n%20y%20l%C3%B3gica%20de%20negocio%22%20style%3D%22whiteSpace%3Dwrap%3Bhtml%3D0%3BstrokeWidth%3D1.5%3BfontFamily%3DArial%3BfontColor%3D%235c6875%3Balign%3Dcenter%3BverticalAlign%3Dmiddle%3Bspacing%3D6%3Bshadow%3D0%3BfillColor%3Dnone%3BstrokeColor%3Dnone%3BfontSize%3D15%3BfontStyle%3D0%3B%22%20vertex%3D%221%22%20parent%3D%22n40%22%3E%3CmxGeometry%20x%3D%2216%22%20y%3D%22472%22%20width%3D%22398%22%20height%3D%2226%22%20as%3D%22geometry%22%2F%3E%3C%2FmxCell%3E%0A%20%20%20%20%20%20%20%20%3CmxCell%20id%3D%22n49%22%20value%3D%22src%2Futils%2F%22%20style%3D%22whiteSpace%3Dwrap%3Bhtml%3D0%3BstrokeWidth%3D1.5%3BfontFamily%3DArial%3BfontColor%3D%23263238%3Balign%3Dcenter%3BverticalAlign%3Dmiddle%3Bspacing%3D6%3Bshadow%3D0%3BfillColor%3D%23f5f5f5%3BstrokeColor%3D%23535b63%3BfontSize%3D19%3BfontStyle%3D1%3Brounded%3D1%3BarcSize%3D8%3BverticalAlign%3Dtop%3B%22%20vertex%3D%221%22%20parent%3D%221%22%3E%3CmxGeometry%20x%3D%221140%22%20y%3D%221250%22%20width%3D%22430%22%20height%3D%22210%22%20as%3D%22geometry%22%2F%3E%3C%2FmxCell%3E%0A%20%20%20%20%20%20%20%20%3CmxCell%20id%3D%22n50%22%20value%3D%22DateFormatUtil.ts%22%20style%3D%22whiteSpace%3Dwrap%3Bhtml%3D0%3BstrokeWidth%3D1.5%3BfontFamily%3DArial%3BfontColor%3D%23263238%3Balign%3Dcenter%3BverticalAlign%3Dmiddle%3Bspacing%3D6%3Bshadow%3D0%3BfillColor%3D%23ffffff%3BstrokeColor%3D%238b939c%3BfontSize%3D17%3BfontStyle%3D0%3B%22%20vertex%3D%221%22%20parent%3D%22n49%22%3E%3CmxGeometry%20x%3D%2216%22%20y%3D%2260%22%20width%3D%22398%22%20height%3D%2244%22%20as%3D%22geometry%22%2F%3E%3C%2FmxCell%3E%0A%20%20%20%20%20%20%20%20%3CmxCell%20id%3D%22n51%22%20value%3D%22TableRenderUtil.ts%22%20style%3D%22whiteSpace%3Dwrap%3Bhtml%3D0%3BstrokeWidth%3D1.5%3BfontFamily%3DArial%3BfontColor%3D%23263238%3Balign%3Dcenter%3BverticalAlign%3Dmiddle%3Bspacing%3D6%3Bshadow%3D0%3BfillColor%3D%23ffffff%3BstrokeColor%3D%238b939c%3BfontSize%3D17%3BfontStyle%3D0%3B%22%20vertex%3D%221%22%20parent%3D%22n49%22%3E%3CmxGeometry%20x%3D%2216%22%20y%3D%22116%22%20width%3D%22398%22%20height%3D%2244%22%20as%3D%22geometry%22%2F%3E%3C%2FmxCell%3E%0A%20%20%20%20%20%20%20%20%3CmxCell%20id%3D%22n52%22%20value%3D%22Utilidades%20puras%22%20style%3D%22whiteSpace%3Dwrap%3Bhtml%3D0%3BstrokeWidth%3D1.5%3BfontFamily%3DArial%3BfontColor%3D%235c6875%3Balign%3Dcenter%3BverticalAlign%3Dmiddle%3Bspacing%3D6%3Bshadow%3D0%3BfillColor%3Dnone%3BstrokeColor%3Dnone%3BfontSize%3D15%3BfontStyle%3D0%3B%22%20vertex%3D%221%22%20parent%3D%22n49%22%3E%3CmxGeometry%20x%3D%2216%22%20y%3D%22168%22%20width%3D%22398%22%20height%3D%2226%22%20as%3D%22geometry%22%2F%3E%3C%2FmxCell%3E%0A%20%20%20%20%20%20%20%20%3CmxCell%20id%3D%22n53%22%20value%3D%22src%2Fservices%2F__tests__%2F%22%20style%3D%22whiteSpace%3Dwrap%3Bhtml%3D0%3BstrokeWidth%3D1.5%3BfontFamily%3DArial%3BfontColor%3D%23263238%3Balign%3Dcenter%3BverticalAlign%3Dmiddle%3Bspacing%3D6%3Bshadow%3D0%3BfillColor%3D%23f5f5f5%3BstrokeColor%3D%23535b63%3BfontSize%3D19%3BfontStyle%3D1%3Brounded%3D1%3BarcSize%3D8%3BverticalAlign%3Dtop%3B%22%20vertex%3D%221%22%20parent%3D%221%22%3E%3CmxGeometry%20x%3D%221140%22%20y%3D%221490%22%20width%3D%22430%22%20height%3D%22154%22%20as%3D%22geometry%22%2F%3E%3C%2FmxCell%3E%0A%20%20%20%20%20%20%20%20%3CmxCell%20id%3D%22n54%22%20value%3D%22SemesterService.test.ts%22%20style%3D%22whiteSpace%3Dwrap%3Bhtml%3D0%3BstrokeWidth%3D1.5%3BfontFamily%3DArial%3BfontColor%3D%23263238%3Balign%3Dcenter%3BverticalAlign%3Dmiddle%3Bspacing%3D6%3Bshadow%3D0%3BfillColor%3D%23ffffff%3BstrokeColor%3D%238b939c%3BfontSize%3D17%3BfontStyle%3D0%3B%22%20vertex%3D%221%22%20parent%3D%22n53%22%3E%3CmxGeometry%20x%3D%2216%22%20y%3D%2260%22%20width%3D%22398%22%20height%3D%2244%22%20as%3D%22geometry%22%2F%3E%3C%2FmxCell%3E%0A%20%20%20%20%20%20%20%20%3CmxCell%20id%3D%22n55%22%20value%3D%22Cubre%20SemesterService%20con%20Vitest%22%20style%3D%22whiteSpace%3Dwrap%3Bhtml%3D0%3BstrokeWidth%3D1.5%3BfontFamily%3DArial%3BfontColor%3D%235c6875%3Balign%3Dcenter%3BverticalAlign%3Dmiddle%3Bspacing%3D6%3Bshadow%3D0%3BfillColor%3Dnone%3BstrokeColor%3Dnone%3BfontSize%3D15%3BfontStyle%3D0%3B%22%20vertex%3D%221%22%20parent%3D%22n53%22%3E%3CmxGeometry%20x%3D%2216%22%20y%3D%22112%22%20width%3D%22398%22%20height%3D%2226%22%20as%3D%22geometry%22%2F%3E%3C%2FmxCell%3E%0A%20%20%20%20%20%20%20%20%3CmxCell%20id%3D%22n56%22%20value%3D%22src%2Fstores%2F%20%C2%B7%20Pinia%22%20style%3D%22whiteSpace%3Dwrap%3Bhtml%3D0%3BstrokeWidth%3D1.5%3BfontFamily%3DArial%3BfontColor%3D%23263238%3Balign%3Dcenter%3BverticalAlign%3Dmiddle%3Bspacing%3D6%3Bshadow%3D0%3BfillColor%3D%23f5f5f5%3BstrokeColor%3D%23535b63%3BfontSize%3D19%3BfontStyle%3D1%3Brounded%3D1%3BarcSize%3D8%3BverticalAlign%3Dtop%3B%22%20vertex%3D%221%22%20parent%3D%221%22%3E%3CmxGeometry%20x%3D%221710%22%20y%3D%22700%22%20width%3D%22450%22%20height%3D%22234%22%20as%3D%22geometry%22%2F%3E%3C%2FmxCell%3E%0A%20%20%20%20%20%20%20%20%3CmxCell%20id%3D%22n57%22%20value%3D%22AuthStore.ts%0AcurrentUser%20%C2%B7%20login%20%C2%B7%20logout%22%20style%3D%22whiteSpace%3Dwrap%3Bhtml%3D0%3BstrokeWidth%3D1.5%3BfontFamily%3DArial%3BfontColor%3D%23263238%3Balign%3Dcenter%3BverticalAlign%3Dmiddle%3Bspacing%3D6%3Bshadow%3D0%3BfillColor%3D%23ffffff%3BstrokeColor%3D%238b939c%3BfontSize%3D17%3BfontStyle%3D0%3B%22%20vertex%3D%221%22%20parent%3D%22n56%22%3E%3CmxGeometry%20x%3D%2216%22%20y%3D%2260%22%20width%3D%22418%22%20height%3D%2256%22%20as%3D%22geometry%22%2F%3E%3C%2FmxCell%3E%0A%20%20%20%20%20%20%20%20%3CmxCell%20id%3D%22n58%22%20value%3D%22UserStore%20%C2%B7%20SemesterStore%0ASubjectStore%20%C2%B7%20GradeStore%22%20style%3D%22whiteSpace%3Dwrap%3Bhtml%3D0%3BstrokeWidth%3D1.5%3BfontFamily%3DArial%3BfontColor%3D%23263238%3Balign%3Dcenter%3BverticalAlign%3Dmiddle%3Bspacing%3D6%3Bshadow%3D0%3BfillColor%3D%23ffffff%3BstrokeColor%3D%238b939c%3BfontSize%3D17%3BfontStyle%3D0%3B%22%20vertex%3D%221%22%20parent%3D%22n56%22%3E%3CmxGeometry%20x%3D%2216%22%20y%3D%22128%22%20width%3D%22418%22%20height%3D%2256%22%20as%3D%22geometry%22%2F%3E%3C%2FmxCell%3E%0A%20%20%20%20%20%20%20%20%3CmxCell%20id%3D%22n59%22%20value%3D%22Setup%20Stores%3A%20%C3%BAnica%20fuente%20de%20datos%22%20style%3D%22whiteSpace%3Dwrap%3Bhtml%3D0%3BstrokeWidth%3D1.5%3BfontFamily%3DArial%3BfontColor%3D%235c6875%3Balign%3Dcenter%3BverticalAlign%3Dmiddle%3Bspacing%3D6%3Bshadow%3D0%3BfillColor%3Dnone%3BstrokeColor%3Dnone%3BfontSize%3D15%3BfontStyle%3D0%3B%22%20vertex%3D%221%22%20parent%3D%22n56%22%3E%3CmxGeometry%20x%3D%2216%22%20y%3D%22192%22%20width%3D%22418%22%20height%3D%2226%22%20as%3D%22geometry%22%2F%3E%3C%2FmxCell%3E%0A%20%20%20%20%20%20%20%20%3CmxCell%20id%3D%22n60%22%20value%3D%22Persistencia%22%20style%3D%22whiteSpace%3Dwrap%3Bhtml%3D0%3BstrokeWidth%3D1.5%3BfontFamily%3DArial%3BfontColor%3D%23263238%3Balign%3Dcenter%3BverticalAlign%3Dmiddle%3Bspacing%3D6%3Bshadow%3D0%3BfillColor%3D%23f5f5f5%3BstrokeColor%3D%23535b63%3BfontSize%3D19%3BfontStyle%3D1%3Brounded%3D1%3BarcSize%3D8%3BverticalAlign%3Dtop%3B%22%20vertex%3D%221%22%20parent%3D%221%22%3E%3CmxGeometry%20x%3D%221710%22%20y%3D%22970%22%20width%3D%22450%22%20height%3D%22154%22%20as%3D%22geometry%22%2F%3E%3C%2FmxCell%3E%0A%20%20%20%20%20%20%20%20%3CmxCell%20id%3D%22n61%22%20value%3D%22localStorage%20%C2%B7%20clave%20piniaState%22%20style%3D%22whiteSpace%3Dwrap%3Bhtml%3D0%3BstrokeWidth%3D1.5%3BfontFamily%3DArial%3BfontColor%3D%23263238%3Balign%3Dcenter%3BverticalAlign%3Dmiddle%3Bspacing%3D6%3Bshadow%3D0%3BfillColor%3D%23fff4da%3BstrokeColor%3D%238b939c%3BfontSize%3D17%3BfontStyle%3D0%3B%22%20vertex%3D%221%22%20parent%3D%22n60%22%3E%3CmxGeometry%20x%3D%2216%22%20y%3D%2260%22%20width%3D%22418%22%20height%3D%2244%22%20as%3D%22geometry%22%2F%3E%3C%2FmxCell%3E%0A%20%20%20%20%20%20%20%20%3CmxCell%20id%3D%22n62%22%20value%3D%22PiniaConfig%20observa%20los%20stores%20y%20serializa%20con%20flatted%22%20style%3D%22whiteSpace%3Dwrap%3Bhtml%3D0%3BstrokeWidth%3D1.5%3BfontFamily%3DArial%3BfontColor%3D%235c6875%3Balign%3Dcenter%3BverticalAlign%3Dmiddle%3Bspacing%3D6%3Bshadow%3D0%3BfillColor%3Dnone%3BstrokeColor%3Dnone%3BfontSize%3D15%3BfontStyle%3D0%3B%22%20vertex%3D%221%22%20parent%3D%22n60%22%3E%3CmxGeometry%20x%3D%2216%22%20y%3D%22112%22%20width%3D%22418%22%20height%3D%2226%22%20as%3D%22geometry%22%2F%3E%3C%2FmxCell%3E%0A%20%20%20%20%20%20%20%20%3CmxCell%20id%3D%22n63%22%20value%3D%22src%2Fseeders%2F%20%C2%B7%20src%2Fdata%2F%22%20style%3D%22whiteSpace%3Dwrap%3Bhtml%3D0%3BstrokeWidth%3D1.5%3BfontFamily%3DArial%3BfontColor%3D%23263238%3Balign%3Dcenter%3BverticalAlign%3Dmiddle%3Bspacing%3D6%3Bshadow%3D0%3BfillColor%3D%23f5f5f5%3BstrokeColor%3D%23535b63%3BfontSize%3D19%3BfontStyle%3D1%3Brounded%3D1%3BarcSize%3D8%3BverticalAlign%3Dtop%3B%22%20vertex%3D%221%22%20parent%3D%221%22%3E%3CmxGeometry%20x%3D%221710%22%20y%3D%221180%22%20width%3D%22450%22%20height%3D%22222%22%20as%3D%22geometry%22%2F%3E%3C%2FmxCell%3E%0A%20%20%20%20%20%20%20%20%3CmxCell%20id%3D%22n64%22%20value%3D%22seedData.ts%22%20style%3D%22whiteSpace%3Dwrap%3Bhtml%3D0%3BstrokeWidth%3D1.5%3BfontFamily%3DArial%3BfontColor%3D%23263238%3Balign%3Dcenter%3BverticalAlign%3Dmiddle%3Bspacing%3D6%3Bshadow%3D0%3BfillColor%3D%23ffffff%3BstrokeColor%3D%238b939c%3BfontSize%3D17%3BfontStyle%3D0%3B%22%20vertex%3D%221%22%20parent%3D%22n63%22%3E%3CmxGeometry%20x%3D%2216%22%20y%3D%2260%22%20width%3D%22418%22%20height%3D%2244%22%20as%3D%22geometry%22%2F%3E%3C%2FmxCell%3E%0A%20%20%20%20%20%20%20%20%3CmxCell%20id%3D%22n65%22%20value%3D%22userseeder%20%C2%B7%20semesterseeder%0Asubjectseeder%20%C2%B7%20gradeseeder%22%20style%3D%22whiteSpace%3Dwrap%3Bhtml%3D0%3BstrokeWidth%3D1.5%3BfontFamily%3DArial%3BfontColor%3D%23263238%3Balign%3Dcenter%3BverticalAlign%3Dmiddle%3Bspacing%3D6%3Bshadow%3D0%3BfillColor%3D%23ffffff%3BstrokeColor%3D%238b939c%3BfontSize%3D17%3BfontStyle%3D0%3B%22%20vertex%3D%221%22%20parent%3D%22n63%22%3E%3CmxGeometry%20x%3D%2216%22%20y%3D%22116%22%20width%3D%22418%22%20height%3D%2256%22%20as%3D%22geometry%22%2F%3E%3C%2FmxCell%3E%0A%20%20%20%20%20%20%20%20%3CmxCell%20id%3D%22n66%22%20value%3D%22Estado%20inicial%20la%20primera%20vez%22%20style%3D%22whiteSpace%3Dwrap%3Bhtml%3D0%3BstrokeWidth%3D1.5%3BfontFamily%3DArial%3BfontColor%3D%235c6875%3Balign%3Dcenter%3BverticalAlign%3Dmiddle%3Bspacing%3D6%3Bshadow%3D0%3BfillColor%3Dnone%3BstrokeColor%3Dnone%3BfontSize%3D15%3BfontStyle%3D0%3B%22%20vertex%3D%221%22%20parent%3D%22n63%22%3E%3CmxGeometry%20x%3D%2216%22%20y%3D%22180%22%20width%3D%22418%22%20height%3D%2226%22%20as%3D%22geometry%22%2F%3E%3C%2FmxCell%3E%0A%20%20%20%20%20%20%20%20%3CmxCell%20id%3D%22n67%22%20value%3D%22src%2Finterfaces%2F%20%C2%B7%20src%2Fdtos%2F%20%28M%29%22%20style%3D%22whiteSpace%3Dwrap%3Bhtml%3D0%3BstrokeWidth%3D1.5%3BfontFamily%3DArial%3BfontColor%3D%23263238%3Balign%3Dcenter%3BverticalAlign%3Dmiddle%3Bspacing%3D6%3Bshadow%3D0%3BfillColor%3D%23f5f5f5%3BstrokeColor%3D%23535b63%3BfontSize%3D19%3BfontStyle%3D1%3Brounded%3D1%3BarcSize%3D8%3BverticalAlign%3Dtop%3B%22%20vertex%3D%221%22%20parent%3D%221%22%3E%3CmxGeometry%20x%3D%221710%22%20y%3D%221430%22%20width%3D%22450%22%20height%3D%22290%22%20as%3D%22geometry%22%2F%3E%3C%2FmxCell%3E%0A%20%20%20%20%20%20%20%20%3CmxCell%20id%3D%22n68%22%20value%3D%22UserInterface%20%28enum%20Role%29%0ASemester%20%C2%B7%20Subject%20%C2%B7%20GradeInterface%22%20style%3D%22whiteSpace%3Dwrap%3Bhtml%3D0%3BstrokeWidth%3D1.5%3BfontFamily%3DArial%3BfontColor%3D%23263238%3Balign%3Dcenter%3BverticalAlign%3Dmiddle%3Bspacing%3D6%3Bshadow%3D0%3BfillColor%3D%23ffffff%3BstrokeColor%3D%238b939c%3BfontSize%3D17%3BfontStyle%3D0%3B%22%20vertex%3D%221%22%20parent%3D%22n67%22%3E%3CmxGeometry%20x%3D%2216%22%20y%3D%2260%22%20width%3D%22418%22%20height%3D%2256%22%20as%3D%22geometry%22%2F%3E%3C%2FmxCell%3E%0A%20%20%20%20%20%20%20%20%3CmxCell%20id%3D%22n69%22%20value%3D%22UserDTOs%20%C2%B7%20SemesterDTOs%0ASubjectDTOs%20%C2%B7%20GradeDTOs%22%20style%3D%22whiteSpace%3Dwrap%3Bhtml%3D0%3BstrokeWidth%3D1.5%3BfontFamily%3DArial%3BfontColor%3D%23263238%3Balign%3Dcenter%3BverticalAlign%3Dmiddle%3Bspacing%3D6%3Bshadow%3D0%3BfillColor%3D%23ffffff%3BstrokeColor%3D%238b939c%3BfontSize%3D17%3BfontStyle%3D0%3B%22%20vertex%3D%221%22%20parent%3D%22n67%22%3E%3CmxGeometry%20x%3D%2216%22%20y%3D%22128%22%20width%3D%22418%22%20height%3D%2256%22%20as%3D%22geometry%22%2F%3E%3C%2FmxCell%3E%0A%20%20%20%20%20%20%20%20%3CmxCell%20id%3D%22n70%22%20value%3D%22AnalyticsDTOs%20%C2%B7%20PlatformReportDTOs%22%20style%3D%22whiteSpace%3Dwrap%3Bhtml%3D0%3BstrokeWidth%3D1.5%3BfontFamily%3DArial%3BfontColor%3D%23263238%3Balign%3Dcenter%3BverticalAlign%3Dmiddle%3Bspacing%3D6%3Bshadow%3D0%3BfillColor%3D%23ffffff%3BstrokeColor%3D%238b939c%3BfontSize%3D17%3BfontStyle%3D0%3B%22%20vertex%3D%221%22%20parent%3D%22n67%22%3E%3CmxGeometry%20x%3D%2216%22%20y%3D%22196%22%20width%3D%22418%22%20height%3D%2244%22%20as%3D%22geometry%22%2F%3E%3C%2FmxCell%3E%0A%20%20%20%20%20%20%20%20%3CmxCell%20id%3D%22n71%22%20value%3D%22Entidades%20y%20contratos%20de%20entrada%22%20style%3D%22whiteSpace%3Dwrap%3Bhtml%3D0%3BstrokeWidth%3D1.5%3BfontFamily%3DArial%3BfontColor%3D%235c6875%3Balign%3Dcenter%3BverticalAlign%3Dmiddle%3Bspacing%3D6%3Bshadow%3D0%3BfillColor%3Dnone%3BstrokeColor%3Dnone%3BfontSize%3D15%3BfontStyle%3D0%3B%22%20vertex%3D%221%22%20parent%3D%22n67%22%3E%3CmxGeometry%20x%3D%2216%22%20y%3D%22248%22%20width%3D%22418%22%20height%3D%2226%22%20as%3D%22geometry%22%2F%3E%3C%2FmxCell%3E%0A%20%20%20%20%20%20%20%20%3CmxCell%20id%3D%22e72%22%20value%3D%22HTTP%3A%20solicitud%20y%20respuesta%22%20style%3D%22edgeStyle%3DorthogonalEdgeStyle%3Brounded%3D0%3Bhtml%3D0%3BstrokeWidth%3D1.8%3BstrokeColor%3D%23263238%3BendArrow%3Dopen%3BendFill%3D0%3BfontFamily%3DArial%3BfontSize%3D15%3BfontColor%3D%23263238%3BlabelBackgroundColor%3D%23ffffff%3BstartArrow%3Dopen%3BstartFill%3D0%3B%22%20edge%3D%221%22%20parent%3D%221%22%20source%3D%22n17%22%20target%3D%22n14%22%3E%3CmxGeometry%20relative%3D%221%22%20as%3D%22geometry%22%2F%3E%3C%2FmxCell%3E%0A%20%20%20%20%20%20%20%20%3CmxCell%20id%3D%22e73%22%20value%3D%22use%28router%29%22%20style%3D%22edgeStyle%3DorthogonalEdgeStyle%3Brounded%3D0%3Bhtml%3D0%3BstrokeWidth%3D1.8%3BstrokeColor%3D%23263238%3BendArrow%3Dopen%3BendFill%3D0%3BfontFamily%3DArial%3BfontSize%3D15%3BfontColor%3D%23263238%3BlabelBackgroundColor%3D%23ffffff%3B%22%20edge%3D%221%22%20parent%3D%221%22%20source%3D%22n20%22%20target%3D%22n24%22%3E%3CmxGeometry%20relative%3D%221%22%20as%3D%22geometry%22%2F%3E%3C%2FmxCell%3E%0A%20%20%20%20%20%20%20%20%3CmxCell%20id%3D%22e74%22%20value%3D%22resuelve%22%20style%3D%22edgeStyle%3DorthogonalEdgeStyle%3Brounded%3D0%3Bhtml%3D0%3BstrokeWidth%3D1.8%3BstrokeColor%3D%23263238%3BendArrow%3Dopen%3BendFill%3D0%3BfontFamily%3DArial%3BfontSize%3D15%3BfontColor%3D%23263238%3BlabelBackgroundColor%3D%23ffffff%3B%22%20edge%3D%221%22%20parent%3D%221%22%20source%3D%22n24%22%20target%3D%22n28%22%3E%3CmxGeometry%20relative%3D%221%22%20as%3D%22geometry%22%2F%3E%3C%2FmxCell%3E%0A%20%20%20%20%20%20%20%20%3CmxCell%20id%3D%22e75%22%20value%3D%22guards%20leen%20AuthStore%22%20style%3D%22edgeStyle%3DorthogonalEdgeStyle%3Brounded%3D0%3Bhtml%3D0%3BstrokeWidth%3D1.8%3BstrokeColor%3D%23263238%3BendArrow%3Dopen%3BendFill%3D0%3BfontFamily%3DArial%3BfontSize%3D15%3BfontColor%3D%23263238%3BlabelBackgroundColor%3D%23ffffff%3Bdashed%3D1%3B%22%20edge%3D%221%22%20parent%3D%221%22%20source%3D%22n24%22%20target%3D%22n56%22%3E%3CmxGeometry%20relative%3D%221%22%20as%3D%22geometry%22%2F%3E%3C%2FmxCell%3E%0A%20%20%20%20%20%20%20%20%3CmxCell%20id%3D%22e76%22%20value%3D%22props%20%2F%20emit%22%20style%3D%22edgeStyle%3DorthogonalEdgeStyle%3Brounded%3D0%3Bhtml%3D0%3BstrokeWidth%3D1.8%3BstrokeColor%3D%23263238%3BendArrow%3Dopen%3BendFill%3D0%3BfontFamily%3DArial%3BfontSize%3D15%3BfontColor%3D%23263238%3BlabelBackgroundColor%3D%23ffffff%3B%22%20edge%3D%221%22%20parent%3D%221%22%20source%3D%22n28%22%20target%3D%22n35%22%3E%3CmxGeometry%20relative%3D%221%22%20as%3D%22geometry%22%2F%3E%3C%2FmxCell%3E%0A%20%20%20%20%20%20%20%20%3CmxCell%20id%3D%22e77%22%20value%3D%22consulta%20y%20muta%22%20style%3D%22edgeStyle%3DorthogonalEdgeStyle%3Brounded%3D0%3Bhtml%3D0%3BstrokeWidth%3D1.8%3BstrokeColor%3D%23263238%3BendArrow%3Dopen%3BendFill%3D0%3BfontFamily%3DArial%3BfontSize%3D15%3BfontColor%3D%23263238%3BlabelBackgroundColor%3D%23ffffff%3B%22%20edge%3D%221%22%20parent%3D%221%22%20source%3D%22n28%22%20target%3D%22n40%22%3E%3CmxGeometry%20relative%3D%221%22%20as%3D%22geometry%22%2F%3E%3C%2FmxCell%3E%0A%20%20%20%20%20%20%20%20%3CmxCell%20id%3D%22e78%22%20value%3D%22formularios%20y%20gr%C3%A1ficas%22%20style%3D%22edgeStyle%3DorthogonalEdgeStyle%3Brounded%3D0%3Bhtml%3D0%3BstrokeWidth%3D1.8%3BstrokeColor%3D%23263238%3BendArrow%3Dopen%3BendFill%3D0%3BfontFamily%3DArial%3BfontSize%3D15%3BfontColor%3D%23263238%3BlabelBackgroundColor%3D%23ffffff%3B%22%20edge%3D%221%22%20parent%3D%221%22%20source%3D%22n35%22%20target%3D%22n40%22%3E%3CmxGeometry%20relative%3D%221%22%20as%3D%22geometry%22%2F%3E%3C%2FmxCell%3E%0A%20%20%20%20%20%20%20%20%3CmxCell%20id%3D%22e79%22%20value%3D%22formatea%22%20style%3D%22edgeStyle%3DorthogonalEdgeStyle%3Brounded%3D0%3Bhtml%3D0%3BstrokeWidth%3D1.8%3BstrokeColor%3D%23263238%3BendArrow%3Dopen%3BendFill%3D0%3BfontFamily%3DArial%3BfontSize%3D15%3BfontColor%3D%23263238%3BlabelBackgroundColor%3D%23ffffff%3Bdashed%3D1%3B%22%20edge%3D%221%22%20parent%3D%221%22%20source%3D%22n28%22%20target%3D%22n49%22%3E%3CmxGeometry%20relative%3D%221%22%20as%3D%22geometry%22%2F%3E%3C%2FmxCell%3E%0A%20%20%20%20%20%20%20%20%3CmxCell%20id%3D%22e80%22%20value%3D%22lee%20%2F%20escribe%22%20style%3D%22edgeStyle%3DorthogonalEdgeStyle%3Brounded%3D0%3Bhtml%3D0%3BstrokeWidth%3D1.8%3BstrokeColor%3D%23263238%3BendArrow%3Dopen%3BendFill%3D0%3BfontFamily%3DArial%3BfontSize%3D15%3BfontColor%3D%23263238%3BlabelBackgroundColor%3D%23ffffff%3B%22%20edge%3D%221%22%20parent%3D%221%22%20source%3D%22n40%22%20target%3D%22n56%22%3E%3CmxGeometry%20relative%3D%221%22%20as%3D%22geometry%22%2F%3E%3C%2FmxCell%3E%0A%20%20%20%20%20%20%20%20%3CmxCell%20id%3D%22e81%22%20value%3D%22tipa%20con%22%20style%3D%22edgeStyle%3DorthogonalEdgeStyle%3Brounded%3D0%3Bhtml%3D0%3BstrokeWidth%3D1.8%3BstrokeColor%3D%23263238%3BendArrow%3Dopen%3BendFill%3D0%3BfontFamily%3DArial%3BfontSize%3D15%3BfontColor%3D%23263238%3BlabelBackgroundColor%3D%23ffffff%3Bdashed%3D1%3B%22%20edge%3D%221%22%20parent%3D%221%22%20source%3D%22n40%22%20target%3D%22n67%22%3E%3CmxGeometry%20relative%3D%221%22%20as%3D%22geometry%22%2F%3E%3C%2FmxCell%3E%0A%20%20%20%20%20%20%20%20%3CmxCell%20id%3D%22e82%22%20value%3D%22%22%20style%3D%22edgeStyle%3DorthogonalEdgeStyle%3Brounded%3D0%3Bhtml%3D0%3BstrokeWidth%3D1.8%3BstrokeColor%3D%23263238%3BendArrow%3Dopen%3BendFill%3D0%3BfontFamily%3DArial%3BfontSize%3D15%3BfontColor%3D%23263238%3BlabelBackgroundColor%3D%23ffffff%3B%22%20edge%3D%221%22%20parent%3D%221%22%20source%3D%22n56%22%20target%3D%22n60%22%3E%3CmxGeometry%20relative%3D%221%22%20as%3D%22geometry%22%2F%3E%3C%2FmxCell%3E%0A%20%20%20%20%20%20%20%20%3CmxCell%20id%3D%22e83%22%20value%3D%22siembra%22%20style%3D%22edgeStyle%3DorthogonalEdgeStyle%3Brounded%3D0%3Bhtml%3D0%3BstrokeWidth%3D1.8%3BstrokeColor%3D%23263238%3BendArrow%3Dopen%3BendFill%3D0%3BfontFamily%3DArial%3BfontSize%3D15%3BfontColor%3D%23263238%3BlabelBackgroundColor%3D%23ffffff%3B%22%20edge%3D%221%22%20parent%3D%221%22%20source%3D%22n63%22%20target%3D%22n60%22%3E%3CmxGeometry%20relative%3D%221%22%20as%3D%22geometry%22%2F%3E%3C%2FmxCell%3E%0A%20%20%20%20%20%20%20%20%3CmxCell%20id%3D%22n84%22%20value%3D%22Convenciones%22%20style%3D%22whiteSpace%3Dwrap%3Bhtml%3D0%3BstrokeWidth%3D1.5%3BfontFamily%3DArial%3BfontColor%3D%23263238%3Balign%3Dcenter%3BverticalAlign%3Dmiddle%3Bspacing%3D6%3Bshadow%3D0%3BfillColor%3D%23ffffff%3BstrokeColor%3D%23535b63%3BfontSize%3D18%3BfontStyle%3D1%3Brounded%3D1%3BarcSize%3D4%3BverticalAlign%3Dtop%3B%22%20vertex%3D%221%22%20parent%3D%221%22%3E%3CmxGeometry%20x%3D%2240%22%20y%3D%22470%22%20width%3D%22280%22%20height%3D%22294%22%20as%3D%22geometry%22%2F%3E%3C%2FmxCell%3E%0A%20%20%20%20%20%20%20%20%3CmxCell%20id%3D%22n85%22%20value%3D%22Capa%20%2F%20m%C3%B3dulo%22%20style%3D%22whiteSpace%3Dwrap%3Bhtml%3D0%3BstrokeWidth%3D1.5%3BfontFamily%3DArial%3BfontColor%3D%23263238%3Balign%3Dcenter%3BverticalAlign%3Dmiddle%3Bspacing%3D6%3Bshadow%3D0%3BfillColor%3D%23ffffff%3BstrokeColor%3D%238b939c%3BfontSize%3D15%3BfontStyle%3D0%3B%22%20vertex%3D%221%22%20parent%3D%22n84%22%3E%3CmxGeometry%20x%3D%2216%22%20y%3D%2256%22%20width%3D%22248%22%20height%3D%2238%22%20as%3D%22geometry%22%2F%3E%3C%2FmxCell%3E%0A%20%20%20%20%20%20%20%20%3CmxCell%20id%3D%22n86%22%20value%3D%22Clase%20%2F%20archivo%22%20style%3D%22whiteSpace%3Dwrap%3Bhtml%3D0%3BstrokeWidth%3D1.5%3BfontFamily%3DArial%3BfontColor%3D%23263238%3Balign%3Dcenter%3BverticalAlign%3Dmiddle%3Bspacing%3D6%3Bshadow%3D0%3BfillColor%3D%23ffffff%3BstrokeColor%3D%238b939c%3BfontSize%3D15%3BfontStyle%3D0%3B%22%20vertex%3D%221%22%20parent%3D%22n84%22%3E%3CmxGeometry%20x%3D%2216%22%20y%3D%22102%22%20width%3D%22248%22%20height%3D%2238%22%20as%3D%22geometry%22%2F%3E%3C%2FmxCell%3E%0A%20%20%20%20%20%20%20%20%3CmxCell%20id%3D%22n87%22%20value%3D%22Estado%20persistido%22%20style%3D%22whiteSpace%3Dwrap%3Bhtml%3D0%3BstrokeWidth%3D1.5%3BfontFamily%3DArial%3BfontColor%3D%23263238%3Balign%3Dcenter%3BverticalAlign%3Dmiddle%3Bspacing%3D6%3Bshadow%3D0%3BfillColor%3D%23ffffff%3BstrokeColor%3D%238b939c%3BfontSize%3D15%3BfontStyle%3D0%3B%22%20vertex%3D%221%22%20parent%3D%22n84%22%3E%3CmxGeometry%20x%3D%2216%22%20y%3D%22148%22%20width%3D%22248%22%20height%3D%2238%22%20as%3D%22geometry%22%2F%3E%3C%2FmxCell%3E%0A%20%20%20%20%20%20%20%20%3CmxCell%20id%3D%22n88%22%20value%3D%22Comunicaci%C3%B3n%22%20style%3D%22whiteSpace%3Dwrap%3Bhtml%3D0%3BstrokeWidth%3D1.5%3BfontFamily%3DArial%3BfontColor%3D%23263238%3Balign%3Dcenter%3BverticalAlign%3Dmiddle%3Bspacing%3D6%3Bshadow%3D0%3BfillColor%3D%23ffffff%3BstrokeColor%3D%238b939c%3BfontSize%3D15%3BfontStyle%3D0%3B%22%20vertex%3D%221%22%20parent%3D%22n84%22%3E%3CmxGeometry%20x%3D%2216%22%20y%3D%22194%22%20width%3D%22248%22%20height%3D%2238%22%20as%3D%22geometry%22%2F%3E%3C%2FmxCell%3E%0A%20%20%20%20%20%20%20%20%3CmxCell%20id%3D%22n89%22%20value%3D%22Usa%20%2F%20depende%20de%22%20style%3D%22whiteSpace%3Dwrap%3Bhtml%3D0%3BstrokeWidth%3D1.5%3BfontFamily%3DArial%3BfontColor%3D%23263238%3Balign%3Dcenter%3BverticalAlign%3Dmiddle%3Bspacing%3D6%3Bshadow%3D0%3BfillColor%3D%23ffffff%3BstrokeColor%3D%238b939c%3BfontSize%3D15%3BfontStyle%3D0%3B%22%20vertex%3D%221%22%20parent%3D%22n84%22%3E%3CmxGeometry%20x%3D%2216%22%20y%3D%22240%22%20width%3D%22248%22%20height%3D%2238%22%20as%3D%22geometry%22%2F%3E%3C%2FmxCell%3E%0A%20%20%20%20%20%20%20%20%3CmxCell%20id%3D%22n90%22%20value%3D%22Estado%20del%20proyecto%22%20style%3D%22whiteSpace%3Dwrap%3Bhtml%3D0%3BstrokeWidth%3D1.5%3BfontFamily%3DArial%3BfontColor%3D%23263238%3Balign%3Dcenter%3BverticalAlign%3Dmiddle%3Bspacing%3D6%3Bshadow%3D0%3BfillColor%3D%23ffffff%3BstrokeColor%3D%23535b63%3BfontSize%3D18%3BfontStyle%3D1%3Brounded%3D1%3BarcSize%3D4%3BverticalAlign%3Dtop%3B%22%20vertex%3D%221%22%20parent%3D%221%22%3E%3CmxGeometry%20x%3D%2240%22%20y%3D%22890%22%20width%3D%22280%22%20height%3D%22280%22%20as%3D%22geometry%22%2F%3E%3C%2FmxCell%3E%0A%20%20%20%20%20%20%20%20%3CmxCell%20id%3D%22n91%22%20value%3D%22CRUD%20completo%0ASemester%2C%20Subject%20y%20Grade%2C%20con%20validaci%C3%B3n%20en%20los%20servicios.%22%20style%3D%22whiteSpace%3Dwrap%3Bhtml%3D0%3BstrokeWidth%3D1.5%3BfontFamily%3DArial%3BfontColor%3D%23263238%3Balign%3Dcenter%3BverticalAlign%3Dmiddle%3Bspacing%3D6%3Bshadow%3D0%3BfillColor%3D%23ffffff%3BstrokeColor%3D%238b939c%3BfontSize%3D14%3BfontStyle%3D0%3B%22%20vertex%3D%221%22%20parent%3D%22n90%22%3E%3CmxGeometry%20x%3D%2216%22%20y%3D%2256%22%20width%3D%22248%22%20height%3D%2264%22%20as%3D%22geometry%22%2F%3E%3C%2FmxCell%3E%0A%20%20%20%20%20%20%20%20%3CmxCell%20id%3D%22n92%22%20value%3D%22Sesi%C3%B3n%0AAuthService%20con%20guards%20por%20rol%3B%20%C3%A1rea%20%2Fadmin%20restringida.%22%20style%3D%22whiteSpace%3Dwrap%3Bhtml%3D0%3BstrokeWidth%3D1.5%3BfontFamily%3DArial%3BfontColor%3D%23263238%3Balign%3Dcenter%3BverticalAlign%3Dmiddle%3Bspacing%3D6%3Bshadow%3D0%3BfillColor%3D%23ffffff%3BstrokeColor%3D%238b939c%3BfontSize%3D14%3BfontStyle%3D0%3B%22%20vertex%3D%221%22%20parent%3D%22n90%22%3E%3CmxGeometry%20x%3D%2216%22%20y%3D%22128%22%20width%3D%22248%22%20height%3D%2264%22%20as%3D%22geometry%22%2F%3E%3C%2FmxCell%3E%0A%20%20%20%20%20%20%20%20%3CmxCell%20id%3D%22n93%22%20value%3D%22Datos%0ASin%20backend%3A%20seeders%20en%20localStorage%2C%20clave%20piniaState.%22%20style%3D%22whiteSpace%3Dwrap%3Bhtml%3D0%3BstrokeWidth%3D1.5%3BfontFamily%3DArial%3BfontColor%3D%23263238%3Balign%3Dcenter%3BverticalAlign%3Dmiddle%3Bspacing%3D6%3Bshadow%3D0%3BfillColor%3D%23ffffff%3BstrokeColor%3D%238b939c%3BfontSize%3D14%3BfontStyle%3D0%3B%22%20vertex%3D%221%22%20parent%3D%22n90%22%3E%3CmxGeometry%20x%3D%2216%22%20y%3D%22200%22%20width%3D%22248%22%20height%3D%2264%22%20as%3D%22geometry%22%2F%3E%3C%2FmxCell%3E%0A%20%20%20%20%20%20%20%20%3CmxCell%20id%3D%22n94%22%20value%3D%22Fuente%3A%20c%C3%B3digo%20de%20Notium%20en%20main%20%C2%B7%20M%20%3D%20modelo%20%C2%B7%20VM%20%3D%20l%C3%B3gica%20de%20presentaci%C3%B3n%20%C2%B7%20V%20%3D%20vista%22%20style%3D%22whiteSpace%3Dwrap%3Bhtml%3D0%3BstrokeWidth%3D1.5%3BfontFamily%3DArial%3BfontColor%3D%235c6875%3Balign%3Dcenter%3BverticalAlign%3Dmiddle%3Bspacing%3D6%3Bshadow%3D0%3BfillColor%3Dnone%3BstrokeColor%3Dnone%3BfontSize%3D16%3BfontStyle%3D0%3Balign%3Dleft%3B%22%20vertex%3D%221%22%20parent%3D%221%22%3E%3CmxGeometry%20x%3D%2240%22%20y%3D%221822%22%20width%3D%221600%22%20height%3D%2230%22%20as%3D%22geometry%22%2F%3E%3C%2FmxCell%3E%0A%20%20%20%20%20%20%3C%2Froot%3E%0A%20%20%20%20%3C%2FmxGraphModel%3E%0A%20%20%3C%2Fdiagram%3E%0A%3C%2Fmxfile%3E%0A" xmlns="http://www.w3.org/2000/svg" width="2260" height="1880" viewBox="0 0 2260 1880">
+<defs><marker id="a" markerWidth="12" markerHeight="12" refX="10" refY="5" orient="auto"><path d="M0,0 L11,5 L0,10" fill="none" stroke="#263238" stroke-width="1.8"/></marker><marker id="a0" markerWidth="12" markerHeight="12" refX="1" refY="5" orient="auto"><path d="M11,0 L0,5 L11,10" fill="none" stroke="#263238" stroke-width="1.8"/></marker></defs>
+<rect x="0" y="0" width="2260" height="1880" rx="0" fill="#ffffff" stroke="none" stroke-width="0"/>
+<rect x="40" y="30" width="320" height="52" rx="0" fill="#ffffff" stroke="#535b63" stroke-width="2"/>
+<text x="200" y="56.0" font-family="Arial, Helvetica, sans-serif" font-size="30" fill="#263238" font-weight="bold" text-anchor="middle" dominant-baseline="middle">
+<tspan x="200" dy="0.0">NOTIUM</tspan>
+</text>
+<text x="40" y="104.0" font-family="Arial, Helvetica, sans-serif" font-size="19" fill="#5c6875" font-weight="normal" text-anchor="start" dominant-baseline="middle">
+<tspan x="40" dy="0.0">Arquitectura actual · semestres, materias, calificaciones, analítica y administración</tspan>
+</text>
+<rect x="1960" y="40" width="260" height="36" rx="0" fill="#dae8fc" stroke="none" stroke-width="1.5"/>
+<text x="2090" y="58.0" font-family="Arial, Helvetica, sans-serif" font-size="17" fill="#263238" font-weight="normal" text-anchor="middle" dominant-baseline="middle">
+<tspan x="2090" dy="0.0">15 sep 2026</tspan>
+</text>
+<rect x="460" y="170" width="1760" height="1600" rx="4" fill="#ffffff" stroke="#535b63" stroke-width="2"/>
+<text x="484" y="202.0" font-family="Arial, Helvetica, sans-serif" font-size="21" fill="#263238" font-weight="bold" text-anchor="start" dominant-baseline="middle">
+<tspan x="484" dy="0.0">Proyecto Notium</tspan>
+</text>
+<rect x="500" y="230" width="1680" height="100" rx="6" fill="#f5f5f5" stroke="#8b939c" stroke-width="1.5"/>
+<text x="520" y="260.0" font-family="Arial, Helvetica, sans-serif" font-size="19" fill="#263238" font-weight="bold" text-anchor="start" dominant-baseline="middle">
+<tspan x="520" dy="0.0">Servidor web</tspan>
+</text>
+<text x="520" y="294.0" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#5c6875" font-weight="normal" text-anchor="start" dominant-baseline="middle">
+<tspan x="520" dy="0.0">Vite en desarrollo · GitHub Pages con nginx en producción. Entrega index.html y los assets estáticos.</tspan>
+</text>
+<rect x="520" y="350" width="1680" height="1400" rx="4" fill="#ffffff" stroke="#535b63" stroke-width="2"/>
+<text x="540" y="378.0" font-family="Arial, Helvetica, sans-serif" font-size="20" fill="#263238" font-weight="bold" text-anchor="start" dominant-baseline="middle">
+<tspan x="540" dy="0.0">Frontend · Vue 3 + TypeScript</tspan>
+</text>
+<text x="2180" y="378.0" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#5c6875" font-weight="normal" text-anchor="end" dominant-baseline="middle">
+<tspan x="2180" dy="0.0">SPA / CSR · se ejecuta en el navegador</tspan>
+</text>
+<rect x="40" y="170" width="280" height="216" rx="8" fill="#f5f5f5" stroke="#535b63" stroke-width="1.5"/>
+<text x="180" y="202.0" font-family="Arial, Helvetica, sans-serif" font-size="19" fill="#263238" font-weight="bold" text-anchor="middle" dominant-baseline="middle">
+<tspan x="180" dy="0.0">Cliente</tspan>
+</text>
+<rect x="56" y="230" width="248" height="60" rx="0" fill="#ffffff" stroke="#8b939c" stroke-width="1.5"/>
+<text x="180" y="251.5" font-family="Arial, Helvetica, sans-serif" font-size="17" fill="#263238" font-weight="bold" text-anchor="middle" dominant-baseline="middle">
+<tspan x="180" dy="0.0">Navegador web</tspan>
+</text>
+<text x="180" y="271.0" font-family="Arial, Helvetica, sans-serif" font-size="14" fill="#5c6875" font-weight="normal" text-anchor="middle" dominant-baseline="middle">
+<tspan x="180" dy="0.0">Móvil · escritorio</tspan>
+</text>
+<rect x="56" y="302" width="248" height="68" rx="0" fill="#ffffff" stroke="#8b939c" stroke-width="1.5" stroke-dasharray="6 5"/>
+<text x="180" y="315.0" font-family="Arial, Helvetica, sans-serif" font-size="15" fill="#5c6875" font-weight="normal" text-anchor="middle" dominant-baseline="middle">
+<tspan x="180" dy="0.0">La SPA se ejecuta aquí.</tspan>
+<tspan x="180" dy="21.0">El estado queda en localStorage</tspan>
+<tspan x="180" dy="21.0">del propio navegador.</tspan>
+</text>
+<rect x="560" y="400" width="650" height="210" rx="8" fill="#f5f5f5" stroke="#535b63" stroke-width="1.5"/>
+<text x="885" y="432.0" font-family="Arial, Helvetica, sans-serif" font-size="19" fill="#263238" font-weight="bold" text-anchor="middle" dominant-baseline="middle">
+<tspan x="885" dy="0.0">Arranque</tspan>
+</text>
+<rect x="576" y="460" width="618" height="44" rx="0" fill="#ffffff" stroke="#8b939c" stroke-width="1.5"/>
+<text x="885" y="482.0" font-family="Arial, Helvetica, sans-serif" font-size="17" fill="#263238" font-weight="normal" text-anchor="middle" dominant-baseline="middle">
+<tspan x="885" dy="0.0">src/main.ts  →  src/App.vue</tspan>
+</text>
+<rect x="576" y="516" width="618" height="44" rx="0" fill="#ffffff" stroke="#8b939c" stroke-width="1.5"/>
+<text x="885" y="538.0" font-family="Arial, Helvetica, sans-serif" font-size="17" fill="#263238" font-weight="normal" text-anchor="middle" dominant-baseline="middle">
+<tspan x="885" dy="0.0">src/PiniaConfig.ts</tspan>
+</text>
+<text x="885" y="581.0" font-family="Arial, Helvetica, sans-serif" font-size="15" fill="#5c6875" font-weight="normal" text-anchor="middle" dominant-baseline="middle">
+<tspan x="885" dy="0.0">Crea la app, siembra el estado e instala Pinia y el router</tspan>
+</text>
+<rect x="1360" y="400" width="800" height="234" rx="8" fill="#f5f5f5" stroke="#535b63" stroke-width="1.5"/>
+<text x="1760" y="432.0" font-family="Arial, Helvetica, sans-serif" font-size="19" fill="#263238" font-weight="bold" text-anchor="middle" dominant-baseline="middle">
+<tspan x="1760" dy="0.0">src/router/</tspan>
+</text>
+<rect x="1376" y="460" width="768" height="56" rx="0" fill="#ffffff" stroke="#8b939c" stroke-width="1.5"/>
+<text x="1760" y="479.5" font-family="Arial, Helvetica, sans-serif" font-size="17" fill="#263238" font-weight="bold" text-anchor="middle" dominant-baseline="middle">
+<tspan x="1760" dy="0.0">index.ts</tspan>
+</text>
+<text x="1760" y="499.0" font-family="Arial, Helvetica, sans-serif" font-size="14" fill="#5c6875" font-weight="normal" text-anchor="middle" dominant-baseline="middle">
+<tspan x="1760" dy="0.0">13 rutas de la SPA</tspan>
+</text>
+<rect x="1376" y="528" width="768" height="56" rx="0" fill="#ffffff" stroke="#8b939c" stroke-width="1.5"/>
+<text x="1760" y="547.5" font-family="Arial, Helvetica, sans-serif" font-size="17" fill="#263238" font-weight="bold" text-anchor="middle" dominant-baseline="middle">
+<tspan x="1760" dy="0.0">accessControl.ts</tspan>
+</text>
+<text x="1760" y="567.0" font-family="Arial, Helvetica, sans-serif" font-size="14" fill="#5c6875" font-weight="normal" text-anchor="middle" dominant-baseline="middle">
+<tspan x="1760" dy="0.0">Guards: requiresAuth y roles</tspan>
+</text>
+<text x="1760" y="605.0" font-family="Arial, Helvetica, sans-serif" font-size="15" fill="#5c6875" font-weight="normal" text-anchor="middle" dominant-baseline="middle">
+<tspan x="1760" dy="0.0">createWebHistory(BASE_URL)</tspan>
+</text>
+<rect x="560" y="700" width="430" height="450" rx="8" fill="#f5f5f5" stroke="#535b63" stroke-width="1.5"/>
+<text x="775" y="732.0" font-family="Arial, Helvetica, sans-serif" font-size="19" fill="#263238" font-weight="bold" text-anchor="middle" dominant-baseline="middle">
+<tspan x="775" dy="0.0">src/views/ (VM / V)</tspan>
+</text>
+<rect x="576" y="760" width="398" height="68" rx="0" fill="#ffffff" stroke="#8b939c" stroke-width="1.5"/>
+<text x="775" y="777.0" font-family="Arial, Helvetica, sans-serif" font-size="17" fill="#263238" font-weight="bold" text-anchor="middle" dominant-baseline="middle">
+<tspan x="775" dy="0.0">HomeView · LoginView</tspan>
+</text>
+<text x="775" y="796.5" font-family="Arial, Helvetica, sans-serif" font-size="14" fill="#5c6875" font-weight="normal" text-anchor="middle" dominant-baseline="middle">
+<tspan x="775" dy="0.0">DashboardView · AnalyticsView</tspan>
+<tspan x="775" dy="17.0">NotFoundView</tspan>
+</text>
+<rect x="576" y="840" width="398" height="56" rx="0" fill="#ffffff" stroke="#8b939c" stroke-width="1.5"/>
+<text x="775" y="859.5" font-family="Arial, Helvetica, sans-serif" font-size="17" fill="#263238" font-weight="bold" text-anchor="middle" dominant-baseline="middle">
+<tspan x="775" dy="0.0">semester/</tspan>
+</text>
+<text x="775" y="879.0" font-family="Arial, Helvetica, sans-serif" font-size="14" fill="#5c6875" font-weight="normal" text-anchor="middle" dominant-baseline="middle">
+<tspan x="775" dy="0.0">Index · Show</tspan>
+</text>
+<rect x="576" y="908" width="398" height="56" rx="0" fill="#ffffff" stroke="#8b939c" stroke-width="1.5"/>
+<text x="775" y="927.5" font-family="Arial, Helvetica, sans-serif" font-size="17" fill="#263238" font-weight="bold" text-anchor="middle" dominant-baseline="middle">
+<tspan x="775" dy="0.0">subject/</tspan>
+</text>
+<text x="775" y="947.0" font-family="Arial, Helvetica, sans-serif" font-size="14" fill="#5c6875" font-weight="normal" text-anchor="middle" dominant-baseline="middle">
+<tspan x="775" dy="0.0">Index · Show</tspan>
+</text>
+<rect x="576" y="976" width="398" height="56" rx="0" fill="#ffffff" stroke="#8b939c" stroke-width="1.5"/>
+<text x="775" y="995.5" font-family="Arial, Helvetica, sans-serif" font-size="17" fill="#263238" font-weight="bold" text-anchor="middle" dominant-baseline="middle">
+<tspan x="775" dy="0.0">grade/</tspan>
+</text>
+<text x="775" y="1015.0" font-family="Arial, Helvetica, sans-serif" font-size="14" fill="#5c6875" font-weight="normal" text-anchor="middle" dominant-baseline="middle">
+<tspan x="775" dy="0.0">Index · Show</tspan>
+</text>
+<rect x="576" y="1044" width="398" height="56" rx="0" fill="#ffffff" stroke="#8b939c" stroke-width="1.5"/>
+<text x="775" y="1063.5" font-family="Arial, Helvetica, sans-serif" font-size="17" fill="#263238" font-weight="bold" text-anchor="middle" dominant-baseline="middle">
+<tspan x="775" dy="0.0">admin/</tspan>
+</text>
+<text x="775" y="1083.0" font-family="Arial, Helvetica, sans-serif" font-size="14" fill="#5c6875" font-weight="normal" text-anchor="middle" dominant-baseline="middle">
+<tspan x="775" dy="0.0">AdminUsers · AdminReports</tspan>
+</text>
+<text x="775" y="1121.0" font-family="Arial, Helvetica, sans-serif" font-size="15" fill="#5c6875" font-weight="normal" text-anchor="middle" dominant-baseline="middle">
+<tspan x="775" dy="0.0">Pantallas asociadas a las rutas</tspan>
+</text>
+<rect x="560" y="1190" width="430" height="302" rx="8" fill="#f5f5f5" stroke="#535b63" stroke-width="1.5"/>
+<text x="775" y="1222.0" font-family="Arial, Helvetica, sans-serif" font-size="19" fill="#263238" font-weight="bold" text-anchor="middle" dominant-baseline="middle">
+<tspan x="775" dy="0.0">src/components/ (V)</tspan>
+</text>
+<rect x="576" y="1250" width="398" height="56" rx="0" fill="#ffffff" stroke="#8b939c" stroke-width="1.5"/>
+<text x="775" y="1269.5" font-family="Arial, Helvetica, sans-serif" font-size="17" fill="#263238" font-weight="bold" text-anchor="middle" dominant-baseline="middle">
+<tspan x="775" dy="0.0">semester/ · subject/ · grade/</tspan>
+</text>
+<text x="775" y="1289.0" font-family="Arial, Helvetica, sans-serif" font-size="14" fill="#5c6875" font-weight="normal" text-anchor="middle" dominant-baseline="middle">
+<tspan x="775" dy="0.0">Card y Form por dominio</tspan>
+</text>
+<rect x="576" y="1318" width="398" height="56" rx="0" fill="#ffffff" stroke="#8b939c" stroke-width="1.5"/>
+<text x="775" y="1337.5" font-family="Arial, Helvetica, sans-serif" font-size="17" fill="#263238" font-weight="bold" text-anchor="middle" dominant-baseline="middle">
+<tspan x="775" dy="0.0">admin/UserForm</tspan>
+</text>
+<text x="775" y="1357.0" font-family="Arial, Helvetica, sans-serif" font-size="14" fill="#5c6875" font-weight="normal" text-anchor="middle" dominant-baseline="middle">
+<tspan x="775" dy="0.0">common/ChartPanel</tspan>
+</text>
+<rect x="576" y="1386" width="398" height="56" rx="0" fill="#ffffff" stroke="#8b939c" stroke-width="1.5"/>
+<text x="775" y="1405.5" font-family="Arial, Helvetica, sans-serif" font-size="17" fill="#263238" font-weight="bold" text-anchor="middle" dominant-baseline="middle">
+<tspan x="775" dy="0.0">graphs/</tspan>
+</text>
+<text x="775" y="1425.0" font-family="Arial, Helvetica, sans-serif" font-size="14" fill="#5c6875" font-weight="normal" text-anchor="middle" dominant-baseline="middle">
+<tspan x="775" dy="0.0">5 gráficas de Chart.js</tspan>
+</text>
+<text x="775" y="1463.0" font-family="Arial, Helvetica, sans-serif" font-size="15" fill="#5c6875" font-weight="normal" text-anchor="middle" dominant-baseline="middle">
+<tspan x="775" dy="0.0">Reciben props y emiten eventos</tspan>
+</text>
+<rect x="1140" y="700" width="430" height="514" rx="8" fill="#f5f5f5" stroke="#535b63" stroke-width="1.5"/>
+<text x="1355" y="732.0" font-family="Arial, Helvetica, sans-serif" font-size="19" fill="#263238" font-weight="bold" text-anchor="middle" dominant-baseline="middle">
+<tspan x="1355" dy="0.0">src/services/ (M)</tspan>
+</text>
+<rect x="1156" y="760" width="398" height="44" rx="0" fill="#ffffff" stroke="#8b939c" stroke-width="1.5"/>
+<text x="1355" y="782.0" font-family="Arial, Helvetica, sans-serif" font-size="17" fill="#263238" font-weight="normal" text-anchor="middle" dominant-baseline="middle">
+<tspan x="1355" dy="0.0">AuthService.ts</tspan>
+</text>
+<rect x="1156" y="816" width="398" height="44" rx="0" fill="#ffffff" stroke="#8b939c" stroke-width="1.5"/>
+<text x="1355" y="838.0" font-family="Arial, Helvetica, sans-serif" font-size="17" fill="#263238" font-weight="normal" text-anchor="middle" dominant-baseline="middle">
+<tspan x="1355" dy="0.0">UserService.ts</tspan>
+</text>
+<rect x="1156" y="872" width="398" height="44" rx="0" fill="#ffffff" stroke="#8b939c" stroke-width="1.5"/>
+<text x="1355" y="894.0" font-family="Arial, Helvetica, sans-serif" font-size="17" fill="#263238" font-weight="normal" text-anchor="middle" dominant-baseline="middle">
+<tspan x="1355" dy="0.0">SemesterService.ts</tspan>
+</text>
+<rect x="1156" y="928" width="398" height="44" rx="0" fill="#ffffff" stroke="#8b939c" stroke-width="1.5"/>
+<text x="1355" y="950.0" font-family="Arial, Helvetica, sans-serif" font-size="17" fill="#263238" font-weight="normal" text-anchor="middle" dominant-baseline="middle">
+<tspan x="1355" dy="0.0">SubjectService.ts</tspan>
+</text>
+<rect x="1156" y="984" width="398" height="44" rx="0" fill="#ffffff" stroke="#8b939c" stroke-width="1.5"/>
+<text x="1355" y="1006.0" font-family="Arial, Helvetica, sans-serif" font-size="17" fill="#263238" font-weight="normal" text-anchor="middle" dominant-baseline="middle">
+<tspan x="1355" dy="0.0">GradeService.ts</tspan>
+</text>
+<rect x="1156" y="1040" width="398" height="56" rx="0" fill="#fff4da" stroke="#8b939c" stroke-width="1.5"/>
+<text x="1355" y="1059.5" font-family="Arial, Helvetica, sans-serif" font-size="17" fill="#263238" font-weight="bold" text-anchor="middle" dominant-baseline="middle">
+<tspan x="1355" dy="0.0">AnalyticsService.ts</tspan>
+</text>
+<text x="1355" y="1079.0" font-family="Arial, Helvetica, sans-serif" font-size="14" fill="#5c6875" font-weight="normal" text-anchor="middle" dominant-baseline="middle">
+<tspan x="1355" dy="0.0">Puro: no toca los stores</tspan>
+</text>
+<rect x="1156" y="1108" width="398" height="56" rx="0" fill="#fff4da" stroke="#8b939c" stroke-width="1.5"/>
+<text x="1355" y="1127.5" font-family="Arial, Helvetica, sans-serif" font-size="17" fill="#263238" font-weight="bold" text-anchor="middle" dominant-baseline="middle">
+<tspan x="1355" dy="0.0">PlatformReportService.ts</tspan>
+</text>
+<text x="1355" y="1147.0" font-family="Arial, Helvetica, sans-serif" font-size="14" fill="#5c6875" font-weight="normal" text-anchor="middle" dominant-baseline="middle">
+<tspan x="1355" dy="0.0">Puro: no toca los stores</tspan>
+</text>
+<text x="1355" y="1185.0" font-family="Arial, Helvetica, sans-serif" font-size="15" fill="#5c6875" font-weight="normal" text-anchor="middle" dominant-baseline="middle">
+<tspan x="1355" dy="0.0">Validación y lógica de negocio</tspan>
+</text>
+<rect x="1140" y="1250" width="430" height="210" rx="8" fill="#f5f5f5" stroke="#535b63" stroke-width="1.5"/>
+<text x="1355" y="1282.0" font-family="Arial, Helvetica, sans-serif" font-size="19" fill="#263238" font-weight="bold" text-anchor="middle" dominant-baseline="middle">
+<tspan x="1355" dy="0.0">src/utils/</tspan>
+</text>
+<rect x="1156" y="1310" width="398" height="44" rx="0" fill="#ffffff" stroke="#8b939c" stroke-width="1.5"/>
+<text x="1355" y="1332.0" font-family="Arial, Helvetica, sans-serif" font-size="17" fill="#263238" font-weight="normal" text-anchor="middle" dominant-baseline="middle">
+<tspan x="1355" dy="0.0">DateFormatUtil.ts</tspan>
+</text>
+<rect x="1156" y="1366" width="398" height="44" rx="0" fill="#ffffff" stroke="#8b939c" stroke-width="1.5"/>
+<text x="1355" y="1388.0" font-family="Arial, Helvetica, sans-serif" font-size="17" fill="#263238" font-weight="normal" text-anchor="middle" dominant-baseline="middle">
+<tspan x="1355" dy="0.0">TableRenderUtil.ts</tspan>
+</text>
+<text x="1355" y="1431.0" font-family="Arial, Helvetica, sans-serif" font-size="15" fill="#5c6875" font-weight="normal" text-anchor="middle" dominant-baseline="middle">
+<tspan x="1355" dy="0.0">Utilidades puras</tspan>
+</text>
+<rect x="1140" y="1490" width="430" height="154" rx="8" fill="#f5f5f5" stroke="#535b63" stroke-width="1.5"/>
+<text x="1355" y="1522.0" font-family="Arial, Helvetica, sans-serif" font-size="19" fill="#263238" font-weight="bold" text-anchor="middle" dominant-baseline="middle">
+<tspan x="1355" dy="0.0">src/services/__tests__/</tspan>
+</text>
+<rect x="1156" y="1550" width="398" height="44" rx="0" fill="#ffffff" stroke="#8b939c" stroke-width="1.5"/>
+<text x="1355" y="1572.0" font-family="Arial, Helvetica, sans-serif" font-size="17" fill="#263238" font-weight="normal" text-anchor="middle" dominant-baseline="middle">
+<tspan x="1355" dy="0.0">SemesterService.test.ts</tspan>
+</text>
+<text x="1355" y="1615.0" font-family="Arial, Helvetica, sans-serif" font-size="15" fill="#5c6875" font-weight="normal" text-anchor="middle" dominant-baseline="middle">
+<tspan x="1355" dy="0.0">Cubre SemesterService con Vitest</tspan>
+</text>
+<rect x="1710" y="700" width="450" height="234" rx="8" fill="#f5f5f5" stroke="#535b63" stroke-width="1.5"/>
+<text x="1935" y="732.0" font-family="Arial, Helvetica, sans-serif" font-size="19" fill="#263238" font-weight="bold" text-anchor="middle" dominant-baseline="middle">
+<tspan x="1935" dy="0.0">src/stores/ · Pinia</tspan>
+</text>
+<rect x="1726" y="760" width="418" height="56" rx="0" fill="#ffffff" stroke="#8b939c" stroke-width="1.5"/>
+<text x="1935" y="779.5" font-family="Arial, Helvetica, sans-serif" font-size="17" fill="#263238" font-weight="bold" text-anchor="middle" dominant-baseline="middle">
+<tspan x="1935" dy="0.0">AuthStore.ts</tspan>
+</text>
+<text x="1935" y="799.0" font-family="Arial, Helvetica, sans-serif" font-size="14" fill="#5c6875" font-weight="normal" text-anchor="middle" dominant-baseline="middle">
+<tspan x="1935" dy="0.0">currentUser · login · logout</tspan>
+</text>
+<rect x="1726" y="828" width="418" height="56" rx="0" fill="#ffffff" stroke="#8b939c" stroke-width="1.5"/>
+<text x="1935" y="847.5" font-family="Arial, Helvetica, sans-serif" font-size="17" fill="#263238" font-weight="bold" text-anchor="middle" dominant-baseline="middle">
+<tspan x="1935" dy="0.0">UserStore · SemesterStore</tspan>
+</text>
+<text x="1935" y="867.0" font-family="Arial, Helvetica, sans-serif" font-size="14" fill="#5c6875" font-weight="normal" text-anchor="middle" dominant-baseline="middle">
+<tspan x="1935" dy="0.0">SubjectStore · GradeStore</tspan>
+</text>
+<text x="1935" y="905.0" font-family="Arial, Helvetica, sans-serif" font-size="15" fill="#5c6875" font-weight="normal" text-anchor="middle" dominant-baseline="middle">
+<tspan x="1935" dy="0.0">Setup Stores: única fuente de datos</tspan>
+</text>
+<rect x="1710" y="970" width="450" height="154" rx="8" fill="#f5f5f5" stroke="#535b63" stroke-width="1.5"/>
+<text x="1935" y="1002.0" font-family="Arial, Helvetica, sans-serif" font-size="19" fill="#263238" font-weight="bold" text-anchor="middle" dominant-baseline="middle">
+<tspan x="1935" dy="0.0">Persistencia</tspan>
+</text>
+<rect x="1726" y="1030" width="418" height="44" rx="0" fill="#fff4da" stroke="#8b939c" stroke-width="1.5"/>
+<text x="1935" y="1052.0" font-family="Arial, Helvetica, sans-serif" font-size="17" fill="#263238" font-weight="normal" text-anchor="middle" dominant-baseline="middle">
+<tspan x="1935" dy="0.0">localStorage · clave piniaState</tspan>
+</text>
+<text x="1935" y="1095.0" font-family="Arial, Helvetica, sans-serif" font-size="15" fill="#5c6875" font-weight="normal" text-anchor="middle" dominant-baseline="middle">
+<tspan x="1935" dy="0.0">PiniaConfig observa los stores y serializa con flatted</tspan>
+</text>
+<rect x="1710" y="1180" width="450" height="222" rx="8" fill="#f5f5f5" stroke="#535b63" stroke-width="1.5"/>
+<text x="1935" y="1212.0" font-family="Arial, Helvetica, sans-serif" font-size="19" fill="#263238" font-weight="bold" text-anchor="middle" dominant-baseline="middle">
+<tspan x="1935" dy="0.0">src/seeders/ · src/data/</tspan>
+</text>
+<rect x="1726" y="1240" width="418" height="44" rx="0" fill="#ffffff" stroke="#8b939c" stroke-width="1.5"/>
+<text x="1935" y="1262.0" font-family="Arial, Helvetica, sans-serif" font-size="17" fill="#263238" font-weight="normal" text-anchor="middle" dominant-baseline="middle">
+<tspan x="1935" dy="0.0">seedData.ts</tspan>
+</text>
+<rect x="1726" y="1296" width="418" height="56" rx="0" fill="#ffffff" stroke="#8b939c" stroke-width="1.5"/>
+<text x="1935" y="1315.5" font-family="Arial, Helvetica, sans-serif" font-size="17" fill="#263238" font-weight="bold" text-anchor="middle" dominant-baseline="middle">
+<tspan x="1935" dy="0.0">userseeder · semesterseeder</tspan>
+</text>
+<text x="1935" y="1335.0" font-family="Arial, Helvetica, sans-serif" font-size="14" fill="#5c6875" font-weight="normal" text-anchor="middle" dominant-baseline="middle">
+<tspan x="1935" dy="0.0">subjectseeder · gradeseeder</tspan>
+</text>
+<text x="1935" y="1373.0" font-family="Arial, Helvetica, sans-serif" font-size="15" fill="#5c6875" font-weight="normal" text-anchor="middle" dominant-baseline="middle">
+<tspan x="1935" dy="0.0">Estado inicial la primera vez</tspan>
+</text>
+<rect x="1710" y="1430" width="450" height="290" rx="8" fill="#f5f5f5" stroke="#535b63" stroke-width="1.5"/>
+<text x="1935" y="1462.0" font-family="Arial, Helvetica, sans-serif" font-size="19" fill="#263238" font-weight="bold" text-anchor="middle" dominant-baseline="middle">
+<tspan x="1935" dy="0.0">src/interfaces/ · src/dtos/ (M)</tspan>
+</text>
+<rect x="1726" y="1490" width="418" height="56" rx="0" fill="#ffffff" stroke="#8b939c" stroke-width="1.5"/>
+<text x="1935" y="1509.5" font-family="Arial, Helvetica, sans-serif" font-size="17" fill="#263238" font-weight="bold" text-anchor="middle" dominant-baseline="middle">
+<tspan x="1935" dy="0.0">UserInterface (enum Role)</tspan>
+</text>
+<text x="1935" y="1529.0" font-family="Arial, Helvetica, sans-serif" font-size="14" fill="#5c6875" font-weight="normal" text-anchor="middle" dominant-baseline="middle">
+<tspan x="1935" dy="0.0">Semester · Subject · GradeInterface</tspan>
+</text>
+<rect x="1726" y="1558" width="418" height="56" rx="0" fill="#ffffff" stroke="#8b939c" stroke-width="1.5"/>
+<text x="1935" y="1577.5" font-family="Arial, Helvetica, sans-serif" font-size="17" fill="#263238" font-weight="bold" text-anchor="middle" dominant-baseline="middle">
+<tspan x="1935" dy="0.0">UserDTOs · SemesterDTOs</tspan>
+</text>
+<text x="1935" y="1597.0" font-family="Arial, Helvetica, sans-serif" font-size="14" fill="#5c6875" font-weight="normal" text-anchor="middle" dominant-baseline="middle">
+<tspan x="1935" dy="0.0">SubjectDTOs · GradeDTOs</tspan>
+</text>
+<rect x="1726" y="1626" width="418" height="44" rx="0" fill="#ffffff" stroke="#8b939c" stroke-width="1.5"/>
+<text x="1935" y="1648.0" font-family="Arial, Helvetica, sans-serif" font-size="17" fill="#263238" font-weight="normal" text-anchor="middle" dominant-baseline="middle">
+<tspan x="1935" dy="0.0">AnalyticsDTOs · PlatformReportDTOs</tspan>
+</text>
+<text x="1935" y="1691.0" font-family="Arial, Helvetica, sans-serif" font-size="15" fill="#5c6875" font-weight="normal" text-anchor="middle" dominant-baseline="middle">
+<tspan x="1935" dy="0.0">Entidades y contratos de entrada</tspan>
+</text>
+<polyline points="320,278 390,278 390,970 460,970" fill="none" stroke="#263238" stroke-width="1.8" marker-end="url(#a)" marker-start="url(#a0)"/>
+<rect x="331" y="602" width="118" height="44" rx="0" fill="#ffffff" stroke="none" stroke-width="0"/>
+<text x="390" y="615.0" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#263238" font-weight="normal" text-anchor="middle" dominant-baseline="middle">
+<tspan x="390" dy="0.0">HTTP: solicitud</tspan>
+<tspan x="390" dy="18.0">y respuesta</tspan>
+</text>
+<polyline points="1210,505 1360,505" fill="none" stroke="#263238" stroke-width="1.8" marker-end="url(#a)"/>
+<rect x="1240" y="492" width="91" height="26" rx="0" fill="#ffffff" stroke="none" stroke-width="0"/>
+<text x="1285" y="505.0" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#263238" font-weight="normal" text-anchor="middle" dominant-baseline="middle">
+<tspan x="1285" dy="0.0">use(router)</tspan>
+</text>
+<polyline points="1472,634 1472,667 775,667 775,700" fill="none" stroke="#263238" stroke-width="1.8" marker-end="url(#a)"/>
+<rect x="1088" y="654" width="70" height="26" rx="0" fill="#ffffff" stroke="none" stroke-width="0"/>
+<text x="1124" y="667.0" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#263238" font-weight="normal" text-anchor="middle" dominant-baseline="middle">
+<tspan x="1124" dy="0.0">resuelve</tspan>
+</text>
+<polyline points="1936,634 1936,700" fill="none" stroke="#263238" stroke-width="1.8" stroke-dasharray="8 6" marker-end="url(#a)"/>
+<rect x="1891" y="645" width="91" height="44" rx="0" fill="#ffffff" stroke="none" stroke-width="0"/>
+<text x="1936" y="658.0" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#263238" font-weight="normal" text-anchor="middle" dominant-baseline="middle">
+<tspan x="1936" dy="0.0">guards leen</tspan>
+<tspan x="1936" dy="18.0">AuthStore</tspan>
+</text>
+<polyline points="775,1150 775,1190" fill="none" stroke="#263238" stroke-width="1.8" marker-end="url(#a)"/>
+<rect x="726" y="1157" width="98" height="26" rx="0" fill="#ffffff" stroke="none" stroke-width="0"/>
+<text x="775" y="1170.0" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#263238" font-weight="normal" text-anchor="middle" dominant-baseline="middle">
+<tspan x="775" dy="0.0">props / emit</tspan>
+</text>
+<polyline points="990,799 1065,799 1065,854 1140,854" fill="none" stroke="#263238" stroke-width="1.8" marker-end="url(#a)"/>
+<rect x="992" y="777" width="70" height="44" rx="0" fill="#ffffff" stroke="none" stroke-width="0"/>
+<text x="1028" y="790.0" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#263238" font-weight="normal" text-anchor="middle" dominant-baseline="middle">
+<tspan x="1028" dy="0.0">consulta</tspan>
+<tspan x="1028" dy="18.0">y muta</tspan>
+</text>
+<polyline points="990,1341 1095,1341 1095,1188 1140,1188" fill="none" stroke="#263238" stroke-width="1.8" marker-end="url(#a)"/>
+<rect x="1050" y="1243" width="91" height="44" rx="0" fill="#ffffff" stroke="none" stroke-width="0"/>
+<text x="1095" y="1255.7" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#263238" font-weight="normal" text-anchor="middle" dominant-baseline="middle">
+<tspan x="1095" dy="0.0">formularios</tspan>
+<tspan x="1095" dy="18.0">y gráficas</tspan>
+</text>
+<polyline points="990,948 1025,948 1025,1355 1140,1355" fill="none" stroke="#263238" stroke-width="1.8" stroke-dasharray="8 6" marker-end="url(#a)"/>
+<rect x="990" y="1138" width="70" height="26" rx="0" fill="#ffffff" stroke="none" stroke-width="0"/>
+<text x="1025" y="1151.2" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#263238" font-weight="normal" text-anchor="middle" dominant-baseline="middle">
+<tspan x="1025" dy="0.0">formatea</tspan>
+</text>
+<polyline points="1570,823 1710,823" fill="none" stroke="#263238" stroke-width="1.8" marker-end="url(#a)"/>
+<rect x="1588" y="810" width="104" height="26" rx="0" fill="#ffffff" stroke="none" stroke-width="0"/>
+<text x="1640" y="823.4" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#263238" font-weight="normal" text-anchor="middle" dominant-baseline="middle">
+<tspan x="1640" dy="0.0">lee / escribe</tspan>
+</text>
+<polyline points="1570,1142 1640,1142 1640,1511 1710,1511" fill="none" stroke="#263238" stroke-width="1.8" stroke-dasharray="8 6" marker-end="url(#a)"/>
+<rect x="1605" y="1314" width="70" height="26" rx="0" fill="#ffffff" stroke="none" stroke-width="0"/>
+<text x="1640" y="1326.6" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#263238" font-weight="normal" text-anchor="middle" dominant-baseline="middle">
+<tspan x="1640" dy="0.0">tipa con</tspan>
+</text>
+<polyline points="1935,934 1935,970" fill="none" stroke="#263238" stroke-width="1.8" marker-end="url(#a)"/>
+<polyline points="1935,1180 1935,1124" fill="none" stroke="#263238" stroke-width="1.8" marker-end="url(#a)"/>
+<rect x="1903" y="1139" width="64" height="26" rx="0" fill="#ffffff" stroke="none" stroke-width="0"/>
+<text x="1935" y="1152.0" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#263238" font-weight="normal" text-anchor="middle" dominant-baseline="middle">
+<tspan x="1935" dy="0.0">siembra</tspan>
+</text>
+<rect x="40" y="470" width="280" height="294" rx="8" fill="#ffffff" stroke="#535b63" stroke-width="1.5"/>
+<text x="180" y="502.0" font-family="Arial, Helvetica, sans-serif" font-size="18" fill="#263238" font-weight="bold" text-anchor="middle" dominant-baseline="middle">
+<tspan x="180" dy="0.0">Convenciones</tspan>
+</text>
+<rect x="56" y="532" width="54" height="26" rx="6" fill="#f5f5f5" stroke="#535b63" stroke-width="1.5"/>
+<text x="124" y="545.0" font-family="Arial, Helvetica, sans-serif" font-size="15" fill="#263238" font-weight="normal" text-anchor="start" dominant-baseline="middle">
+<tspan x="124" dy="0.0">Capa / módulo</tspan>
+</text>
+<rect x="56" y="578" width="54" height="26" rx="0" fill="#ffffff" stroke="#8b939c" stroke-width="1.5"/>
+<text x="124" y="591.0" font-family="Arial, Helvetica, sans-serif" font-size="15" fill="#263238" font-weight="normal" text-anchor="start" dominant-baseline="middle">
+<tspan x="124" dy="0.0">Clase / archivo</tspan>
+</text>
+<rect x="56" y="624" width="54" height="26" rx="0" fill="#fff4da" stroke="#8b939c" stroke-width="1.5"/>
+<text x="124" y="637.0" font-family="Arial, Helvetica, sans-serif" font-size="15" fill="#263238" font-weight="normal" text-anchor="start" dominant-baseline="middle">
+<tspan x="124" dy="0.0">Estado persistido</tspan>
+</text>
+<polyline points="56,683 110,683" fill="none" stroke="#263238" stroke-width="1.8" marker-end="url(#a)"/>
+<text x="124" y="683.0" font-family="Arial, Helvetica, sans-serif" font-size="15" fill="#263238" font-weight="normal" text-anchor="start" dominant-baseline="middle">
+<tspan x="124" dy="0.0">Comunicación</tspan>
+</text>
+<polyline points="56,729 110,729" fill="none" stroke="#263238" stroke-width="1.8" stroke-dasharray="8 6" marker-end="url(#a)"/>
+<text x="124" y="729.0" font-family="Arial, Helvetica, sans-serif" font-size="15" fill="#263238" font-weight="normal" text-anchor="start" dominant-baseline="middle">
+<tspan x="124" dy="0.0">Usa / depende de</tspan>
+</text>
+<rect x="40" y="890" width="280" height="280" rx="8" fill="#ffffff" stroke="#535b63" stroke-width="1.5"/>
+<text x="180" y="922.0" font-family="Arial, Helvetica, sans-serif" font-size="18" fill="#263238" font-weight="bold" text-anchor="middle" dominant-baseline="middle">
+<tspan x="180" dy="0.0">Estado del proyecto</tspan>
+</text>
+<text x="56" y="958.0" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#263238" font-weight="bold" text-anchor="start" dominant-baseline="middle">
+<tspan x="56" dy="0.0">CRUD completo</tspan>
+</text>
+<text x="56" y="977.0" font-family="Arial, Helvetica, sans-serif" font-size="14" fill="#5c6875" font-weight="normal" text-anchor="start" dominant-baseline="middle">
+<tspan x="56" dy="0.0">Semester, Subject y Grade, con</tspan>
+<tspan x="56" dy="18.0">validación en los servicios.</tspan>
+</text>
+<text x="56" y="1030.0" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#263238" font-weight="bold" text-anchor="start" dominant-baseline="middle">
+<tspan x="56" dy="0.0">Sesión</tspan>
+</text>
+<text x="56" y="1049.0" font-family="Arial, Helvetica, sans-serif" font-size="14" fill="#5c6875" font-weight="normal" text-anchor="start" dominant-baseline="middle">
+<tspan x="56" dy="0.0">AuthService con guards por rol;</tspan>
+<tspan x="56" dy="18.0">área /admin restringida.</tspan>
+</text>
+<text x="56" y="1102.0" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#263238" font-weight="bold" text-anchor="start" dominant-baseline="middle">
+<tspan x="56" dy="0.0">Datos</tspan>
+</text>
+<text x="56" y="1121.0" font-family="Arial, Helvetica, sans-serif" font-size="14" fill="#5c6875" font-weight="normal" text-anchor="start" dominant-baseline="middle">
+<tspan x="56" dy="0.0">Sin backend: seeders en</tspan>
+<tspan x="56" dy="18.0">localStorage, clave piniaState.</tspan>
+</text>
+<text x="40" y="1840.0" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#5c6875" font-weight="normal" text-anchor="start" dominant-baseline="middle">
+<tspan x="40" dy="0.0">Fuente: código de Notium en main · M = modelo · VM = lógica de presentación · V = vista</tspan>
+</text>
+</svg>

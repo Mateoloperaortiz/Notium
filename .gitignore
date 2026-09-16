@@ -26,6 +26,9 @@ coverage
 
 *.tsbuildinfo
 
+# Generador de diagramas (Python)
+__pycache__/
+
 .eslintcache
 
 # Cypress
