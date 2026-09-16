@@ -106,8 +106,14 @@ borra la clave `piniaState` de `localStorage`.
 
 ## Despliegue
 
-Cada push a `main` ejecuta `.github/workflows/cicd.yml`, que instala dependencias, corre las
-pruebas y `npm run check`, construye el sitio y lo publica en la rama `gh-pages`.
+El sitio está publicado en <https://mateoloperaortiz.github.io/Notium/>. Cada push a `main`
+ejecuta `.github/workflows/cicd.yml`, que instala dependencias, corre las pruebas y
+`npm run check`, construye el sitio y lo publica en la rama `gh-pages`.
+
+GitHub Pages sirve el proyecto bajo `/Notium/`, así que el pipeline compila con
+`BASE_PATH=/Notium/`. Sin esa variable la base es la raíz, que es lo que necesita la imagen de
+Docker. El pipeline también copia `index.html` a `404.html` porque Pages no reescribe rutas: sin
+ese archivo, los enlaces directos a rutas del cliente no cargarían la aplicación.
 
 El `Dockerfile` usa una construcción multietapa. La primera etapa parte de `node:24-alpine`,
 instala las dependencias con `npm ci` y compila la SPA; la imagen final solo contiene nginx con
