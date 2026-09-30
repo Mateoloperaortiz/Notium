@@ -4,55 +4,51 @@ import type { CreateGradeDTO, GradeValidationErrorsDTO } from '@/dtos/GradeDTOs.
 import type { GradeInterface } from '@/interfaces/GradeInterface.js';
 import type { SubjectInterface } from '@/interfaces/SubjectInterface.js';
 import { GradeService } from '@/services/GradeService.js';
+import { DateFormatUtil } from '@/utils/DateFormatUtil.js';
+
 // External imports
-import { computed, reactive, ref, useId, watch } from 'vue';
+import { computed, ref, useId } from 'vue';
 
-// Interfaces and types
-interface Props {
-  grade?: GradeInterface;
-  loading?: boolean;
-  subjects: SubjectInterface[];
-}
+// Props
+const props = defineProps<{ grade?: GradeInterface; subjects: SubjectInterface[] }>();
 
-interface Emits {
+// Emits
+const emit = defineEmits<{
   cancel: [];
-  submit: [grade: CreateGradeDTO, subjectId: string];
-}
+  submit: [grade: CreateGradeDTO, subjectId: number];
+}>();
 
-type FormField = keyof GradeValidationErrorsDTO;
-
-// Props and emits
-const props = withDefaults(defineProps<Props>(), { loading: false });
-const emit = defineEmits<Emits>();
-
-// Form variables
+// State
 const formId = useId();
-const form = reactive<CreateGradeDTO>({
-  date: new Date(),
-  percentage: 20,
-  title: '',
-  type: '',
-  value: 0,
-});
-const subjectId = ref<string>('');
-const associationError = ref<string>('');
-const dateValue = ref<string>('');
 const titleInputId = `${formId}-title`;
 const typeInputId = `${formId}-type`;
 const valueInputId = `${formId}-value`;
 const percentageInputId = `${formId}-percentage`;
 const dateInputId = `${formId}-date`;
-
-// Error control variables
-const fieldOrder: FormField[] = ['title', 'type', 'value', 'percentage', 'date'];
-const errors = reactive<GradeValidationErrorsDTO>({
+const fieldOrder: (keyof GradeValidationErrorsDTO)[] = [
+  'title',
+  'type',
+  'value',
+  'percentage',
+  'date',
+];
+const form = ref<CreateGradeDTO>({
+  date: props.grade?.date ?? DateFormatUtil.getTodayIsoDate(),
+  percentage: props.grade?.percentage ?? 20,
+  title: props.grade?.title ?? '',
+  type: props.grade?.type ?? '',
+  value: props.grade?.value ?? 0,
+});
+const subjectId = ref<number>(props.grade?.subjectId ?? 0);
+const associationError = ref<string>('');
+const errors = ref<GradeValidationErrorsDTO>({
   date: '',
   percentage: '',
   title: '',
   type: '',
   value: '',
 });
-const touched = reactive<Record<FormField, boolean>>({
+const touched = ref<Record<keyof GradeValidationErrorsDTO, boolean>>({
   date: false,
   percentage: false,
   title: false,
@@ -61,74 +57,59 @@ const touched = reactive<Record<FormField, boolean>>({
 });
 const submissionAttempted = ref<boolean>(false);
 
-// Derived form state
+// Computed
 const isEditing = computed<boolean>((): boolean => props.grade !== undefined);
+
 const hasValidationErrors = computed<boolean>((): boolean =>
-  fieldOrder.some((field: FormField): boolean => errors[field] !== ''),
+  fieldOrder.some((field: keyof GradeValidationErrorsDTO): boolean => errors.value[field] !== ''),
 );
 
-// Error control functions
-const validateField = (field: FormField): boolean => {
-  touched[field] = true;
-  errors[field] = GradeService.validateFields({ ...form })[field];
-  return errors[field] === '';
-};
+// Functions
+function validateField(field: keyof GradeValidationErrorsDTO): boolean {
+  touched.value[field] = true;
+  errors.value[field] = GradeService.validateFields(form.value)[field];
 
-const revalidateField = (field: FormField): void => {
-  if (touched[field] || submissionAttempted.value) validateField(field);
-};
+  return errors.value[field] === '';
+}
 
-const validateForm = (): boolean =>
-  fieldOrder.map((field: FormField): boolean => validateField(field)).every(Boolean);
+function revalidateField(field: keyof GradeValidationErrorsDTO): void {
+  if (touched.value[field] || submissionAttempted.value) {
+    validateField(field);
+  }
+}
 
-const resetValidation = (): void => {
-  fieldOrder.forEach((field: FormField): void => {
-    errors[field] = '';
-    touched[field] = false;
-  });
-  submissionAttempted.value = false;
-};
+function validateForm(): boolean {
+  return fieldOrder
+    .map((field: keyof GradeValidationErrorsDTO): boolean => validateField(field))
+    .every(Boolean);
+}
 
-// Form handlers
-const handleSubmit = (): void => {
-  if (props.loading) return;
+function handleSubmit(): void {
   associationError.value = subjectId.value ? '' : 'Selecciona una materia.';
-  form.date = new Date(`${dateValue.value}T00:00:00`);
   submissionAttempted.value = true;
-  if (!validateForm() || associationError.value) return;
-  emit('submit', { ...form }, subjectId.value);
-};
 
-const handleCancel = (): void => emit('cancel');
+  if (!validateForm() || associationError.value) {
+    return;
+  }
 
-// Synchronize form data with the selected grade
-watch(
-  (): GradeInterface | undefined => props.grade,
-  (grade: GradeInterface | undefined): void => {
-    form.date = grade?.date ?? new Date();
-    form.percentage = grade?.percentage ?? 20;
-    form.title = grade?.title ?? '';
-    form.type = grade?.type ?? '';
-    form.value = grade?.value ?? 0;
-    subjectId.value = grade?.subject.id ?? '';
-    associationError.value = '';
-    dateValue.value = form.date.toISOString().slice(0, 10);
-    resetValidation();
-  },
-  { immediate: true },
-);
+  emit('submit', { ...form.value }, subjectId.value);
+}
+
+function handleCancel(): void {
+  emit('cancel');
+}
 </script>
 
 <template>
-  <form class="grade-form" novalidate :aria-busy="loading" @submit.prevent="handleSubmit">
+  <form class="grade-form" novalidate @submit.prevent="handleSubmit">
     <div v-if="submissionAttempted && hasValidationErrors" class="grade-form__alert" role="alert">
       Revisa los datos de la nota antes de continuar.
     </div>
 
     <label class="grade-form__field">
       <span>Materia</span>
-      <select v-model="subjectId" required :disabled="loading || isEditing">
-        <option value="">Selecciona una materia</option>
+      <select v-model="subjectId" required :disabled="isEditing">
+        <option :value="0">Selecciona una materia</option>
         <option v-for="subject in subjects" :key="subject.id" :value="subject.id">
           {{ subject.code }} · {{ subject.name }}
         </option>
@@ -144,7 +125,6 @@ watch(
           v-model="form.title"
           type="text"
           required
-          :disabled="loading"
           @blur="validateField('title')"
           @input="revalidateField('title')"
         />
@@ -158,7 +138,6 @@ watch(
           type="text"
           placeholder="Parcial, proyecto..."
           required
-          :disabled="loading"
           @blur="validateField('type')"
           @input="revalidateField('type')"
         />
@@ -177,7 +156,6 @@ watch(
           max="5"
           step="0.1"
           required
-          :disabled="loading"
           @blur="validateField('value')"
           @input="revalidateField('value')"
         />
@@ -192,7 +170,6 @@ watch(
           min="1"
           max="100"
           required
-          :disabled="loading"
           @blur="validateField('percentage')"
           @input="revalidateField('percentage')"
         />
@@ -204,10 +181,9 @@ watch(
       <span>Fecha</span>
       <input
         :id="dateInputId"
-        v-model="dateValue"
+        v-model="form.date"
         type="date"
         required
-        :disabled="loading"
         @blur="validateField('date')"
         @input="revalidateField('date')"
       />
@@ -215,16 +191,9 @@ watch(
     </label>
 
     <footer class="grade-form__actions">
-      <button
-        class="button button--secondary"
-        type="button"
-        :disabled="loading"
-        @click="handleCancel"
-      >
-        Cancelar
-      </button>
-      <button class="button button--primary" type="submit" :disabled="loading">
-        {{ loading ? 'Guardando...' : isEditing ? 'Guardar cambios' : 'Crear nota' }}
+      <button class="button button--secondary" type="button" @click="handleCancel">Cancelar</button>
+      <button class="button button--primary" type="submit">
+        {{ isEditing ? 'Guardar cambios' : 'Crear nota' }}
       </button>
     </footer>
   </form>

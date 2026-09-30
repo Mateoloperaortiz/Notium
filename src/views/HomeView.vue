@@ -24,10 +24,10 @@ import { RouterLink } from 'vue-router';
       </div>
     </div>
 
-    <aside class="dashboard-preview" aria-label="Estado del proyecto">
+    <aside class="dashboard-preview" aria-label="Qué puedes hacer en Notium">
       <div class="dashboard-preview__topline">
         <span>HOY</span>
-        <span class="dashboard-preview__status">Base inicial</span>
+        <span class="dashboard-preview__status">Disponible</span>
       </div>
 
       <div class="dashboard-preview__focus">
@@ -41,10 +41,10 @@ import { RouterLink } from 'vue-router';
       <div class="dashboard-preview__divider"></div>
 
       <div class="dashboard-preview__next">
-        <span>Próximamente</span>
+        <span>En tu dashboard</span>
         <p>
-          El dashboard mostrará tu promedio, créditos y progreso cuando los demás módulos estén
-          listos.
+          Consulta tu promedio por semestre y por materia, tus créditos y el avance de tus
+          evaluaciones.
         </p>
       </div>
     </aside>

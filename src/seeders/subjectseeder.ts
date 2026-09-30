@@ -1,4 +1,64 @@
-import { seedSubjects } from '@/data/seedData.js';
 import type { SubjectInterface } from '@/interfaces/SubjectInterface.js';
 
-export const subjectSeeder: SubjectInterface[] = seedSubjects;
+export const subjectSeeder: SubjectInterface[] = [
+  {
+    id: 1,
+    semesterId: 1,
+    code: 'ISAW-01',
+    name: 'Ingeniería de Software para Aplicaciones Web',
+    credits: 3,
+    professor: 'Daniel Correa',
+    createdAt: 1768811400000,
+    updatedAt: 1768811400000,
+  },
+  {
+    id: 2,
+    semesterId: 1,
+    code: 'DAW-01',
+    name: 'Desarrollo de Aplicaciones Web',
+    credits: 3,
+    professor: 'Laura Gómez',
+    createdAt: 1768811400000,
+    updatedAt: 1768811400000,
+  },
+  {
+    id: 3,
+    semesterId: 2,
+    code: 'FAA-01',
+    name: 'Fundamentos de Aprendizaje Automático',
+    credits: 3,
+    professor: 'Andrés Rojas',
+    createdAt: 1785141000000,
+    updatedAt: 1785141000000,
+  },
+  {
+    id: 4,
+    semesterId: 3,
+    code: 'BD-01',
+    name: 'Bases de Datos',
+    credits: 3,
+    professor: 'Carolina Pérez',
+    createdAt: 1768815000000,
+    updatedAt: 1768815000000,
+  },
+  {
+    id: 5,
+    semesterId: 3,
+    code: 'AS-01',
+    name: 'Arquitectura de Software',
+    credits: 3,
+    professor: 'Felipe Vargas',
+    createdAt: 1768815000000,
+    updatedAt: 1768815000000,
+  },
+  {
+    id: 6,
+    semesterId: 4,
+    code: 'SEG-01',
+    name: 'Seguridad de Aplicaciones Web',
+    credits: 3,
+    professor: 'Natalia Ruiz',
+    createdAt: 1785144600000,
+    updatedAt: 1785144600000,
+  },
+];

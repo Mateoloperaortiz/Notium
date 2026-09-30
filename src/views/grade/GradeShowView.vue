@@ -1,46 +1,36 @@
 <script setup lang="ts">
 // Internal imports
 import type { GradeInterface } from '@/interfaces/GradeInterface.js';
+import type { SubjectInterface } from '@/interfaces/SubjectInterface.js';
+import { AuthService } from '@/services/AuthService.js';
 import { GradeService } from '@/services/GradeService.js';
+import { SemesterService } from '@/services/SemesterService.js';
+import { SubjectService } from '@/services/SubjectService.js';
+import { DateFormatUtil } from '@/utils/DateFormatUtil.js';
+
 // External imports
-import { ref, shallowRef, watch } from 'vue';
+import { computed } from 'vue';
 import { RouterLink } from 'vue-router';
 
-// Interfaces and types
-interface Props {
-  gradeId: string;
-  subjectId: string;
-}
-
 // Props
-const props = defineProps<Props>();
+const props = defineProps<{ gradeId: string; subjectId: string }>();
 
-// View state
-const grade = shallowRef<GradeInterface>();
-const errorMessage = ref<string>('');
-const isLoading = ref<boolean>(true);
+// State
+const loggedUserId = AuthService.getLoggedUser()?.id ?? 0;
 
-// Data loading
-async function loadGrade(gradeId: string): Promise<void> {
-  isLoading.value = true;
-  errorMessage.value = '';
+// Computed
+const subject = computed<SubjectInterface | undefined>((): SubjectInterface | undefined =>
+  SubjectService.getSubjectsBySemesters(SemesterService.getSemestersByUserId(loggedUserId)).find(
+    (userSubject: SubjectInterface): boolean => userSubject.id === Number(props.subjectId),
+  ),
+);
 
-  try {
-    grade.value = await GradeService.findById(gradeId);
-  } catch (error: unknown) {
-    errorMessage.value = error instanceof Error ? error.message : 'No fue posible cargar la nota.';
-    grade.value = undefined;
-  } finally {
-    isLoading.value = false;
-  }
-}
-
-watch(
-  (): string => props.gradeId,
-  (gradeId: string): void => {
-    void loadGrade(gradeId);
-  },
-  { immediate: true },
+const grade = computed<GradeInterface | undefined>((): GradeInterface | undefined =>
+  subject.value
+    ? GradeService.getGradesBySubjectId(subject.value.id).find(
+        (subjectGrade: GradeInterface): boolean => subjectGrade.id === Number(props.gradeId),
+      )
+    : undefined,
 );
 </script>
 
@@ -51,17 +41,12 @@ watch(
       Volver a notas
     </RouterLink>
 
-    <div v-if="isLoading" class="grade-detail__loading" aria-busy="true">Cargando nota...</div>
-    <p v-else-if="errorMessage" class="status-message status-message--error" role="alert">
-      {{ errorMessage }}
-    </p>
-
-    <div v-else-if="grade">
+    <div v-if="grade">
       <header class="grade-detail__hero">
         <div>
           <p class="eyebrow">{{ grade.type }}</p>
           <h1 id="grade-detail-title" class="page-title">{{ grade.title }}</h1>
-          <p>Materia: {{ grade.subject.name }}</p>
+          <p>Materia: {{ subject?.name }}</p>
         </div>
         <strong class="grade-detail__value">{{ grade.value.toFixed(1) }}</strong>
       </header>
@@ -73,7 +58,7 @@ watch(
         </div>
         <div>
           <dt>Fecha</dt>
-          <dd>{{ new Date(grade.date).toLocaleDateString('es-CO') }}</dd>
+          <dd>{{ DateFormatUtil.formatDate(grade.date) }}</dd>
         </div>
       </dl>
     </div>
@@ -121,7 +106,6 @@ watch(
   font-size: 3rem;
 }
 .grade-detail__data,
-.grade-detail__loading,
 .grade-detail__not-found {
   display: grid;
   gap: 1rem;

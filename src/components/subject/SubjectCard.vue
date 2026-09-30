@@ -1,36 +1,36 @@
 <script setup lang="ts">
 // Internal imports
 import type { SubjectInterface } from '@/interfaces/SubjectInterface.js';
+import { GradeService } from '@/services/GradeService.js';
+
 // External imports
+import { computed } from 'vue';
 import { RouterLink } from 'vue-router';
 
-// Interfaces and types
-interface Props {
-  showActions?: boolean;
-  subject: SubjectInterface;
-}
-
 // Props
-const props = withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<{ showActions?: boolean; subject: SubjectInterface }>(), {
   showActions: true,
 });
 
 // Emits
-interface Emits {
-  delete: [subjectId: string];
+const emit = defineEmits<{
+  delete: [subjectId: number];
   edit: [subject: SubjectInterface];
+}>();
+
+// Computed
+const gradeCount = computed<number>(
+  (): number => GradeService.getGradesBySubjectId(props.subject.id).length,
+);
+
+// Functions
+function handleDelete(): void {
+  emit('delete', props.subject.id);
 }
 
-const emit = defineEmits<Emits>();
-
-// Event handlers
-const handleDelete = (): void => {
-  emit('delete', props.subject.id);
-};
-
-const handleEdit = (): void => {
+function handleEdit(): void {
   emit('edit', props.subject);
-};
+}
 </script>
 
 <template>
@@ -73,7 +73,7 @@ const handleEdit = (): void => {
 
       <div class="semester-card__date">
         <dt>Notas</dt>
-        <dd>{{ subject.grades.length }}</dd>
+        <dd>{{ gradeCount }}</dd>
       </div>
     </dl>
 
@@ -82,7 +82,7 @@ const handleEdit = (): void => {
         class="semester-card__action semester-card__action--primary"
         :to="{
           name: 'subject-show',
-          params: { semesterId: subject.semester.id, subjectId: subject.id },
+          params: { semesterId: subject.semesterId, subjectId: subject.id },
         }"
         :aria-label="`Ver detalle de ${subject.name}`"
       >

@@ -1,10 +1,9 @@
 export interface AnalyticsFilterDTO {
-  semesterId?: string;
+  semesterId?: number;
   type?: string;
 }
 
 export interface EvolutionPointDTO {
-  date: string;
   label: string;
   value: number;
 }
@@ -12,13 +11,13 @@ export interface EvolutionPointDTO {
 export interface SemesterComparisonRowDTO {
   averageGrade: number | null;
   gradeCount: number;
-  semesterId: string;
+  semesterId: number;
   semesterLabel: string;
   subjectCount: number;
 }
 
 export interface SemesterOptionDTO {
-  id: string;
+  id: number;
   label: string;
 }
 

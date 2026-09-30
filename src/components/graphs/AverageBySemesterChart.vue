@@ -2,77 +2,41 @@
 // Internal imports
 import type { GradeInterface } from '@/interfaces/GradeInterface.js';
 import type { SemesterInterface } from '@/interfaces/SemesterInterface.js';
+import { AuthService } from '@/services/AuthService.js';
 import { GradeService } from '@/services/GradeService.js';
 import { SemesterService } from '@/services/SemesterService.js';
+import { SubjectService } from '@/services/SubjectService.js';
+import { AnalyticsUtil } from '@/utils/AnalyticsUtil.js';
+
 // External imports
-import {
-  BarElement,
-  CategoryScale,
-  type ChartData,
-  Chart as ChartJS,
-  type ChartOptions,
-  Legend,
-  LinearScale,
-  Title,
-  Tooltip,
-} from 'chart.js';
-import { computed, onMounted, ref } from 'vue';
+import type { ChartData, ChartOptions } from 'chart.js';
 import { Bar } from 'vue-chartjs';
 
-ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
-
-const semesters = ref<SemesterInterface[]>([]);
-const grades = ref<GradeInterface[]>([]);
-const isLoading = ref<boolean>(true);
-const errorMessage = ref<string>('');
-
-function getSemesterAverage(semester: SemesterInterface): number {
-  const semesterGrades = grades.value.filter(
-    (grade: GradeInterface): boolean => grade.subject.semester.id === semester.id,
-  );
-
-  if (semesterGrades.length === 0) return 0;
-
-  return (
-    semesterGrades.reduce(
-      (total: number, grade: GradeInterface): number => total + grade.value,
-      0,
-    ) / semesterGrades.length
-  );
-}
-
-const chartData = computed<ChartData<'bar'>>((): ChartData<'bar'> => ({
-  labels: semesters.value.map((semester: SemesterInterface): string => semester.name),
+// State
+const loggedUserId = AuthService.getLoggedUser()?.id ?? 0;
+const semesters = SemesterService.getSemestersByUserId(loggedUserId);
+const chartData: ChartData<'bar'> = {
+  labels: semesters.map((semester: SemesterInterface): string => semester.name),
   datasets: [
     {
       backgroundColor: '#236b56',
       borderRadius: 8,
-      data: semesters.value.map(getSemesterAverage),
+      data: semesters.map(
+        (semester: SemesterInterface): number =>
+          AnalyticsUtil.getAverage(
+            GradeService.getGradesBySubjects(
+              SubjectService.getSubjectsBySemesterId(semester.id),
+            ).map((grade: GradeInterface): number => grade.value),
+          ) ?? 0,
+      ),
       label: 'Promedio',
     },
   ],
-}));
-
+};
 const chartOptions: ChartOptions<'bar'> = {
   maintainAspectRatio: false,
   scales: { y: { beginAtZero: true, max: 5 } },
 };
-
-async function loadData(): Promise<void> {
-  try {
-    [semesters.value, grades.value] = await Promise.all([
-      SemesterService.findAllByCurrentUser(),
-      GradeService.findAllByCurrentUser(),
-    ]);
-  } catch (error: unknown) {
-    errorMessage.value =
-      error instanceof Error ? error.message : 'No fue posible cargar el gráfico.';
-  } finally {
-    isLoading.value = false;
-  }
-}
-
-onMounted(loadData);
 </script>
 
 <template>
@@ -81,9 +45,7 @@ onMounted(loadData);
       <p class="eyebrow">Rendimiento</p>
       <h2>Promedio por semestre</h2>
     </header>
-    <div v-if="isLoading" class="graph-state">Cargando gráfico...</div>
-    <p v-else-if="errorMessage" class="graph-state graph-state--error">{{ errorMessage }}</p>
-    <div v-else-if="semesters.length" class="graph-canvas">
+    <div v-if="semesters.length" class="graph-canvas">
       <Bar :data="chartData" :options="chartOptions" />
     </div>
     <p v-else class="graph-state">Aún no hay semestres registrados.</p>
@@ -116,8 +78,5 @@ onMounted(loadData);
   place-items: center;
   color: var(--color-muted);
   text-align: center;
-}
-.graph-state--error {
-  color: var(--color-danger);
 }
 </style>

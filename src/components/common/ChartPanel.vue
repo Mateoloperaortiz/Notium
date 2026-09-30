@@ -1,76 +1,30 @@
 <script setup lang="ts">
-import {
-  BarController,
-  BarElement,
-  CategoryScale,
-  Chart,
-  type ChartData,
-  Legend,
-  LinearScale,
-  LineController,
-  LineElement,
-  PointElement,
-  Tooltip,
-} from 'chart.js';
-import { onBeforeUnmount, onMounted, ref, type Ref, shallowRef, type ShallowRef, watch } from 'vue';
+// External imports
+import type { ChartData, ChartOptions } from 'chart.js';
+import { computed } from 'vue';
+import { Chart } from 'vue-chartjs';
 
-Chart.register(
-  BarController,
-  BarElement,
-  CategoryScale,
-  Legend,
-  LinearScale,
-  LineController,
-  LineElement,
-  PointElement,
-  Tooltip,
-);
-
-interface Props {
+// Props
+const props = defineProps<{
   data: ChartData<'bar' | 'line'>;
   title: string;
   type: 'bar' | 'line';
-}
+}>();
 
-const props = defineProps<Props>();
-
-const canvasElement: Ref<HTMLCanvasElement | null> = ref(null);
-const chartInstance: ShallowRef<Chart<'bar' | 'line'> | null> = shallowRef(null);
-
-const renderChart = (): void => {
-  if (canvasElement.value === null) {
-    return;
-  }
-
-  chartInstance.value?.destroy();
-  chartInstance.value = new Chart<'bar' | 'line'>(canvasElement.value, {
-    data: props.data,
-    options: {
-      maintainAspectRatio: false,
-      plugins: { legend: { display: props.data.datasets.length > 1 } },
-      responsive: true,
-      scales: { y: { beginAtZero: true } },
-    },
-    type: props.type,
-  });
-};
-
-watch((): [ChartData<'bar' | 'line'>, string] => [props.data, props.type], renderChart, {
-  deep: true,
-});
-
-onMounted(renderChart);
-
-onBeforeUnmount((): void => {
-  chartInstance.value?.destroy();
-});
+// Computed
+const options = computed<ChartOptions<'bar' | 'line'>>((): ChartOptions<'bar' | 'line'> => ({
+  maintainAspectRatio: false,
+  plugins: { legend: { display: props.data.datasets.length > 1 } },
+  responsive: true,
+  scales: { y: { beginAtZero: true } },
+}));
 </script>
 
 <template>
   <figure class="chart-panel">
     <figcaption class="chart-panel__title">{{ title }}</figcaption>
     <div class="chart-panel__canvas-wrap">
-      <canvas ref="canvasElement" role="img" :aria-label="title"></canvas>
+      <Chart :type="type" :data="data" :options="options" role="img" :aria-label="title" />
     </div>
   </figure>
 </template>

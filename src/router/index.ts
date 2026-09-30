@@ -1,103 +1,89 @@
-// Imports internos
 import { configureRouterGuards } from './accessControl.js';
 import { Role } from '@/interfaces/UserInterface.js';
-// Imports externos
+import AdminReportsView from '@/views/admin/AdminReportsView.vue';
+import AdminUsersView from '@/views/admin/AdminUsersView.vue';
+import AnalyticsView from '@/views/AnalyticsView.vue';
+import DashboardView from '@/views/DashboardView.vue';
+import GradeIndexView from '@/views/grade/GradeIndexView.vue';
+import GradeShowView from '@/views/grade/GradeShowView.vue';
+import HomeView from '@/views/HomeView.vue';
+import LoginView from '@/views/LoginView.vue';
+import NotFoundView from '@/views/NotFoundView.vue';
+import SemesterIndexView from '@/views/semester/SemesterIndexView.vue';
+import SemesterShowView from '@/views/semester/SemesterShowView.vue';
+import SubjectIndexView from '@/views/subject/SubjectIndexView.vue';
+import SubjectShowView from '@/views/subject/SubjectShowView.vue';
 import { createRouter, createWebHistory } from 'vue-router';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
-    {
-      path: '/',
-      name: 'home',
-      component: (): Promise<typeof import('@/views/HomeView.vue')> =>
-        import('@/views/HomeView.vue'),
-    },
+    { path: '/', name: 'home', component: HomeView },
     {
       path: '/dashboard',
       name: 'dashboard',
-      component: (): Promise<typeof import('@/views/DashboardView.vue')> =>
-        import('@/views/DashboardView.vue'),
+      component: DashboardView,
       meta: { requiresAuth: true },
     },
-    {
-      path: '/login',
-      name: 'login',
-      component: (): Promise<typeof import('@/views/LoginView.vue')> =>
-        import('@/views/LoginView.vue'),
-    },
+    { path: '/login', name: 'login', component: LoginView },
     {
       path: '/semesters',
       name: 'semester-index',
-      component: (): Promise<typeof import('@/views/semester/SemesterIndexView.vue')> =>
-        import('@/views/semester/SemesterIndexView.vue'),
+      component: SemesterIndexView,
       meta: { requiresAuth: true },
     },
     {
       path: '/semesters/:id',
       name: 'semester-show',
-      component: (): Promise<typeof import('@/views/semester/SemesterShowView.vue')> =>
-        import('@/views/semester/SemesterShowView.vue'),
+      component: SemesterShowView,
       meta: { requiresAuth: true },
       props: true,
     },
     {
       path: '/subjects',
       name: 'subject-index',
-      component: (): Promise<typeof import('@/views/subject/SubjectIndexView.vue')> =>
-        import('@/views/subject/SubjectIndexView.vue'),
+      component: SubjectIndexView,
       meta: { requiresAuth: true },
     },
     {
       path: '/semesters/:semesterId/subjects/:subjectId',
       name: 'subject-show',
-      component: (): Promise<typeof import('@/views/subject/SubjectShowView.vue')> =>
-        import('@/views/subject/SubjectShowView.vue'),
+      component: SubjectShowView,
       meta: { requiresAuth: true },
       props: true,
     },
     {
       path: '/grades',
       name: 'grade-index',
-      component: (): Promise<typeof import('@/views/grade/GradeIndexView.vue')> =>
-        import('@/views/grade/GradeIndexView.vue'),
+      component: GradeIndexView,
       meta: { requiresAuth: true },
     },
     {
       path: '/subjects/:subjectId/grades/:gradeId',
       name: 'grade-show',
-      component: (): Promise<typeof import('@/views/grade/GradeShowView.vue')> =>
-        import('@/views/grade/GradeShowView.vue'),
+      component: GradeShowView,
       meta: { requiresAuth: true },
       props: true,
     },
     {
       path: '/analytics',
       name: 'analytics',
-      component: (): Promise<typeof import('@/views/AnalyticsView.vue')> =>
-        import('@/views/AnalyticsView.vue'),
+      component: AnalyticsView,
       meta: { requiresAuth: true },
     },
     {
       path: '/admin/users',
       name: 'admin-users',
-      component: (): Promise<typeof import('@/views/admin/AdminUsersView.vue')> =>
-        import('@/views/admin/AdminUsersView.vue'),
+      component: AdminUsersView,
       meta: { requiresAuth: true, roles: [Role.Admin] },
     },
     {
       path: '/admin/reports',
       name: 'admin-reports',
-      component: (): Promise<typeof import('@/views/admin/AdminReportsView.vue')> =>
-        import('@/views/admin/AdminReportsView.vue'),
+      component: AdminReportsView,
       meta: { requiresAuth: true, roles: [Role.Admin] },
     },
-    {
-      path: '/:pathMatch(.*)*',
-      name: 'not-found',
-      component: (): Promise<typeof import('@/views/NotFoundView.vue')> =>
-        import('@/views/NotFoundView.vue'),
-    },
+    { path: '/:pathMatch(.*)*', name: 'not-found', component: NotFoundView },
   ],
   scrollBehavior: (): ScrollToOptions => ({ top: 0 }),
 });

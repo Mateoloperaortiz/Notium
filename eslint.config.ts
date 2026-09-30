@@ -8,25 +8,25 @@ const explicitTypeRestrictions = [
   {
     selector:
       ':matches(FunctionDeclaration, FunctionExpression, ArrowFunctionExpression) > :matches(Identifier, ObjectPattern, ArrayPattern, RestElement).params:not([typeAnnotation])',
-    message: 'AGENTS.md §2.1: declara explícitamente el tipo de cada parámetro.',
+    message: 'AGENTS.md §3.6: declara explícitamente el tipo de cada parámetro.',
   },
   {
     selector:
       ':matches(FunctionDeclaration, FunctionExpression, ArrowFunctionExpression) > AssignmentPattern.params > .left:not([typeAnnotation])',
-    message: 'AGENTS.md §2.1: los parámetros con valor inicial también requieren tipo explícito.',
+    message: 'AGENTS.md §3.6: los parámetros con valor inicial también requieren tipo explícito.',
   },
   {
     selector:
       'TSParameterProperty > :matches(Identifier, ObjectPattern, ArrayPattern).parameter:not([typeAnnotation]), TSParameterProperty > AssignmentPattern.parameter > .left:not([typeAnnotation])',
-    message: 'AGENTS.md §2.1: tipa explícitamente los atributos declarados en el constructor.',
+    message: 'AGENTS.md §3.6: tipa explícitamente los atributos declarados en el constructor.',
   },
   {
     selector: ':matches(PropertyDefinition, TSPropertySignature):not([typeAnnotation])',
-    message: 'AGENTS.md §2.1: declara explícitamente el tipo de los atributos y contratos.',
+    message: 'AGENTS.md §3.6: declara explícitamente el tipo de los atributos y contratos.',
   },
 ];
 
-// AGENTS.md §2.5: ordenar por ruta del módulo, incluidos imports de tipos y de efectos secundarios.
+// AGENTS.md §3.5: ordenar por ruta del módulo, incluidos imports de tipos y de efectos secundarios.
 const alphabeticalImports: Rule.RuleModule = {
   meta: {
     type: 'suggestion',
@@ -109,7 +109,7 @@ export default defineConfigWithVueTs(
           patterns: [
             {
               group: ['@/data/**', '**/data/**', '@/infrastructure/**', '**/infrastructure/**'],
-              message: 'AGENTS.md §3 y §6: accede a la infraestructura mediante un servicio.',
+              message: 'AGENTS.md §7.3: accede a la infraestructura mediante un servicio.',
             },
           ],
         },
@@ -128,7 +128,7 @@ export default defineConfigWithVueTs(
         {
           selector:
             'VElement[name="a"]:not(:has(VAttribute[key.name="download"])) > VStartTag > VAttribute[key.name="href"][value.value=/^(?![a-zA-Z][a-zA-Z0-9+.-]*:|\\/\\/|#).+/]',
-          message: 'AGENTS.md §5.3: usa RouterLink para las rutas internas de la SPA.',
+          message: 'AGENTS.md §7.6: usa RouterLink para las rutas internas de la SPA.',
         },
       ],
     },
@@ -143,7 +143,7 @@ export default defineConfigWithVueTs(
         {
           selector:
             'CallExpression[callee.name="defineStore"]:matches([arguments.0.type="ObjectExpression"], [arguments.1.type="ObjectExpression"])',
-          message: 'AGENTS.md §8.2: defineStore debe usar un id y una función Setup Store.',
+          message: 'AGENTS.md §4.3: defineStore debe usar un id y una función Setup Store.',
         },
       ],
     },
@@ -158,7 +158,7 @@ export default defineConfigWithVueTs(
           paths: [
             {
               name: 'vue',
-              message: 'AGENTS.md §9.1: las utilidades deben ser independientes de Vue.',
+              message: 'AGENTS.md §6: las utilidades deben ser independientes de Vue.',
             },
           ],
         },

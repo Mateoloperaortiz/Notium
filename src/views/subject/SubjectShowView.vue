@@ -3,71 +3,43 @@
 import GradeCard from '@/components/grade/GradeCard.vue';
 import type { GradeInterface } from '@/interfaces/GradeInterface.js';
 import type { SubjectInterface } from '@/interfaces/SubjectInterface.js';
+import { AuthService } from '@/services/AuthService.js';
 import { GradeService } from '@/services/GradeService.js';
+import { SemesterService } from '@/services/SemesterService.js';
 import { SubjectService } from '@/services/SubjectService.js';
+
 // External imports
-import { computed, ref, shallowRef, watch } from 'vue';
+import { computed } from 'vue';
 import { RouterLink } from 'vue-router';
 
-// Interfaces and types
-interface Props {
-  semesterId: string;
-  subjectId: string;
-}
-
 // Props
-const props = defineProps<Props>();
+const props = defineProps<{ semesterId: string; subjectId: string }>();
 
-// View state
-const subject = shallowRef<SubjectInterface>();
-const grades = shallowRef<GradeInterface[]>([]);
-const errorMessage = ref<string>('');
-const isLoading = ref<boolean>(true);
-const gradeCount = computed<number>((): number => grades.value.length);
+// State
+const loggedUserId = AuthService.getLoggedUser()?.id ?? 0;
 
-// Data loading
-async function loadSubject(subjectId: string): Promise<void> {
-  isLoading.value = true;
-  errorMessage.value = '';
+// Computed
+const subject = computed<SubjectInterface | undefined>((): SubjectInterface | undefined =>
+  SubjectService.getSubjectsBySemesters(SemesterService.getSemestersByUserId(loggedUserId)).find(
+    (userSubject: SubjectInterface): boolean =>
+      userSubject.id === Number(props.subjectId) &&
+      userSubject.semesterId === Number(props.semesterId),
+  ),
+);
 
-  try {
-    subject.value = await SubjectService.findById(subjectId);
-    grades.value = subject.value ? await GradeService.findBySubjectId(subjectId) : [];
-  } catch (error: unknown) {
-    errorMessage.value =
-      error instanceof Error ? error.message : 'No fue posible cargar la materia.';
-    subject.value = undefined;
-    grades.value = [];
-  } finally {
-    isLoading.value = false;
-  }
-}
-
-watch(
-  (): string => props.subjectId,
-  (subjectId: string): void => {
-    void loadSubject(subjectId);
-  },
-  { immediate: true },
+const grades = computed<GradeInterface[]>((): GradeInterface[] =>
+  subject.value ? GradeService.getGradesBySubjectId(subject.value.id) : [],
 );
 </script>
 
 <template>
   <section class="subject-detail" aria-labelledby="subject-detail-title">
-    <RouterLink
-      class="subject-detail__back"
-      :to="{ name: 'subject-index', params: { semesterId } }"
-    >
+    <RouterLink class="subject-detail__back" :to="{ name: 'subject-index' }">
       <span aria-hidden="true">←</span>
       Volver a materias
     </RouterLink>
 
-    <div v-if="isLoading" class="subject-detail__loading" aria-busy="true">Cargando materia...</div>
-    <p v-else-if="errorMessage" class="status-message status-message--error" role="alert">
-      {{ errorMessage }}
-    </p>
-
-    <div v-else-if="subject">
+    <div v-if="subject">
       <header class="subject-detail__hero">
         <div>
           <p class="eyebrow">{{ subject.code }}</p>
@@ -83,9 +55,11 @@ watch(
       <section class="subject-detail__grades" aria-labelledby="grades-title">
         <p class="eyebrow">Evaluación</p>
         <h2 id="grades-title">Notas de la materia</h2>
-        <p>{{ gradeCount }} {{ gradeCount === 1 ? 'nota registrada' : 'notas registradas' }}.</p>
+        <p>
+          {{ grades.length }} {{ grades.length === 1 ? 'nota registrada' : 'notas registradas' }}.
+        </p>
         <div v-if="grades.length" class="subject-detail__grade-list">
-          <GradeCard v-for="grade in grades" :key="grade.id" :grade="grade" :show-actions="false" />
+          <GradeCard v-for="grade in grades" :key="grade.id" :grade="grade" />
         </div>
         <p v-else class="subject-detail__empty-grades">Aún no hay notas registradas.</p>
         <RouterLink class="button button--primary" :to="{ name: 'grade-index' }">
@@ -98,9 +72,7 @@ watch(
       <span aria-hidden="true">404</span>
       <h1 id="subject-detail-title">No encontramos esta materia</h1>
       <p>Puede que haya sido eliminada o que el enlace no sea correcto.</p>
-      <RouterLink
-        class="button button--primary"
-        :to="{ name: 'subject-index', params: { semesterId } }"
+      <RouterLink class="button button--primary" :to="{ name: 'subject-index' }"
         >Volver a materias</RouterLink
       >
     </div>
@@ -154,7 +126,6 @@ watch(
   font-size: 0.78rem;
 }
 .subject-detail__grades,
-.subject-detail__loading,
 .subject-detail__not-found {
   margin-top: 1.5rem;
   padding: clamp(1.4rem, 4vw, 2rem);

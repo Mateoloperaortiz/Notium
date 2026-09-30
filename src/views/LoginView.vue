@@ -1,37 +1,34 @@
 <script setup lang="ts">
 // Internal imports
+import type { LoginDTO } from '@/dtos/UserDTOs.js';
 import { AuthService } from '@/services/AuthService.js';
+
 // External imports
-import { reactive } from 'vue';
+import { ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
-// Form variables
-const form = reactive({
-  email: 'mateo@example.com',
-  password: 'mateo-password',
-  errorMessage: '',
-});
+// State
 const route = useRoute();
 const router = useRouter();
+const form = ref<LoginDTO>({
+  email: 'mateo@example.com',
+  password: 'mateo-password',
+});
+const errorMessage = ref<string>('');
 
-// Form handlers
-const submitLogin = (): void => {
-  form.errorMessage = '';
+// Functions
+function submitLogin(): void {
+  errorMessage.value = '';
 
-  const user = AuthService.login({
-    email: form.email,
-    password: form.password,
-  });
-
-  if (user === null) {
-    form.errorMessage = 'El correo o la contraseña no son correctos.';
+  if (AuthService.login(form.value) === undefined) {
+    errorMessage.value = 'El correo o la contraseña no son correctos.';
     return;
   }
 
   const redirectPath =
     typeof route.query.redirect === 'string' ? route.query.redirect : '/dashboard';
-  void router.push(redirectPath);
-};
+  router.push(redirectPath);
+}
 </script>
 
 <template>
@@ -52,8 +49,8 @@ const submitLogin = (): void => {
           <input v-model="form.password" type="password" autocomplete="current-password" required />
         </label>
 
-        <p v-if="form.errorMessage" class="login-form__error" role="alert">
-          {{ form.errorMessage }}
+        <p v-if="errorMessage" class="login-form__error" role="alert">
+          {{ errorMessage }}
         </p>
 
         <button class="button button--primary" type="submit">Entrar</button>

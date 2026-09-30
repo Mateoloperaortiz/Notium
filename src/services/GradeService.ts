@@ -1,106 +1,118 @@
 import type { CreateGradeDTO, GradeValidationErrorsDTO, UpdateGradeDTO } from '@/dtos/GradeDTOs.js';
 import type { GradeInterface } from '@/interfaces/GradeInterface.js';
-import { SubjectService } from '@/services/SubjectService.js';
-import { useAuthStore } from '@/stores/AuthStore.js';
+import type { SubjectInterface } from '@/interfaces/SubjectInterface.js';
 import { useGradeStore } from '@/stores/GradeStore.js';
-
-const generateGradeId = (): string => globalThis.crypto.randomUUID();
+import { IdUtil } from '@/utils/IdUtil.js';
 
 export class GradeService {
-  public static async findAll(): Promise<GradeInterface[]> {
-    return [...useGradeStore().grade];
+  public static getGrades(): GradeInterface[] {
+    return useGradeStore().grades;
   }
 
-  public static async findAllByCurrentUser(): Promise<GradeInterface[]> {
-    const currentUser = useAuthStore().currentUser;
-
-    if (currentUser === null) {
-      return [];
-    }
-
-    return (await GradeService.findAll())
-      .filter((grade: GradeInterface): boolean => grade.subject.semester.user.id === currentUser.id)
-      .map((grade: GradeInterface): GradeInterface => {
-        grade.date = new Date(grade.date);
-        return grade;
-      });
+  public static getGradeById(id: number): GradeInterface | undefined {
+    return GradeService.getGrades().find((grade: GradeInterface): boolean => grade.id === id);
   }
 
-  public static async findBySubjectId(subjectId: string): Promise<GradeInterface[]> {
-    const grades = await GradeService.findAllByCurrentUser();
-
-    return grades.filter((grade: GradeInterface): boolean => grade.subject.id === subjectId);
+  public static getGradesBySubjectId(subjectId: number): GradeInterface[] {
+    return GradeService.getGrades().filter(
+      (grade: GradeInterface): boolean => grade.subjectId === subjectId,
+    );
   }
 
-  public static async findById(id: string): Promise<GradeInterface | undefined> {
-    const grades = await GradeService.findAllByCurrentUser();
+  public static getGradesBySubjects(subjects: SubjectInterface[]): GradeInterface[] {
+    const subjectIds = subjects.map((subject: SubjectInterface): number => subject.id);
 
-    return grades.find((grade: GradeInterface): boolean => grade.id === id);
+    return GradeService.getGrades().filter((grade: GradeInterface): boolean =>
+      subjectIds.includes(grade.subjectId),
+    );
   }
 
-  public static async create(dto: CreateGradeDTO, subjectId: string): Promise<GradeInterface> {
-    const subject = await SubjectService.findById(subjectId);
-
-    if (subject === undefined) {
-      throw new Error('La materia no existe.');
-    }
-
+  public static createGrade(dto: CreateGradeDTO, subjectId: number): GradeInterface {
+    const validatedDto = GradeService.validate(dto);
     const timestamp = Date.now();
     const grade: GradeInterface = {
-      ...dto,
+      ...validatedDto,
       createdAt: timestamp,
-      id: generateGradeId(),
-      subject,
-      updatetAt: timestamp,
+      id: IdUtil.getNextId(GradeService.getGrades()),
+      subjectId,
+      updatedAt: timestamp,
     };
 
-    useGradeStore().grade.push(grade);
-    subject.grades.push(grade);
+    useGradeStore().grades.push(grade);
 
     return grade;
   }
 
-  public static async update(id: string, dto: UpdateGradeDTO): Promise<GradeInterface | undefined> {
-    const grade = await GradeService.findById(id);
+  public static updateGrade(id: number, dto: UpdateGradeDTO): GradeInterface | undefined {
+    const grade = GradeService.getGradeById(id);
 
     if (grade === undefined) {
       return undefined;
     }
 
-    Object.assign(grade, dto, { updatetAt: Date.now() });
+    const validatedDto = GradeService.validate({
+      date: dto.date ?? grade.date,
+      percentage: dto.percentage ?? grade.percentage,
+      title: dto.title ?? grade.title,
+      type: dto.type ?? grade.type,
+      value: dto.value ?? grade.value,
+    });
+
+    Object.assign(grade, validatedDto, { updatedAt: Date.now() });
 
     return grade;
   }
 
-  public static async delete(id: string): Promise<boolean> {
-    const grades = useGradeStore().grade;
-    const grade = await GradeService.findById(id);
-    const gradeIndex = grade === undefined ? -1 : grades.indexOf(grade);
+  public static deleteGrade(id: number): boolean {
+    const grades = GradeService.getGrades();
+    const gradeIndex = grades.findIndex((grade: GradeInterface): boolean => grade.id === id);
 
     if (gradeIndex === -1) {
       return false;
     }
 
-    const [removedGrade] = grades.splice(gradeIndex, 1);
-    const subjectGradeIndex = removedGrade?.subject.grades.indexOf(removedGrade) ?? -1;
-
-    if (subjectGradeIndex >= 0) {
-      removedGrade?.subject.grades.splice(subjectGradeIndex, 1);
-    }
+    grades.splice(gradeIndex, 1);
 
     return true;
   }
 
+  public static deleteGradesBySubjectId(subjectId: number): void {
+    GradeService.getGradesBySubjectId(subjectId).forEach((grade: GradeInterface): void => {
+      GradeService.deleteGrade(grade.id);
+    });
+  }
+
   public static validateFields(dto: CreateGradeDTO): GradeValidationErrorsDTO {
     return {
-      date: Number.isNaN(dto.date.getTime()) ? 'Ingresa una fecha válida.' : '',
+      date: Number.isNaN(Date.parse(dto.date)) ? 'Ingresa una fecha válida.' : '',
       percentage:
         Number.isInteger(dto.percentage) && dto.percentage > 0 && dto.percentage <= 100
           ? ''
           : 'El porcentaje debe estar entre 1 y 100.',
       title: dto.title.trim() ? '' : 'El título es obligatorio.',
       type: dto.type.trim() ? '' : 'El tipo es obligatorio.',
-      value: dto.value >= 0 && dto.value <= 5 ? '' : 'La nota debe estar entre 0 y 5.',
+      value:
+        Number.isFinite(dto.value) && dto.value >= 0 && dto.value <= 5
+          ? ''
+          : 'La nota debe estar entre 0 y 5.',
+    };
+  }
+
+  private static validate(dto: CreateGradeDTO): CreateGradeDTO {
+    const errors = GradeService.validateFields(dto);
+    const firstError =
+      errors.title || errors.type || errors.value || errors.percentage || errors.date;
+
+    if (firstError !== '') {
+      throw new Error(firstError);
+    }
+
+    return {
+      date: dto.date,
+      percentage: dto.percentage,
+      title: dto.title.trim(),
+      type: dto.type.trim(),
+      value: dto.value,
     };
   }
 }

@@ -1,33 +1,27 @@
 <script setup lang="ts">
 // Internal imports
 import type { SemesterInterface } from '@/interfaces/SemesterInterface.js';
+
 // External imports
 import { RouterLink } from 'vue-router';
 
-// Interfaces and types
-interface Props {
-  semester: SemesterInterface;
-}
-
 // Props
-const props = defineProps<Props>();
+const props = defineProps<{ semester: SemesterInterface }>();
 
 // Emits
-interface Emits {
-  delete: [semesterId: string];
+const emit = defineEmits<{
+  delete: [semesterId: number];
   edit: [semester: SemesterInterface];
+}>();
+
+// Functions
+function handleDelete(): void {
+  emit('delete', props.semester.id);
 }
 
-const emit = defineEmits<Emits>();
-
-// Event handlers
-const handleDelete = (): void => {
-  emit('delete', props.semester.id);
-};
-
-const handleEdit = (): void => {
+function handleEdit(): void {
   emit('edit', props.semester);
-};
+}
 </script>
 
 <template>

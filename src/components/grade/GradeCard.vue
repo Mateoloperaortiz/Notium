@@ -1,29 +1,20 @@
 <script setup lang="ts">
 // Internal imports
 import type { GradeInterface } from '@/interfaces/GradeInterface.js';
+import { SubjectService } from '@/services/SubjectService.js';
+import { DateFormatUtil } from '@/utils/DateFormatUtil.js';
+
 // External imports
+import { computed } from 'vue';
 import { RouterLink } from 'vue-router';
 
-// Interfaces and types
-interface Props {
-  grade: GradeInterface;
-  showActions?: boolean;
-}
+// Props
+const props = defineProps<{ grade: GradeInterface }>();
 
-interface Emits {
-  delete: [gradeId: string];
-  edit: [grade: GradeInterface];
-}
-
-// Props and emits
-const props = withDefaults(defineProps<Props>(), {
-  showActions: true,
-});
-const emit = defineEmits<Emits>();
-
-// Event handlers
-const handleDelete = (): void => emit('delete', props.grade.id);
-const handleEdit = (): void => emit('edit', props.grade);
+// Computed
+const subjectName = computed<string>(
+  (): string => SubjectService.getSubjectById(props.grade.subjectId)?.name ?? '—',
+);
 </script>
 
 <template>
@@ -39,7 +30,7 @@ const handleEdit = (): void => emit('edit', props.grade);
     <dl class="grade-card__details">
       <div>
         <dt>Materia</dt>
-        <dd>{{ grade.subject.name }}</dd>
+        <dd>{{ subjectName }}</dd>
       </div>
       <div>
         <dt>Porcentaje</dt>
@@ -47,21 +38,17 @@ const handleEdit = (): void => emit('edit', props.grade);
       </div>
       <div>
         <dt>Fecha</dt>
-        <dd>{{ new Date(grade.date).toLocaleDateString('es-CO') }}</dd>
+        <dd>{{ DateFormatUtil.formatDate(grade.date) }}</dd>
       </div>
     </dl>
 
     <footer class="grade-card__actions">
       <RouterLink
         class="grade-card__detail-link"
-        :to="{ name: 'grade-show', params: { subjectId: grade.subject.id, gradeId: grade.id } }"
+        :to="{ name: 'grade-show', params: { subjectId: grade.subjectId, gradeId: grade.id } }"
       >
         Ver detalle
       </RouterLink>
-      <div v-if="showActions" class="grade-card__buttons">
-        <button type="button" aria-label="Editar nota" @click="handleEdit">Editar</button>
-        <button type="button" aria-label="Eliminar nota" @click="handleDelete">Eliminar</button>
-      </div>
     </footer>
   </article>
 </template>
@@ -77,8 +64,7 @@ const handleEdit = (): void => emit('edit', props.grade);
   box-shadow: var(--shadow-soft);
 }
 .grade-card__header,
-.grade-card__actions,
-.grade-card__buttons {
+.grade-card__actions {
   display: flex;
   align-items: center;
 }
@@ -126,17 +112,6 @@ const handleEdit = (): void => emit('edit', props.grade);
   color: var(--color-accent-dark);
   font-weight: 700;
   text-decoration: none;
-}
-.grade-card__buttons {
-  gap: 0.45rem;
-}
-.grade-card__buttons button {
-  padding: 0.45rem 0.65rem;
-  border: 1px solid var(--color-border);
-  border-radius: 0.55rem;
-  background: var(--color-surface);
-  color: var(--color-ink);
-  cursor: pointer;
 }
 @media (max-width: 34rem) {
   .grade-card__actions {

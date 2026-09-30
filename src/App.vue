@@ -1,17 +1,24 @@
 <script setup lang="ts">
-import { Role } from '@/interfaces/UserInterface.js';
-import { useAuthStore } from '@/stores/AuthStore.js';
-import { storeToRefs } from 'pinia';
+// Internal imports
+import { Role, type UserInterface } from '@/interfaces/UserInterface.js';
+import { AuthService } from '@/services/AuthService.js';
+
+// External imports
 import { computed } from 'vue';
-import { RouterLink, RouterView } from 'vue-router';
+import { RouterLink, RouterView, useRouter } from 'vue-router';
 
-const authStore = useAuthStore();
-const { currentUser } = storeToRefs(authStore);
+// State
+const router = useRouter();
 
-const isAdmin = computed<boolean>((): boolean => currentUser.value?.role === Role.Admin);
+// Computed
+const loggedUser = computed<UserInterface | undefined>((): UserInterface | undefined =>
+  AuthService.getLoggedUser(),
+);
+
+const isAdmin = computed<boolean>((): boolean => loggedUser.value?.role === Role.Admin);
 
 const userInitials = computed<string>((): string => {
-  const name = currentUser.value?.name ?? 'Usuario';
+  const name = loggedUser.value?.name ?? 'Usuario';
 
   return name
     .split(' ')
@@ -20,6 +27,12 @@ const userInitials = computed<string>((): string => {
     .map((part: string): string => part.charAt(0).toUpperCase())
     .join('');
 });
+
+// Functions
+function logout(): void {
+  AuthService.logout();
+  router.push({ name: 'login' });
+}
 </script>
 
 <template>
@@ -27,7 +40,7 @@ const userInitials = computed<string>((): string => {
     <a class="skip-link" href="#main-content">Saltar al contenido</a>
 
     <header class="app-header">
-      <div class="app-header__content">
+      <div class="app-header__content" :class="{ 'app-header__content--stacked': isAdmin }">
         <RouterLink class="brand" :to="{ name: 'home' }" aria-label="Ir al inicio de Notium">
           <span class="brand__mark" aria-hidden="true">N</span>
           <span class="brand__wordmark">Notium</span>
@@ -35,27 +48,23 @@ const userInitials = computed<string>((): string => {
 
         <nav class="main-navigation" aria-label="Navegación principal">
           <RouterLink class="main-navigation__link" :to="{ name: 'home' }"> Inicio </RouterLink>
-          <RouterLink v-if="currentUser" class="main-navigation__link" :to="{ name: 'dashboard' }">
+          <RouterLink v-if="loggedUser" class="main-navigation__link" :to="{ name: 'dashboard' }">
             Mi dashboard
           </RouterLink>
           <RouterLink class="main-navigation__link" :to="{ name: 'semester-index' }">
             Semestres
           </RouterLink>
           <RouterLink
-            v-if="currentUser"
+            v-if="loggedUser"
             class="main-navigation__link"
             :to="{ name: 'subject-index' }"
           >
             Materias
           </RouterLink>
-          <RouterLink
-            v-if="currentUser"
-            class="main-navigation__link"
-            :to="{ name: 'grade-index' }"
-          >
+          <RouterLink v-if="loggedUser" class="main-navigation__link" :to="{ name: 'grade-index' }">
             Notas
           </RouterLink>
-          <RouterLink v-if="currentUser" class="main-navigation__link" :to="{ name: 'analytics' }">
+          <RouterLink v-if="loggedUser" class="main-navigation__link" :to="{ name: 'analytics' }">
             Analíticas
           </RouterLink>
           <RouterLink v-if="isAdmin" class="main-navigation__link" :to="{ name: 'admin-users' }">
@@ -64,17 +73,18 @@ const userInitials = computed<string>((): string => {
           <RouterLink v-if="isAdmin" class="main-navigation__link" :to="{ name: 'admin-reports' }">
             Reportes
           </RouterLink>
-          <RouterLink v-if="!currentUser" class="main-navigation__link" :to="{ name: 'login' }">
+          <RouterLink v-if="!loggedUser" class="main-navigation__link" :to="{ name: 'login' }">
             Iniciar sesión
           </RouterLink>
         </nav>
 
-        <div v-if="currentUser" class="user-chip" :title="currentUser.email">
+        <div v-if="loggedUser" class="user-chip" :title="loggedUser.email">
           <span class="user-chip__avatar" aria-hidden="true">{{ userInitials }}</span>
           <span class="user-chip__content">
             <span class="user-chip__eyebrow">Sesión académica</span>
-            <span class="user-chip__name">{{ currentUser?.name ?? 'Cargando…' }}</span>
+            <span class="user-chip__name">{{ loggedUser.name }}</span>
           </span>
+          <button class="user-chip__logout" type="button" @click="logout">Cerrar sesión</button>
         </div>
       </div>
     </header>

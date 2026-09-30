@@ -1,6 +1,6 @@
 import type { SubjectInterface } from '@/interfaces/SubjectInterface.js';
 
-type SubjectManagedFields = 'createdAt' | 'grades' | 'id' | 'semester' | 'updatedAt';
+type SubjectManagedFields = 'createdAt' | 'id' | 'semesterId' | 'updatedAt';
 
 export type CreateSubjectDTO = Omit<SubjectInterface, SubjectManagedFields>;
 

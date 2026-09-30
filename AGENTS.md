@@ -1,4 +1,3 @@
-
 # AGENTS.md — Notium
 
 Reglas para agentes de código (Claude Code, Codex, Cursor u otros) que trabajen en este repositorio. Provienen de las presentaciones y tutoriales del curso **Desarrollo Web (EAFIT, 2026-2, prof. Daniel Correa)** y de sus observaciones a la Entrega 1 Parte 1 de Notium (nota 4,05). El curso define una "dictadura" de estándares: no basta con que el programa funcione, debe estar construido con los patrones acordados en clase. El código generado con IA que no los siga, o que el equipo no pueda explicar, se penaliza.
@@ -12,7 +11,7 @@ Reglas para agentes de código (Claude Code, Codex, Cursor u otros) que trabajen
 ## 1. Contexto del proyecto
 
 - Notium es una SPA para organizar semestres, materias y notas. Actores: **Estudiante** (`Role.User`) y **Administrador** (`Role.Admin`). Entidades: `User`, `Semester`, `Subject`, `Grade`.
-- Etapa actual: SPA sin backend. Los datos viven en stores de Pinia que `PiniaConfig` persiste en `localStorage` (clave `piniaState`). Las reglas de la fase FullStack están en la sección 10 y solo aplican cuando exista `backend/`.
+- Etapa actual: SPA sin backend. Los datos viven en stores de Pinia que `PiniaConfig` persiste en `localStorage` (clave `piniaStateV2`). Las reglas de la fase FullStack están en la sección 10 y solo aplican cuando exista `backend/`.
 - Estructura:
 
 ```
@@ -38,16 +37,16 @@ Reglas para agentes de código (Claude Code, Codex, Cursor u otros) que trabajen
 
 ## 2. Herramientas: qué, cómo, dónde y cuándo `[E1]`
 
-| Herramienta       | Qué hace                                                  | Cómo se ejecuta                                               | Dónde se configura                                              | Cuándo                                    |
-| ----------------- | ---------------------------------------------------------- | -------------------------------------------------------------- | ---------------------------------------------------------------- | ------------------------------------------ |
-| Vite              | Servidor de desarrollo y build de producción              | `npm run dev` · `npm run build` · `npm run preview`    | `vite.config.ts`                                               | Desarrollo diario; build antes de entregar |
-| vue-tsc           | Verifica tipos en`.ts` y `.vue`                        | `npm run type-check` (incluido en `build`)                 | `tsconfig.json`, `tsconfig.app.json`, `tsconfig.node.json` | Antes de cada commit                       |
-| ESLint            | Detecta errores y malas prácticas sin ejecutar el código | `npm run lint` · `npm run lint:fix`                       | `eslint.config.ts`                                             | Antes de cada commit y en CI               |
-| Prettier          | Formatea el código; no corrige lógica                    | `npm run format` · `npm run format:check`                 | `.prettierrc.json`, `.prettierignore`, `.editorconfig`     | Antes de cada commit y en CI               |
-| Vitest            | Pruebas unitarias de servicios                             | `npm test`                                                   | `src/services/__tests__/`                                      | Al cambiar un servicio y en CI             |
-| `npm run check` | Lint + formato + build en un solo paso                     | `npm run check`                                              | `package.json`                                                 | Antes de cada push                         |
-| GitHub Actions    | Corre pruebas y`check`, publica en GitHub Pages          | Automático en push y PR a`main`                             | `.github/workflows/cicd.yml`                                   | Cada push                                  |
-| Docker + nginx    | Imagen que sirve la SPA compilada                          | `docker build -t notium .` · `docker run -p 80:80 notium` | `Dockerfile`, `nginx.conf`, `.dockerignore`                | Al desplegar en la VM de GCP               |
+| Herramienta     | Qué hace                                                 | Cómo se ejecuta                                           | Dónde se configura                                         | Cuándo                                     |
+| --------------- | -------------------------------------------------------- | --------------------------------------------------------- | ---------------------------------------------------------- | ------------------------------------------ |
+| Vite            | Servidor de desarrollo y build de producción             | `npm run dev` · `npm run build` · `npm run preview`       | `vite.config.ts`                                           | Desarrollo diario; build antes de entregar |
+| vue-tsc         | Verifica tipos en `.ts` y `.vue`                         | `npm run type-check` (incluido en `build`)                | `tsconfig.json`, `tsconfig.app.json`, `tsconfig.node.json` | Antes de cada commit                       |
+| ESLint          | Detecta errores y malas prácticas sin ejecutar el código | `npm run lint` · `npm run lint:fix`                       | `eslint.config.ts`                                         | Antes de cada commit y en CI               |
+| Prettier        | Formatea el código; no corrige lógica                    | `npm run format` · `npm run format:check`                 | `.prettierrc.json`, `.prettierignore`, `.editorconfig`     | Antes de cada commit y en CI               |
+| Vitest          | Pruebas unitarias de servicios                           | `npm test`                                                | `src/services/__tests__/`                                  | Al cambiar un servicio y en CI             |
+| `npm run check` | Lint + formato + build en un solo paso                   | `npm run check`                                           | `package.json`                                             | Antes de cada push                         |
+| GitHub Actions  | Corre pruebas y `check`, publica en GitHub Pages         | Automático en push y PR a `main`                          | `.github/workflows/cicd.yml`                               | Cada push                                  |
+| Docker + nginx  | Imagen que sirve la SPA compilada                        | `docker build -t notium .` · `docker run -p 80:80 notium` | `Dockerfile`, `nginx.conf`, `.dockerignore`                | Al desplegar en la VM de GCP               |
 
 Una tarea no está terminada hasta que `npm test` y `npm run check` pasan sin errores.
 
@@ -108,7 +107,7 @@ Una tarea no está terminada hasta que `npm test` y `npm run check` pasan sin er
 
 ### 3.7 Identificadores `[E1][T04][T05]`
 
-- Los IDs son `number` y se generan con un único mecanismo: el máximo existente más uno.
+- Los IDs son `number` y se generan con un único mecanismo: el máximo existente más uno, implementado una sola vez en `IdUtil.getNextId()`.
 - Prohibido `crypto.randomUUID()` y cualquier API que exija contexto seguro (HTTPS): el despliegue evaluado corre sobre HTTP y ahí esa API no existe, por eso crear datos falló en producción.
 
 ## 4. Datos locales: interfaces, seeders, stores y PiniaConfig
@@ -159,7 +158,7 @@ export const subjectSeeder: SubjectInterface[] = [
 
 - Setup Stores (`defineStore('<id>', () => { ... })`); el id es el nombre de la entidad en singular y la colección del state va en plural: `users`, `semesters`, `subjects`, `grades`.
 - El store solo guarda estado; la lógica va en los servicios. Sin interfaces auxiliares para tipar el retorno del store.
-- `AuthStore` guarda el usuario en sesión en `loggedUser`.
+- `AuthStore` guarda solo el ID del usuario en sesión (`loggedUserId`); el usuario completo se obtiene con `AuthService.getLoggedUser()`.
 
 ### 4.4 PiniaConfig `[T04]`
 
@@ -171,11 +170,13 @@ export const subjectSeeder: SubjectInterface[] = [
 - Un servicio por entidad; es la única capa que lee y escribe los stores.
 - En esta etapa los servicios son síncronos: sin `async`, `await` ni `Promise`, porque leen memoria.
 - Nombres de métodos con el patrón del curso: `getGrades()`, `getGradeById(id)`, `getGradesBySubjectId(subjectId)`, `createGrade(dto)`, `updateGrade(id, dto)`, `deleteGrade(id)`. El nombre dice qué entidad devuelve y en qué cantidad.
-- Los servicios no deciden quién puede ver qué: no leen el usuario en sesión para filtrar ni para negar acceso. Reciben lo que necesitan por parámetro (`getSemestersByUserId(userId)`). El control de acceso vive en los guards del router.
+- Los servicios no deciden quién puede ver qué: no leen el usuario en sesión para filtrar ni para negar acceso. Reciben lo que necesitan por parámetro (`getSemestersByUserId(userId)`). Los guards del router controlan la autenticación y el rol; las vistas, incluidas las de detalle, buscan los registros solo dentro de los datos del usuario en sesión y muestran el estado "no encontrado" si el registro no le pertenece.
 - `AuthService` expone `login(dto)`, `logout()` y `getLoggedUser()`. Vistas y componentes obtienen el usuario en sesión con `getLoggedUser()`, nunca importando `AuthStore`.
-- Las relaciones se resuelven consultando por ID, no sincronizando arreglos en ambos lados.
+- Las relaciones se resuelven consultando por ID, no sincronizando arreglos en ambos lados. Las consultas que cruzan entidades reciben las entidades padre ya obtenidas: `SubjectService.getSubjectsBySemesters(semesters)`, `GradeService.getGradesBySubjects(subjects)`.
+- Las dependencias entre servicios van en una sola dirección, de padre a hijo: `AuthService` → `UserService` → `SemesterService` → `SubjectService` → `GradeService`. Un servicio nunca importa a su padre.
+- Borrar un registro borra sus hijos (usuario → semestres → materias → notas). Sin esto, un ID reutilizado por `máximo + 1` heredaría registros huérfanos.
 - La validación de datos de entrada vive en el servicio (`validateFields`).
-- Un servicio accede a datos. Una clase que solo calcula sobre datos que ya recibió (promedios, series, reportes) es un util, no un servicio. Por eso `AnalyticsService` y `PlatformReportService` deben revisarse.
+- Un servicio accede a datos. Una clase que solo calcula sobre datos que ya recibió (promedios, series, reportes) es un util, no un servicio: por eso esos cálculos viven en `AnalyticsUtil` y `PlatformReportUtil`.
 
 ## 6. Utils `[E1][P07]`
 
@@ -259,32 +260,32 @@ function deleteSemester(id: number): void {
 
 ## 12. Anti-patrones
 
-| No hacer                                                                                  | Hacer                                                     | Origen    |
-| ----------------------------------------------------------------------------------------- | --------------------------------------------------------- | --------- |
-| `src/data/seedData.ts` con un grafo de objetos y referencias circulares                 | Un seeder plano por entidad con IDs literales             | [E1]      |
-| `flatted` para serializar el estado                                                     | `JSON.stringify` sobre interfaces planas                | [E1]      |
-| `subject: SubjectInterface`, `grades: GradeInterface[]` en una interfaz               | `subjectId: number`                                     | [E1]      |
-| Colección del store en singular (`subject`, `grade`)                                 | `subjects`, `grades`                                  | [E1]      |
-| `crypto.randomUUID()`                                                                   | Máximo existente + 1                                     | [E1]      |
-| `async`/`await`/`Promise` en servicios que leen Pinia                               | Métodos síncronos                                       | [E1]      |
-| `findAllByCurrentUser()` que filtra por la sesión                                      | `getSemestersByUserId(userId)` + guards                 | [E1]      |
-| `findBySubjectId`, `findAll`, `findById`                                            | `getGradesBySubjectId`, `getGrades`, `getGradeById` | [E1][T04] |
-| Vista o componente que importa`AuthStore`                                               | `AuthService.getLoggedUser()`                           | [E1]      |
-| Funciones y constantes sueltas (`generateGradeId`, `EMAIL_PATTERN`, `HTML_ESCAPES`) | Miembros de la clase o variables dentro del método       | [E1]      |
-| `private constructor() {}` en utils                                                     | Clase sin constructor                                     | [E1]      |
-| Clase de cálculo puro dentro de`services/`                                             | Util                                                      | [E1][P07] |
-| `onMounted(loadData)` + `Promise.all` para datos locales                              | Inicializar el`ref` con el servicio                     | [E1]      |
-| `component: () => import(...)` en el router                                             | Import estático                                          | [E1]      |
-| Guards`async`                                                                           | Guards síncronos                                         | [E1]      |
-| Comentarios de sección distintos en cada archivo, en dos idiomas o sin línea en blanco  | Vocabulario fijo de la sección 3.4                       | [E1]      |
-| Sin botón de cerrar sesión                                                              | Logout visible en la cabecera                             | [E1]      |
-| `ChartJS.register` / `DataTable.use` en cada archivo                                  | Registro único en`main.ts`                             | [E1]      |
-| Promedio calculado en cada gráfica                                                       | Método de un util                                        | [P07]     |
-| Diagrama generado por script                                                              | Diagrama del equipo que refleja el código                | [E1]      |
-| `any`                                                                                   | Tipos explícitos                                         | [P04]     |
-| `<a href="/semesters">`                                                                 | `<RouterLink :to="{ name: 'semester-index' }">`         | [P05]     |
-| Options API                                                                               | `<script setup lang="ts">`                              | [P05]     |
-| Inconsistencias de`default`, `public` o nombres                                       | Mismo estilo en todos los archivos del tipo               | [P07]     |
+| No hacer                                                                               | Hacer                                               | Origen    |
+| -------------------------------------------------------------------------------------- | --------------------------------------------------- | --------- |
+| `src/data/seedData.ts` con un grafo de objetos y referencias circulares                | Un seeder plano por entidad con IDs literales       | [E1]      |
+| `flatted` para serializar el estado                                                    | `JSON.stringify` sobre interfaces planas            | [E1]      |
+| `subject: SubjectInterface`, `grades: GradeInterface[]` en una interfaz                | `subjectId: number`                                 | [E1]      |
+| Colección del store en singular (`subject`, `grade`)                                   | `subjects`, `grades`                                | [E1]      |
+| `crypto.randomUUID()`                                                                  | Máximo existente + 1                                | [E1]      |
+| `async`/`await`/`Promise` en servicios que leen Pinia                                  | Métodos síncronos                                   | [E1]      |
+| `findAllByCurrentUser()` que filtra por la sesión                                      | `getSemestersByUserId(userId)` + guards             | [E1]      |
+| `findBySubjectId`, `findAll`, `findById`                                               | `getGradesBySubjectId`, `getGrades`, `getGradeById` | [E1][T04] |
+| Vista o componente que importa `AuthStore`                                             | `AuthService.getLoggedUser()`                       | [E1]      |
+| Funciones y constantes sueltas (`generateGradeId`, `EMAIL_PATTERN`, `HTML_ESCAPES`)    | Miembros de la clase o variables dentro del método  | [E1]      |
+| `private constructor() {}` en utils                                                    | Clase sin constructor                               | [E1]      |
+| Clase de cálculo puro dentro de `services/`                                            | Util                                                | [E1][P07] |
+| `onMounted(loadData)` + `Promise.all` para datos locales                               | Inicializar el `ref` con el servicio                | [E1]      |
+| `component: () => import(...)` en el router                                            | Import estático                                     | [E1]      |
+| Guards `async`                                                                         | Guards síncronos                                    | [E1]      |
+| Comentarios de sección distintos en cada archivo, en dos idiomas o sin línea en blanco | Vocabulario fijo de la sección 3.4                  | [E1]      |
+| Sin botón de cerrar sesión                                                             | Logout visible en la cabecera                       | [E1]      |
+| `ChartJS.register` / `DataTable.use` en cada archivo                                   | Registro único en `main.ts`                         | [E1]      |
+| Promedio calculado en cada gráfica                                                     | Método de un util                                   | [P07]     |
+| Diagrama generado por script                                                           | Diagrama del equipo que refleja el código           | [E1]      |
+| `any`                                                                                  | Tipos explícitos                                    | [P04]     |
+| `<a href="/semesters">`                                                                | `<RouterLink :to="{ name: 'semester-index' }">`     | [P05]     |
+| Options API                                                                            | `<script setup lang="ts">`                          | [P05]     |
+| Inconsistencias de `default`, `public` o nombres                                       | Mismo estilo en todos los archivos del tipo         | [P07]     |
 
 ## 13. Forma de trabajar del agente
 

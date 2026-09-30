@@ -1,51 +1,61 @@
 <script setup lang="ts">
-// Imports internos
+// Internal imports
 import ChartPanel from '@/components/common/ChartPanel.vue';
 import type {
   AnalyticsFilterDTO,
   EvolutionPointDTO,
   SemesterComparisonRowDTO,
-  SemesterOptionDTO,
   TypeAverageDTO,
 } from '@/dtos/AnalyticsDTOs.js';
-import { AnalyticsService } from '@/services/AnalyticsService.js';
-import { useAuthStore } from '@/stores/AuthStore.js';
-import TableRenderUtil from '@/utils/TableRenderUtil.js';
-// Imports externos
+import type { GradeInterface } from '@/interfaces/GradeInterface.js';
+import { AuthService } from '@/services/AuthService.js';
+import { GradeService } from '@/services/GradeService.js';
+import { SemesterService } from '@/services/SemesterService.js';
+import { SubjectService } from '@/services/SubjectService.js';
+import { AnalyticsUtil } from '@/utils/AnalyticsUtil.js';
+import { TableRenderUtil } from '@/utils/TableRenderUtil.js';
+
+// External imports
 import type { ChartData } from 'chart.js';
-import DataTablesCore from 'datatables.net-dt';
-import 'datatables.net-dt/css/dataTables.dataTables.css';
 import DataTable from 'datatables.net-vue3';
-import { storeToRefs } from 'pinia';
 import { computed, ref } from 'vue';
 
-DataTable.use(DataTablesCore);
-
-// Estado del store
-const { currentUser } = storeToRefs(useAuthStore());
-
-// Estado de la vista
-const selectedSemesterId = ref<string>('');
+// State
+const loggedUserId = AuthService.getLoggedUser()?.id ?? 0;
+const semesters = SemesterService.getSemestersByUserId(loggedUserId);
+const subjects = SubjectService.getSubjectsBySemesters(semesters);
+const grades = GradeService.getGradesBySubjects(subjects);
+const semesterOptions = AnalyticsUtil.getSemesterOptions(semesters);
+const gradeTypes = AnalyticsUtil.getGradeTypes(grades);
+const selectedSemesterId = ref<number>(0);
 const selectedType = ref<string>('');
+const comparisonColumns = [
+  {
+    data: 'semesterLabel',
+    render: (label: string): string => TableRenderUtil.renderText(label),
+    title: 'Semestre',
+  },
+  { data: 'subjectCount', title: 'Materias' },
+  { data: 'gradeCount', title: 'Evaluaciones' },
+  {
+    data: 'averageGrade',
+    render: (averageGrade: number | null): string => TableRenderUtil.renderAverage(averageGrade),
+    title: 'Nota promedio',
+  },
+];
 
-// Estado derivado de la vista
-const semesterOptions = computed<SemesterOptionDTO[]>((): SemesterOptionDTO[] =>
-  currentUser.value ? AnalyticsService.getSemesterOptions(currentUser.value) : [],
-);
-
-const gradeTypes = computed<string[]>((): string[] =>
-  currentUser.value ? AnalyticsService.getGradeTypes(currentUser.value) : [],
-);
-
+// Computed
 const activeFilter = computed<AnalyticsFilterDTO>((): AnalyticsFilterDTO => ({
-  semesterId: selectedSemesterId.value === '' ? undefined : selectedSemesterId.value,
+  semesterId: selectedSemesterId.value === 0 ? undefined : selectedSemesterId.value,
   type: selectedType.value === '' ? undefined : selectedType.value,
 }));
 
+const filteredGrades = computed<GradeInterface[]>((): GradeInterface[] =>
+  AnalyticsUtil.filterGrades(grades, subjects, activeFilter.value),
+);
+
 const evolutionChartData = computed<ChartData<'bar' | 'line'>>((): ChartData<'bar' | 'line'> => {
-  const points = currentUser.value
-    ? AnalyticsService.getEvolutionSeries(currentUser.value, activeFilter.value)
-    : [];
+  const points = AnalyticsUtil.getEvolutionSeries(filteredGrades.value);
 
   return {
     datasets: [
@@ -63,9 +73,7 @@ const evolutionChartData = computed<ChartData<'bar' | 'line'>>((): ChartData<'ba
 });
 
 const typeChartData = computed<ChartData<'bar' | 'line'>>((): ChartData<'bar' | 'line'> => {
-  const averages = currentUser.value
-    ? AnalyticsService.getTypeAverages(currentUser.value, activeFilter.value)
-    : [];
+  const averages = AnalyticsUtil.getTypeAverages(filteredGrades.value);
 
   return {
     datasets: [
@@ -80,26 +88,8 @@ const typeChartData = computed<ChartData<'bar' | 'line'>>((): ChartData<'bar' | 
 });
 
 const comparisonRows = computed<SemesterComparisonRowDTO[]>((): SemesterComparisonRowDTO[] =>
-  currentUser.value
-    ? AnalyticsService.getSemesterComparison(currentUser.value, activeFilter.value)
-    : [],
+  AnalyticsUtil.getSemesterComparison(semesters, subjects, grades, activeFilter.value),
 );
-
-const comparisonColumns = [
-  {
-    data: 'semesterLabel',
-    render: (label: string): string => TableRenderUtil.renderText(label),
-    title: 'Semestre',
-  },
-  { data: 'subjectCount', title: 'Materias' },
-  { data: 'gradeCount', title: 'Evaluaciones' },
-  {
-    data: 'averageGrade',
-    render: (averageGrade: number | null): string =>
-      averageGrade === null ? '—' : averageGrade.toFixed(2),
-    title: 'Nota promedio',
-  },
-];
 </script>
 
 <template>
@@ -116,7 +106,7 @@ const comparisonColumns = [
       <label>
         Semestre
         <select v-model="selectedSemesterId">
-          <option value="">Todos</option>
+          <option :value="0">Todos</option>
           <option v-for="option in semesterOptions" :key="option.id" :value="option.id">
             {{ option.label }}
           </option>
