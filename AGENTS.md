@@ -170,7 +170,7 @@ export const subjectSeeder: SubjectInterface[] = [
 - Un servicio por entidad; es la única capa que lee y escribe los stores.
 - En esta etapa los servicios son síncronos: sin `async`, `await` ni `Promise`, porque leen memoria.
 - Nombres de métodos con el patrón del curso: `getGrades()`, `getGradeById(id)`, `getGradesBySubjectId(subjectId)`, `createGrade(dto)`, `updateGrade(id, dto)`, `deleteGrade(id)`. El nombre dice qué entidad devuelve y en qué cantidad.
-- Los servicios no deciden quién puede ver qué: no leen el usuario en sesión para filtrar ni para negar acceso. Reciben lo que necesitan por parámetro (`getSemestersByUserId(userId)`). El control de acceso vive en los guards del router.
+- Los servicios no deciden quién puede ver qué: no leen el usuario en sesión para filtrar ni para negar acceso. Reciben lo que necesitan por parámetro (`getSemestersByUserId(userId)`). Los guards del router controlan la autenticación y el rol; las vistas, incluidas las de detalle, buscan los registros solo dentro de los datos del usuario en sesión y muestran el estado "no encontrado" si el registro no le pertenece.
 - `AuthService` expone `login(dto)`, `logout()` y `getLoggedUser()`. Vistas y componentes obtienen el usuario en sesión con `getLoggedUser()`, nunca importando `AuthStore`.
 - Las relaciones se resuelven consultando por ID, no sincronizando arreglos en ambos lados. Las consultas que cruzan entidades reciben las entidades padre ya obtenidas: `SubjectService.getSubjectsBySemesters(semesters)`, `GradeService.getGradesBySubjects(subjects)`.
 - Las dependencias entre servicios van en una sola dirección, de padre a hijo: `AuthService` → `UserService` → `SemesterService` → `SubjectService` → `GradeService`. Un servicio nunca importa a su padre.
