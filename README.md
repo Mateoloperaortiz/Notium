@@ -53,8 +53,8 @@ Los módulos TypeScript locales se importan con la extensión `.js` y los compon
 
 ## Arquitectura
 
-El diagrama de arquitectura está en `docs/diagrams/`: `notium-arquitectura.drawio` es el archivo
-editable de draw.io y `notium-arquitectura.png`, su exportación.
+Los diagramas de arquitectura (`notium-arquitectura`) y de clases (`notium-clases`) están en
+`docs/diagrams/`, cada uno como archivo editable de draw.io y como PNG.
 
 ```text
 src/
