@@ -1,268 +1,305 @@
 
-# AGENTS.md
+# AGENTS.md — Notium
 
-Reglas para agentes de código (Claude Code, Codex, Cursor u otros) que trabajen en este repositorio. Provienen de las presentaciones y tutoriales del curso **Desarrollo Web (EAFIT, 2026-2, prof. Daniel Correa)**, que define una "dictadura" de estándares: no basta con que el programa funcione, debe estar construido con los patrones acordados en clase. El código generado con IA que no los siga, o que el equipo no pueda explicar, se penaliza.
+Reglas para agentes de código (Claude Code, Codex, Cursor u otros) que trabajen en este repositorio. Provienen de las presentaciones y tutoriales del curso **Desarrollo Web (EAFIT, 2026-2, prof. Daniel Correa)** y de sus observaciones a la Entrega 1 Parte 1 de Notium (nota 4,05). El curso define una "dictadura" de estándares: no basta con que el programa funcione, debe estar construido con los patrones acordados en clase. El código generado con IA que no los siga, o que el equipo no pueda explicar, se penaliza.
 
-**Prioridad ante conflicto:** (1) instrucción explícita del equipo, (2) este archivo, (3) patrones ya presentes en el repositorio, (4) buenas prácticas genéricas. Si un caso no está cubierto, replica el patrón existente más cercano en lugar de inventar uno nuevo.
+**Prioridad ante conflicto:** (1) instrucción explícita del equipo, (2) observaciones del profesor a este repositorio `[E1]`, (3) el resto de este archivo, (4) patrones ya presentes en el código, (5) buenas prácticas genéricas. Si un caso no está cubierto, elige la solución más simple que siga un patrón visto en clase.
 
-**Etiquetas de origen** (para justificar decisiones en la sustentación): `[P01]` Presentación del curso · `[P03]` Intro MPA/SSR · `[P04]` Fundamentos MPA/SSR · `[P05]` Intro SPA/CSR · `[P06]` Fundamentos SPA/CSR · `[P07]` Elementos avanzados SPA/CSR · `[P10]` Intro APIs REST · `[P11]` Intro FullStack · `[T01]`–`[T08]` Tutoriales 01 a 08.
+**Etiquetas de origen:** `[E1]` observación del profesor a la Entrega 1 de Notium · `[P01]` Presentación del curso · `[P04]` Fundamentos MPA/SSR · `[P05]` Intro SPA/CSR · `[P06]` Fundamentos SPA/CSR · `[P07]` Elementos avanzados SPA/CSR · `[P10]` Intro APIs REST · `[P11]` Intro FullStack · `[T01]`–`[T08]` Tutoriales 01 a 08.
 
 ---
 
 ## 1. Contexto del proyecto
 
-- Proyecto semestral en equipo tipo "Dashboard": aplicación de seguimiento de notas académicas. Actores: **Estudiante** y **Administrador**. Modelos de dominio: `User`, `Semester`, `Subject`, `Grade`.
-- Estructura del repositorio:
+- Notium es una SPA para organizar semestres, materias y notas. Actores: **Estudiante** (`Role.User`) y **Administrador** (`Role.Admin`). Entidades: `User`, `Semester`, `Subject`, `Grade`.
+- Etapa actual: SPA sin backend. Los datos viven en stores de Pinia que `PiniaConfig` persiste en `localStorage` (clave `piniaState`). Las reglas de la fase FullStack están en la sección 10 y solo aplican cuando exista `backend/`.
+- Estructura:
 
 ```
 /
-├── frontend/            Vue 3 + TypeScript + Vite + Vue Router + Pinia + Tailwind
-├── backend/             Nest.js (ESM) + TypeORM + SQLite
-└── docker-compose.yml
+├── src/
+│   ├── assets/main.css         variables CSS y estilos globales
+│   ├── components/<dominio>/   admin, common, grade, graphs, semester, subject
+│   ├── dtos/                   <Entidad>DTOs.ts
+│   ├── interfaces/             <Entidad>Interface.ts (con sus enums: Role, StatusSemester)
+│   ├── router/                 index.ts (rutas) y accessControl.ts (guards)
+│   ├── seeders/                <entidad>seeder.ts, uno por entidad
+│   ├── services/               <Entidad>Service.ts
+│   ├── stores/                 <Entidad>Store.ts
+│   ├── utils/                  <Tema>Util.ts
+│   ├── views/<dominio>/        <Entidad><Acción>View.vue
+│   ├── App.vue · main.ts · PiniaConfig.ts
+├── docs/diagrams/              diagrama de arquitectura (draw.io)
+├── Dockerfile · nginx.conf     imagen de despliegue
+└── .github/workflows/cicd.yml  CI y publicación en GitHub Pages
 ```
 
-- Requisitos de la Entrega 1 que el proyecto debe seguir cumpliendo (no eliminar la funcionalidad que los cubre):
-  - Entre 7 y 14 páginas (Home, Login y mínimo 5 del sistema); mínimo 2 páginas solo para administradores.
-  - Mínimo 2 páginas con selectores de filtrado + tabla + gráfica.
-  - Mínimo 2 componentes reutilizables y mínimo 2 CRUDs.
-  - Todas las clases del diagrama de clases implementadas.
-  - Chart.js (obligatoria) y DataTables.
-  - Datos ficticios sembrados en la primera carga.
-  - `README.md` en la raíz y página de wiki con pantallazos enlazada desde la principal.
-  - Principios DRY y ETC (*The Pragmatic Programmer*).
+- Requisitos de la Entrega 1 que no se pueden romper: entre 7 y 14 páginas (Home, Login y mínimo 5 del sistema), mínimo 2 páginas solo para administradores, mínimo 2 páginas con selectores + tabla + gráfica, mínimo 2 componentes reutilizables, mínimo 2 CRUDs, Chart.js y DataTables, datos sembrados en la primera carga, `README.md` y wiki con pantallazos.
 
-## 2. Comandos
+## 2. Herramientas: qué, cómo, dónde y cuándo `[E1]`
 
-| Proyecto      | Acción                                                  | Comando                  |
-| ------------- | -------------------------------------------------------- | ------------------------ |
-| `frontend/` | Servidor de desarrollo (`http://localhost:5173`)       | `npm run dev`          |
-| `frontend/` | Build de producción (incluye chequeo de tipos)          | `npm run build`        |
-| `frontend/` | Formatear                                                | `npm run format`       |
-| `frontend/` | Linter                                                   | `npm run lint`         |
-| `backend/`  | Servidor en modo escucha (`http://localhost:3000/api`) | `npm run start:dev`    |
-| `backend/`  | Build                                                    | `npm run build`        |
-| `backend/`  | Formatear                                                | `npm run format`       |
-| `backend/`  | Linter (oxlint)                                          | `npm run lint`         |
-| raíz         | Levantar todo con Docker                                 | `docker compose up -d` |
+| Herramienta       | Qué hace                                                  | Cómo se ejecuta                                               | Dónde se configura                                              | Cuándo                                    |
+| ----------------- | ---------------------------------------------------------- | -------------------------------------------------------------- | ---------------------------------------------------------------- | ------------------------------------------ |
+| Vite              | Servidor de desarrollo y build de producción              | `npm run dev` · `npm run build` · `npm run preview`    | `vite.config.ts`                                               | Desarrollo diario; build antes de entregar |
+| vue-tsc           | Verifica tipos en`.ts` y `.vue`                        | `npm run type-check` (incluido en `build`)                 | `tsconfig.json`, `tsconfig.app.json`, `tsconfig.node.json` | Antes de cada commit                       |
+| ESLint            | Detecta errores y malas prácticas sin ejecutar el código | `npm run lint` · `npm run lint:fix`                       | `eslint.config.ts`                                             | Antes de cada commit y en CI               |
+| Prettier          | Formatea el código; no corrige lógica                    | `npm run format` · `npm run format:check`                 | `.prettierrc.json`, `.prettierignore`, `.editorconfig`     | Antes de cada commit y en CI               |
+| Vitest            | Pruebas unitarias de servicios                             | `npm test`                                                   | `src/services/__tests__/`                                      | Al cambiar un servicio y en CI             |
+| `npm run check` | Lint + formato + build en un solo paso                     | `npm run check`                                              | `package.json`                                                 | Antes de cada push                         |
+| GitHub Actions    | Corre pruebas y`check`, publica en GitHub Pages          | Automático en push y PR a`main`                             | `.github/workflows/cicd.yml`                                   | Cada push                                  |
+| Docker + nginx    | Imagen que sirve la SPA compilada                          | `docker build -t notium .` · `docker run -p 80:80 notium` | `Dockerfile`, `nginx.conf`, `.dockerignore`                | Al desplegar en la VM de GCP               |
 
-Una tarea no está terminada hasta que `format`, `lint` y `build` pasan sin errores en cada proyecto modificado. [P06][T03][T06]
+Una tarea no está terminada hasta que `npm test` y `npm run check` pasan sin errores.
 
-## 3. Reglas generales (todo el código TypeScript)
+## 3. Reglas generales
 
-### 3.1 Consistencia
+### 3.1 Simplicidad ante todo `[E1]`
 
-- Un mismo problema se resuelve siempre de la misma forma en todo el repositorio: nombres, exports, modificadores de acceso, paso de datos y generación de IDs. Usar `default` o `public` "algunas veces sí y otras no", o tener dos mecanismos distintos para calcular `nextId`, cuenta como error. [P04][P07]
-- Identificadores en inglés, como en todo el material del curso. camelCase para variables, funciones, métodos y propiedades (`category`, nunca `Category`); PascalCase para clases, interfaces, tipos y componentes. Prohibido `Main_Point`, snake_case o mezclas. [P04]
-- Nombres que describan el dominio. Prohibidos los contenedores genéricos (`OtherService`, `Helpers`, `Misc`): cada función va en el servicio o util de su entidad o tema. [P07]
-- Exports: servicios, utils, DTOs y controladores con export nombrado (`export class BookService`). `export default` solo donde el framework lo espera (router, SFC, clases de configuración como `PiniaConfig`). [P07][T04]
-- Modificadores de acceso explícitos en todos los miembros de clase (`public static`, `private static readonly`, `private readonly`). [P07][T07]
+- La solución correcta es la más simple que cumple el requisito con los patrones vistos en clase. El profesor penalizó explícitamente la sobreingeniería.
+- No agregar capas, abstracciones, librerías, configuraciones ni scripts que no se hayan visto en clase o que el requisito no pida. Antes de crear un archivo nuevo, preguntar si un archivo existente ya puede hacer ese trabajo.
+- Ejemplos de lo que se señaló: un grafo de seeders con referencias circulares que obligó a instalar `flatted`, `async/await` en servicios que leen memoria, `crypto.randomUUID()` para IDs y un diagrama generado por script.
 
-### 3.2 Formato
+### 3.2 Un archivo, una clase; nada de código suelto `[E1]`
 
-- Prettier es la autoridad: `semi: true`, `singleQuote: true`, `printWidth: 100` en `.prettierrc.json`. [T03]
-- Llaves de apertura en la misma línea, indentación uniforme, espacio entre palabra de control y paréntesis (`if (cond) {`). [P04]
-- "Espacio para respirar": una línea en blanco entre bloques lógicos, entre métodos y después de los imports. [P04][P07]
-- Imports ordenados alfabéticamente, `import type` para lo que solo se usa como tipo y extensión explícita (`.js` para módulos TypeScript en ESM, `.vue` para SFC). [P04][P10][P11]
-- Las secciones de un archivo se separan con comentarios cortos en inglés (`// functions`, `// watchers`). No se escriben comentarios que narren lo que el código ya dice. [T05][P11]
+- Un archivo que define una clase contiene únicamente esa clase: sin funciones, constantes, interfaces ni llamadas a nivel de módulo.
+- Una función auxiliar es un método `private static` de la clase. Una constante que usa un solo método se declara dentro de ese método; si la usan varios métodos, es un miembro `private static readonly`.
+- Los tipos auxiliares van en `interfaces/` o `dtos/`, no en el archivo de la clase.
 
-### 3.3 Tipado [P04][P06]
+### 3.3 Consistencia `[P04][P07]`
 
-- Siempre tipar el dominio: interfaces, modelos, entidades, DTOs y contratos de API.
-- Siempre tipar parámetros y retornos de funciones y métodos (servicios, utils, controladores, stores). Los asíncronos retornan `Promise<T>`.
-- No tipar lo que TypeScript infiere en variables locales obvias.
-- Prohibido `any` (incluidos `req: any`, `res: any`, `viewData: any`). Si el tipo es desconocido, `unknown` y estrechamiento.
-- `interface` para describir objetos y contratos (`BookInterface`). `type` para tipos flexibles o compuestos: uniones, literales, `Omit`, `Pick` (`CreateBookDTO`). [P06]
+- Un mismo problema se resuelve siempre igual en todo el repositorio: nombres, exports, modificadores, comentarios y generación de IDs.
+- Identificadores en inglés; camelCase para variables, funciones, métodos y propiedades; PascalCase para clases, interfaces, tipos y componentes. Textos visibles para el usuario en español.
+- Exports nombrados para servicios, utils y stores (`export class GradeService`). `export default` solo para `router/index.ts`, `PiniaConfig` y los SFC.
+- Modificadores de acceso explícitos en todos los miembros de clase (`public static`, `private static`).
+- Nada de contenedores genéricos (`OtherService`, `Helpers`, `Misc`). `[P07]`
 
-### 3.4 Clases de dominio [P04]
+### 3.4 Comentarios de sección `[E1]`
 
-- Si se implementan clases del diagrama de clases: atributos privados, acceso mediante getters y setters, propiedades en camelCase.
-- Las búsquedas (`findById`, filtros) no viven en el modelo: van al servicio o repositorio correspondiente.
-
-### 3.5 Principios
-
-- SRP, DRY, bajo acoplamiento y ETC. Si una lógica aparece en dos lugares, se mueve a un servicio o a un util. [P06][P07]
-
-## 4. Frontend (Vue 3)
-
-### 4.1 Arquitectura modular por capas (MVVM) [P07]
-
-| Carpeta         | Contenido                                                                                 | Regla                                                                                              |
-| --------------- | ----------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
-| `views/`      | Una vista por ruta:`BooksIndexView.vue`, `BooksShowView.vue`, `BooksCreateView.vue` | Pantalla completa, no reutilizable, cargada por el router. Orquesta componentes y llama servicios. |
-| `components/` | Componentes hijos reutilizables                                                           | Reciben datos por`props` y notifican al padre con `emit`.                                      |
-| `services/`   | `BookService.ts`                                                                        | Única capa que conoce la fuente de datos (store/localStorage o API).                              |
-| `interfaces/` | `BookInterface.ts`                                                                      | Contratos de las entidades.                                                                        |
-| `dtos/`       | `CreateBookDTO.ts`                                                                      | Datos que viajan entre capas o hacia el backend.                                                   |
-| `stores/`     | `bookstore.ts`, `bookseeder.ts`                                                       | Estado global con Pinia.                                                                           |
-| `utils/`      | p. ej.`PriceFormatUtil.ts`                                                              | Funciones puras reutilizables agrupadas en clases.                                                 |
-| `router/`     | `index.ts`                                                                              | Definición de rutas.                                                                              |
-
-Flujo obligatorio: **View / Component → Service → (Store | API)**. Una vista o componente nunca importa `stores`, `data`, `axios` ni `localStorage` para datos de dominio; si cambia la fuente de datos, ningún componente debe modificarse. [P06][P11]
-
-Si las vistas crecen, se agrupan en subcarpetas por recurso (`views/books/`). [P04]
-
-### 4.2 Single-File Components [P05][T03]
-
-- Composition API con `<script setup lang="ts">`. Options API prohibida.
-- Orden de bloques: `<script setup>` y luego `<template>`. Estilos con clases utilitarias de Tailwind; sin CSS propio salvo necesidad real. [P03]
-- Orden dentro del script: imports → `// props` (y emits) → `// state` → `// computed` → `// functions` → `// watchers` → `// lifecycle`.
-- `defineProps<{ ... }>()` y `defineEmits<{ ... }>()` siempre tipados. Padre → hijo por props; hijo → padre por emit. [P07]
-- Navegación interna con `<RouterLink>`; nunca `<a href>` para rutas internas porque recarga la página. [P05]
-- `v-for` siempre con `:key`; inputs numéricos con `v-model.number`. [T04][T05]
-- El formateo de datos (precios, fechas) se hace con utils, no con funciones repetidas en cada vista. [P07][T05]
-
-### 4.3 Reactividad [P07]
-
-- `const` normal: valores que no cambian o que no afectan la vista.
-- `ref`: estado que afecta la interfaz (acceso con `.value` en el script).
-- `computed`: solo valores derivados de variables reactivas (p. ej. lista filtrada por un selector). Nunca para llamar APIs, escribir en localStorage ni modificar otras variables.
-- `watch`: efectos secundarios cuando algo cambia (llamadas a API, persistencia, validaciones, redirecciones).
-
-### 4.4 Carga de datos y asincronía [P11][T07]
-
-- Los datos se obtienen invocando el servicio dentro de `onMounted(async () => { ... })` y se guardan en un `ref` tipado (`ref<BookInterface | null>(null)`, `ref<BookInterface[]>([])`).
-- Prohibido `await` en el nivel superior de `<script setup>`: bloquea la inicialización del componente.
-- Toda llamada `await` a un servicio va dentro de `try/catch` en la vista o componente.
-
-### 4.5 Router [P04][P05][T03][T04]
-
-- `src/router/index.ts` con `createWebHistory(import.meta.env.BASE_URL)`.
-- Cada ruta declara `path`, `name`, `component` y `meta: { title }`.
-- Paths por recurso en plural (`/books`, `/books/create`, `/books/:id`); rutas estáticas antes que las dinámicas.
-- Nombres de ruta con un único patrón `recurso.accion` (p. ej. `books.create`); no mezclar estilos.
-- Las páginas de administrador se protegen con route guards basados en `meta`.
-- Si el archivo crece demasiado, las rutas se separan por módulo.
-
-### 4.6 Pinia [P06][T04][T07]
-
-- Solo Setup Stores; los `ref` definidos en el store son su state:
+- Solo en archivos `.vue`, siempre en inglés, con este vocabulario fijo y en este orden. Se escriben únicamente las secciones que existen, cada una precedida por una línea en blanco (salvo la primera):
 
 ```ts
-export const useBookStore = defineStore('book', () => {
-  const books = ref<BookInterface[]>([]);
-
-  return { books };
-});
+// Internal imports
+// External imports
+// Props
+// Emits
+// State
+// Computed
+// Functions
+// Watchers
+// Lifecycle
 ```
 
-- Modo local (sin backend): seeders en `stores/<entidad>seeder.ts`; `PiniaConfig.init()` hidrata el estado desde `localStorage` (clave `piniaState`), siembra en la primera carga y persiste los cambios con `watch(pinia.state, ..., { deep: true })`.
-- Modo FullStack: los datos de dominio viven en la API y se consultan por servicios. Los stores quedan para estado global compartido (p. ej. usuario autenticado) y no duplican lo que sirve el backend.
+- Prohibidas las variantes (`// View state`, `// Estado de la vista`, `// Form handlers`, `// Data loading`, `// Imports internos`…) y los comentarios que narran lo que el código ya dice.
+- Los archivos `.ts` no llevan comentarios de sección.
 
-### 4.7 Servicios, interfaces y DTOs [P06][P07][P11][T04][T07][T08]
+### 3.5 Formato e imports `[P04][P10][P11][T03]`
 
-- Un servicio por entidad, con métodos `public static` tipados y nombrados de forma uniforme: `getBooks()`, `getBookById(id)`, `createBook(dto)`, `updateBook(id, dto)`, `deleteBook(id)`.
-- Los métodos de escritura reciben DTOs con nombre; nunca `Omit<...>` en línea ni objetos anónimos en la firma.
-- Interfaces: `export interface BookInterface { ... }` en `interfaces/BookInterface.ts`.
-- DTOs: `export type CreateBookDTO = Omit<BookInterface, 'id'>;` en `dtos/CreateBookDTO.ts`.
-- Modo FullStack: los servicios usan `axios`, retornan `Promise<T>` y toman la URL base de `import.meta.env.VITE_API_BASE_URL`. Nunca `http://localhost:3000` escrito en el código.
-- La configuración común (URL base, cliente axios) se centraliza en un `BaseService` para no repetirla en cada servicio. [P11]
-- Un único mecanismo de generación de IDs; en modo FullStack lo asigna la base de datos.
+- Prettier manda: `semi: true`, `singleQuote: true`, `printWidth: 100`.
+- "Espacio para respirar": línea en blanco entre bloques lógicos y entre métodos.
+- Imports ordenados alfabéticamente por ruta (lo verifica ESLint), `import type` para lo que solo es tipo, extensión `.js` en módulos TypeScript locales y `.vue` en componentes.
 
-### 4.8 Utils [P07]
+### 3.6 Tipado `[P06]`
 
-- Funciones puras: independientes, reutilizables, sin estado propio y sin dependencia de Vue.
-- Agrupadas por tema en clases con métodos `public static` (p. ej. `PriceFormatUtil.formatToCOP(price: number): string`).
+- Siempre tipar el dominio (interfaces, DTOs, enums) y las firmas de funciones y métodos (parámetros y retorno), `defineProps` y `defineEmits`.
+- No se tipa lo que TypeScript infiere: variables locales obvias y parámetros de callbacks en `map`, `filter`, `find`, `reduce` o `sort`.
+- Prohibido `any`; si el tipo es desconocido, `unknown` y estrechamiento.
+- `interface` para objetos y contratos; `type` para uniones, literales y tipos derivados (`Omit`, `Partial`).
+- Nota: `eslint.config.ts` exige hoy tipos explícitos en todos los callbacks y sus mensajes citan secciones de la versión anterior de este archivo. Mientras no se ajuste en una tarea aparte aprobada por el equipo, se respeta lo que exige el linter; no se modifica la configuración de ESLint como efecto secundario de otra tarea.
 
-## 5. Backend (Nest.js)
+### 3.7 Identificadores `[E1][T04][T05]`
 
-### 5.1 Estructura [P10][T06][T07]
+- Los IDs son `number` y se generan con un único mecanismo: el máximo existente más uno.
+- Prohibido `crypto.randomUUID()` y cualquier API que exija contexto seguro (HTTPS): el despliegue evaluado corre sobre HTTP y ahí esa API no existe, por eso crear datos falló en producción.
 
-```
-backend/src/
-├── main.ts                 prefijo global, CORS y puerto
-├── app.module.ts           solo conecta módulos y TypeORM
-└── books/
-    ├── books.module.ts
-    ├── books.controller.ts
-    ├── books.service.ts
-    ├── entities/book.entity.ts
-    └── dto/create-book.dto.ts
-```
+## 4. Datos locales: interfaces, seeders, stores y PiniaConfig
 
-- Un módulo por conjunto de funcionalidades altamente relacionadas; `AppModule` solo importa módulos.
-- Proyecto en ESM: imports relativos con extensión `.js`.
-- Archivos en kebab-case con sufijo de rol (`.module.ts`, `.controller.ts`, `.service.ts`, `.entity.ts`, `.dto.ts`).
+### 4.1 Interfaces `[E1][P06]`
 
-### 5.2 Controladores [P10]
-
-- Reciben la petición, delegan en el servicio y retornan la respuesta. Sin lógica de negocio ni acceso directo a repositorios.
-- Un controlador por recurso, ruta base en plural (`@Controller('books')`).
-- Métodos con nombres uniformes: `findAll`, `findOne`, `create`, `update`, `remove` (más consultas específicas como `findByBookId`).
-- Verbos REST: `GET` colección, `GET /:id` elemento, `POST` crear, `PUT`/`PATCH` actualizar, `DELETE` eliminar. [P11]
-- Retornos tipados (`Promise<Book[]>`, `Promise<Book | null>`); entradas con `@Param` y `@Body` tipadas con DTO.
-- `import type` para lo que solo aparece como anotación (p. ej. la entidad en el tipo de retorno). Los servicios inyectados y los DTO de `@Body()` se importan como valor.
-
-### 5.3 Providers [P10]
-
-- La lógica de negocio vive en servicios `@Injectable()`, registrados en `providers` del módulo.
-- Dependencias por inyección en el constructor, siempre `private readonly`:
+- Una interfaz describe una entidad plana. Las relaciones son solo IDs (`userId`, `semesterId`, `subjectId`): nunca objetos anidados ni arreglos de hijos.
+- Solo tipos que sobreviven a JSON, porque todo termina en `localStorage`: fechas como `string` ISO y marcas de tiempo como `number`.
+- Los enums de una entidad viven en su archivo de interfaz.
 
 ```ts
-constructor(
-  @InjectRepository(Book)
-  private readonly booksRepository: Repository<Book>,
-) {}
+export interface GradeInterface {
+  id: number;
+  subjectId: number;
+  title: string;
+  value: number;
+  percentage: number;
+  type: string;
+  date: string;
+  createdAt: number;
+  updatedAt: number;
+}
 ```
 
-### 5.4 Entidades y TypeORM [P10][P11][T07]
+### 4.2 Seeders `[E1][T04]`
 
-- Entidades en `entities/<entidad>.entity.ts`, registradas en `TypeOrmModule.forFeature([...])` del módulo.
-- Relaciones siempre envueltas en `Relation<T>` (importado como tipo) en ambos lados para evitar referencias circulares: `book: Relation<Book>`, `reviews: Relation<Review[]>`.
-- En el proyecto el esquema se gestiona con migraciones de TypeORM y con el historial de migraciones activado; `synchronize: true` solo es aceptable en los tutoriales.
+- Un archivo por seeder en `src/seeders/<entidad>seeder.ts`, que exporta un arreglo literal tipado con la interfaz. Las relaciones se escriben como IDs literales.
+- Sin funciones, sin imports entre seeders, sin archivos intermedios de datos: `src/data/` no debe existir. "No jugar a ser un ORM de relaciones."
 
-### 5.5 DTOs [P06][T06]
+```ts
+import type { SubjectInterface } from '@/interfaces/SubjectInterface.js';
 
-- `dto/create-<entidad>.dto.ts` → `export class CreateBookDto`.
-- Los DTO controlan qué entra y qué sale: la entidad no se usa como DTO de entrada y nunca se exponen campos sensibles (contraseñas, tokens) en las respuestas.
+export const subjectSeeder: SubjectInterface[] = [
+  {
+    id: 1,
+    semesterId: 1,
+    code: 'SI2001',
+    name: 'Desarrollo Web',
+    credits: 3,
+    professor: 'Daniel Correa',
+    createdAt: 1768809600000,
+    updatedAt: 1768809600000,
+  },
+];
+```
 
-### 5.6 Configuración [T07][T08]
+### 4.3 Stores `[E1][P06]`
 
-- `main.ts`: `app.setGlobalPrefix('api')`; CORS con orígenes leídos de `process.env.CORS_ORIGIN` (lista separada por comas) y fallback a orígenes locales; `app.listen(process.env.PORT ?? 3000)`.
-- Ruta de la base de datos desde `process.env.SQLITE_PATH ?? 'database.sqlite'`.
-- Nunca escribir IPs ni URLs de despliegue en el código.
+- Setup Stores (`defineStore('<id>', () => { ... })`); el id es el nombre de la entidad en singular y la colección del state va en plural: `users`, `semesters`, `subjects`, `grades`.
+- El store solo guarda estado; la lógica va en los servicios. Sin interfaces auxiliares para tipar el retorno del store.
+- `AuthStore` guarda el usuario en sesión en `loggedUser`.
 
-## 6. Despliegue [T08]
+### 4.4 PiniaConfig `[T04]`
 
-- Docker Compose en una VM de GCP: servicio `backend` (puerto 3000, volumen para SQLite) y servicio `frontend` (puerto 80, `depends_on: backend`).
-- Cada proyecto tiene su `.dockerignore` (`node_modules`, `.git`, `.gitignore`, `*.md`; el backend además `coverage`, `test` y `.env*`).
-- `frontend/.env` define `VITE_API_BASE_URL`. Vite la incrusta en el build, así que cualquier cambio exige volver a ejecutar `npm run build`.
-- No cambiar la estrategia de despliegue (build local o en Dockerfile, SQLite o MySQL) sin que el equipo lo pida.
+- Las claves del estado inicial coinciden con el id del store y el nombre de su colección (`subject: { subjects: subjectSeeder }`).
+- Serializa con `JSON.stringify` y `JSON.parse`; con interfaces planas no se necesita `flatted`.
 
-## 7. Anti-patrones señalados en clase
+## 5. Servicios `[E1][P06][P07]`
 
-| No hacer                                                  | Hacer                                       | Origen     |
-| --------------------------------------------------------- | ------------------------------------------- | ---------- |
-| Misma función copiada en varias vistas (`formatToCOP`) | Método estático en un util                | [T05][P07] |
-| Búsqueda o acceso a datos dentro del componente          | Método del servicio                        | [P06]      |
-| `axios` invocado desde un SFC                           | Llamada desde el servicio                   | [P11]      |
-| `await` en el nivel superior de `<script setup>`      | `onMounted(async () => ...)`              | [P11]      |
-| `computed` que invoca un servicio                       | `ref` cargado en `onMounted`            | [P07][T05] |
-| `OtherService` con lógica de libros                    | Método en`BookService`                   | [P07]      |
-| `Omit<ReviewInterface, 'id'>` en la firma del servicio  | `CreateReviewDTO`                         | [P07][T07] |
-| Dos sistemas distintos para calcular`nextId`            | Un único mecanismo                         | [P07]      |
-| `default` o `public` usados de forma inconsistente    | Mismo estilo en todos los archivos del tipo | [P07]      |
-| `any` en parámetros o variables                        | Tipos explícitos                           | [P04]      |
-| `Main_Point`, `Category`, rutas como `/main-point`  | camelCase y rutas por recurso               | [P04]      |
-| Controlador que mezcla recursos                           | Un controlador por recurso                  | [P04]      |
-| `<a href="/books">`                                     | `<RouterLink to="/books">`                | [P05]      |
-| Options API                                               | Composition API con`<script setup>`       | [P05]      |
-| URL de la API escrita en el servicio                      | `VITE_API_BASE_URL` + `BaseService`     | [T08][P11] |
-| Relaciones sin`Relation<T>`                             | `Relation<T>` en ambos lados              | [P11]      |
-| Imports desordenados o sin extensión                     | Orden alfabético y extensión completa     | [P04][P11] |
-| `synchronize: true` en el proyecto                      | Migraciones con historial                   | [P10]      |
+- Un servicio por entidad; es la única capa que lee y escribe los stores.
+- En esta etapa los servicios son síncronos: sin `async`, `await` ni `Promise`, porque leen memoria.
+- Nombres de métodos con el patrón del curso: `getGrades()`, `getGradeById(id)`, `getGradesBySubjectId(subjectId)`, `createGrade(dto)`, `updateGrade(id, dto)`, `deleteGrade(id)`. El nombre dice qué entidad devuelve y en qué cantidad.
+- Los servicios no deciden quién puede ver qué: no leen el usuario en sesión para filtrar ni para negar acceso. Reciben lo que necesitan por parámetro (`getSemestersByUserId(userId)`). El control de acceso vive en los guards del router.
+- `AuthService` expone `login(dto)`, `logout()` y `getLoggedUser()`. Vistas y componentes obtienen el usuario en sesión con `getLoggedUser()`, nunca importando `AuthStore`.
+- Las relaciones se resuelven consultando por ID, no sincronizando arreglos en ambos lados.
+- La validación de datos de entrada vive en el servicio (`validateFields`).
+- Un servicio accede a datos. Una clase que solo calcula sobre datos que ya recibió (promedios, series, reportes) es un util, no un servicio. Por eso `AnalyticsService` y `PlatformReportService` deben revisarse.
 
-## 8. Forma de trabajar del agente
+## 6. Utils `[E1][P07]`
 
-- Antes de crear un archivo, leer los archivos vecinos del mismo tipo y replicar su estructura.
-- Cambios pequeños y enfocados. No refactorizar zonas no pedidas; si se detecta una violación de estas reglas fuera del alcance, se reporta en lugar de corregirla en silencio.
-- No agregar dependencias, librerías ni patrones no vistos en el curso sin preguntar. Stack aprobado: Vue 3, Vue Router, Pinia, Vite, TypeScript, Tailwind, Font Awesome, Axios, Chart.js, DataTables, Nest.js, TypeORM, better-sqlite3, Docker.
-- La nota de cada entrega es NF × NS y la sustentación es individual. Al terminar, resumir qué se cambió, en qué archivos y qué regla de este documento se aplicó, para que cualquier integrante pueda explicarlo. [P01]
+- Clases con métodos `public static`, sin constructor, sin estado y sin dependencia de Vue.
+- Las constantes que usa un método van dentro de ese método (p. ej. el mapa de escapes HTML dentro de `escapeHtml`).
+- Todo cálculo que hoy aparece repetido en varios componentes (promedios en las gráficas, formato de fechas) se mueve a un util.
+
+## 7. Vistas y componentes
+
+### 7.1 Estructura del SFC `[P05][P07][E1]`
+
+- Composition API con `<script setup lang="ts">`; bloques en orden `<script setup>`, `<template>`, `<style scoped>`.
+- El contenido del script sigue el orden de la sección 3.4. `defineProps<{ ... }>()` y `defineEmits<{ ... }>()` se tipan en línea, sin interfaces locales.
+- Estado con `ref` y valores derivados con `computed`, como en clase; no usar `reactive` ni `shallowRef`.
+- `computed` solo deriva valores; `watch` solo para efectos secundarios (validaciones, redirecciones). `[P07]`
+
+### 7.2 Carga de datos `[E1]`
+
+- Con servicios síncronos, la vista obtiene los datos al declarar su estado: sin `onMounted`, sin `async`, sin `await`, sin `Promise.all` y sin estados de carga para datos locales.
+- Tras crear, editar o eliminar, la vista vuelve a pedir los datos al servicio y reasigna el `ref`.
+- `onMounted` queda solo para lo que necesita el DOM montado (p. ej. dibujar en un `<canvas>`).
+
+```ts
+// State
+const loggedUserId = AuthService.getLoggedUser()?.id ?? 0;
+const semesters = ref<SemesterInterface[]>(SemesterService.getSemestersByUserId(loggedUserId));
+
+// Functions
+function deleteSemester(id: number): void {
+  SemesterService.deleteSemester(id);
+  semesters.value = SemesterService.getSemestersByUserId(loggedUserId);
+}
+```
+
+### 7.3 Capas `[P06][P11]`
+
+- Vistas y componentes hablan solo con servicios: nunca importan stores, seeders ni `localStorage`.
+- Vistas en `views/<dominio>/`, una por ruta; componentes reutilizables en `components/<dominio>/`, con comunicación por props y emits. `[P07]`
+
+### 7.4 Librerías
+
+- Chart.js se usa de una sola forma en todo el proyecto (a través de `vue-chartjs`) y DataTables mediante `datatables.net-vue3`.
+- El registro de librerías (`ChartJS.register`, `DataTable.use`) se hace una sola vez en `main.ts`, no en cada vista o componente.
+
+### 7.5 Estilos
+
+- CSS propio: variables y estilos globales en `assets/main.css`, estilos del componente en `<style scoped>`. El proyecto no usa Tailwind; no mezclarlo.
+
+### 7.6 Navegación y sesión `[P05][E1]`
+
+- Navegación interna con `<RouterLink :to="{ name: '...' }">`; nunca `<a href>` para rutas de la SPA.
+- La cabecera muestra siempre una acción visible de cerrar sesión (`AuthService.logout()` y redirección a `login`) cuando hay un usuario en sesión.
+
+## 8. Router `[E1][P05][T03][T04]`
+
+- Las vistas se importan de forma estática al inicio de `router/index.ts`, como en clase. Prohibidas las importaciones dinámicas (`component: () => import(...)`).
+- Los guards en `router/accessControl.ts` son síncronos: sin `async` ni promesas.
+- Cada ruta declara `path`, `name` y `component`; las protegidas usan `meta: { requiresAuth: true }` y las de administrador además `roles: [Role.Admin]`.
+- Nombres de ruta con el patrón existente `recurso-accion` (`semester-index`, `semester-show`, `admin-users`); paths en plural.
+- Los parámetros de ruta llegan como texto: se convierten con `Number()` antes de pasarlos a un servicio.
+
+## 9. Despliegue `[E1][T08]`
+
+- El despliegue que evalúa el profesor es una VM de GCP que sirve por **HTTP** la imagen del `Dockerfile` (build multietapa y nginx con fallback de SPA). CI publica además en GitHub Pages bajo `/Notium/`.
+- El código debe funcionar sin HTTPS. `localhost` cuenta como contexto seguro y oculta este tipo de errores: para reproducir la VM, servir el build con `npm run preview -- --host` y abrirlo por la IP de la red.
+- Antes de cerrar cualquier cambio que toque autenticación o CRUDs, probar sobre el build: iniciar sesión, cerrar sesión, crear, editar y eliminar.
+- No cambiar la estrategia de despliegue sin que el equipo lo pida.
+
+## 10. Fase FullStack (solo cuando exista `backend/`) `[P10][P11][T06][T07][T08]`
+
+- Con un backend real los servicios pasan a ser asíncronos: usan `axios`, retornan `Promise<T>` y toman la URL base de `import.meta.env.VITE_API_BASE_URL`, centralizada en un `BaseService`. En ese momento, y solo entonces, las vistas cargan datos dentro de `onMounted(async () => ...)` con `try/catch`, y queda prohibido `await` en el nivel superior de `<script setup>`.
+- Backend en Nest.js (ESM): un módulo por recurso; controladores que solo delegan; lógica en servicios `@Injectable()` con dependencias `private readonly`; archivos kebab-case (`grades.controller.ts`, `grade.entity.ts`, `create-grade.dto.ts`); prefijo global `api`; CORS, puerto y ruta de SQLite desde variables de entorno.
+- TypeORM: relaciones envueltas en `Relation<T>` en ambos lados; esquema gestionado con migraciones y historial activado, no con `synchronize: true`.
+- Verbos REST: `GET` colección y `GET /:id`, `POST` crear, `PUT`/`PATCH` actualizar, `DELETE` eliminar. Los IDs los asigna la base de datos.
+
+## 11. Documentación `[E1]`
+
+- Este archivo es el documento de reglas del proyecto. Si cambia una regla, se actualizan en el mismo cambio los mensajes de `eslint.config.ts` que la citan.
+- La guía de estilo describe cada herramienta por separado con qué, cómo, dónde y cuándo; la sección 2 es su fuente.
+- El diagrama de arquitectura lo dibuja el equipo en draw.io a partir del código real: carpetas, clases y flujo que existen, nada más. El agente no genera ni regenera diagramas; si un cambio altera la estructura, lo reporta para que el equipo actualice el diagrama.
+
+## 12. Anti-patrones
+
+| No hacer                                                                                  | Hacer                                                     | Origen    |
+| ----------------------------------------------------------------------------------------- | --------------------------------------------------------- | --------- |
+| `src/data/seedData.ts` con un grafo de objetos y referencias circulares                 | Un seeder plano por entidad con IDs literales             | [E1]      |
+| `flatted` para serializar el estado                                                     | `JSON.stringify` sobre interfaces planas                | [E1]      |
+| `subject: SubjectInterface`, `grades: GradeInterface[]` en una interfaz               | `subjectId: number`                                     | [E1]      |
+| Colección del store en singular (`subject`, `grade`)                                 | `subjects`, `grades`                                  | [E1]      |
+| `crypto.randomUUID()`                                                                   | Máximo existente + 1                                     | [E1]      |
+| `async`/`await`/`Promise` en servicios que leen Pinia                               | Métodos síncronos                                       | [E1]      |
+| `findAllByCurrentUser()` que filtra por la sesión                                      | `getSemestersByUserId(userId)` + guards                 | [E1]      |
+| `findBySubjectId`, `findAll`, `findById`                                            | `getGradesBySubjectId`, `getGrades`, `getGradeById` | [E1][T04] |
+| Vista o componente que importa`AuthStore`                                               | `AuthService.getLoggedUser()`                           | [E1]      |
+| Funciones y constantes sueltas (`generateGradeId`, `EMAIL_PATTERN`, `HTML_ESCAPES`) | Miembros de la clase o variables dentro del método       | [E1]      |
+| `private constructor() {}` en utils                                                     | Clase sin constructor                                     | [E1]      |
+| Clase de cálculo puro dentro de`services/`                                             | Util                                                      | [E1][P07] |
+| `onMounted(loadData)` + `Promise.all` para datos locales                              | Inicializar el`ref` con el servicio                     | [E1]      |
+| `component: () => import(...)` en el router                                             | Import estático                                          | [E1]      |
+| Guards`async`                                                                           | Guards síncronos                                         | [E1]      |
+| Comentarios de sección distintos en cada archivo, en dos idiomas o sin línea en blanco  | Vocabulario fijo de la sección 3.4                       | [E1]      |
+| Sin botón de cerrar sesión                                                              | Logout visible en la cabecera                             | [E1]      |
+| `ChartJS.register` / `DataTable.use` en cada archivo                                  | Registro único en`main.ts`                             | [E1]      |
+| Promedio calculado en cada gráfica                                                       | Método de un util                                        | [P07]     |
+| Diagrama generado por script                                                              | Diagrama del equipo que refleja el código                | [E1]      |
+| `any`                                                                                   | Tipos explícitos                                         | [P04]     |
+| `<a href="/semesters">`                                                                 | `<RouterLink :to="{ name: 'semester-index' }">`         | [P05]     |
+| Options API                                                                               | `<script setup lang="ts">`                              | [P05]     |
+| Inconsistencias de`default`, `public` o nombres                                       | Mismo estilo en todos los archivos del tipo               | [P07]     |
+
+## 13. Forma de trabajar del agente
+
+- Antes de crear o modificar un archivo, leer los archivos vecinos del mismo tipo y replicar su estructura, salvo que contradiga este documento.
+- Cambios pequeños y enfocados. Si se detecta una violación fuera del alcance de la tarea, se reporta en lugar de corregirla en silencio.
+- No agregar dependencias sin preguntar. Stack aprobado: Vue 3, Vue Router, Pinia, Vite, TypeScript, Chart.js con `vue-chartjs`, DataTables, Vitest, Docker con nginx.
+- La nota de cada entrega es NF × NS y la sustentación es individual. Al terminar, resumir qué cambió, en qué archivos y qué regla se aplicó, para que cualquier integrante pueda explicarlo. `[P01]`
 
 ### Checklist de cierre
 
-- [ ] `npm run format`, `npm run lint` y `npm run build` sin errores en cada proyecto modificado.
-- [ ] Sin `any`; imports ordenados, con `import type` donde aplica y extensiones completas.
-- [ ] Ninguna vista o componente accede a datos sin pasar por un servicio.
-- [ ] Nada duplicado que debería vivir en un util o servicio.
-- [ ] Nombres, exports y modificadores consistentes con el resto del repositorio.
-- [ ] Sin URLs, IPs ni credenciales escritas en el código.
+- [ ] `npm test` y `npm run check` pasan.
+- [ ] Ningún archivo de clase tiene código suelto; utils sin constructor.
+- [ ] Servicios síncronos, sin filtros por sesión y con nombres `get…`/`create…`/`update…`/`delete…`.
+- [ ] Interfaces con relaciones solo por ID; seeders planos, uno por entidad.
+- [ ] Comentarios de sección con el vocabulario fijo y línea en blanco antes de cada uno.
+- [ ] Ninguna vista o componente importa stores, seeders ni `localStorage`.
+- [ ] Nada que exija HTTPS; login, logout y CRUDs probados sobre el build.
+- [ ] Ninguna abstracción, archivo o librería que el requisito no pida.
