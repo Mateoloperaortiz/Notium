@@ -110,10 +110,57 @@ Vista → Servicio del frontend → API (/api) → Controlador → Servicio de N
 
 ## Despliegue
 
-El despliegue evaluado es una máquina virtual de GCP servida por HTTP. Con el backend, ambos
-proyectos se levantarán con `docker-compose.yml` como en el Tutorial 08 (issue #29). GitHub Pages
+El despliegue evaluado es una máquina virtual de GCP servida por HTTP. Ambos proyectos se
+levantan con `docker-compose.yml` como en el Tutorial 08 (issue #29). GitHub Pages
 ya no se usa: la página es HTTPS y el navegador bloquea sus llamadas a una API por HTTP.
 
 La imagen del frontend (`frontend/Dockerfile`) se construye en dos etapas: la primera compila la
 SPA con `node:24-alpine` y la segunda la sirve con nginx y la configuración de `nginx.conf` para
 rutas de SPA.
+
+Desde la raíz del repositorio, con Docker y el plugin de Compose instalados:
+
+```bash
+cp .env.example .env
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+```
+
+Copie el secreto generado en `JWT_SECRET` del archivo `.env` y ponga la dirección de la SPA
+en `CORS_ORIGIN` (`http://<IP-de-la-VM>` en GCP). Nunca versione este archivo.
+
+```bash
+docker compose up --build --wait
+docker compose ps
+```
+
+La SPA queda en el puerto 80 y la API en el 3000. La imagen de producción sobrescribe
+`VITE_API_BASE_URL` con una cadena vacía: axios llama a `/api` en el mismo origen y nginx
+reenvía esas peticiones al contenedor `backend:3000`. El `.env` del frontend sigue apuntando a
+`localhost:3000` únicamente para el servidor de desarrollo. La imagen no necesita recompilarse
+si cambia la IP de la VM. En GCP se permiten TCP 80 y 3000 para la VM; SSH se permite por IAP.
+
+Compose espera a que la API esté saludable antes de arrancar nginx. SQLite se guarda en el
+volumen `sqlite-data`, que sobrevive a recrear los contenedores y a apagar la VM. Use
+`docker compose down` para detener los contenedores; `docker compose down --volumes` también
+borra la base de datos y solo se usa cuando se desea reiniciar los datos de prueba.
+
+El CI verifica ambos proyectos y además construye y levanta las imágenes, comprueba el login
+y el perfil autenticado a través de nginx, y elimina sus contenedores y volumen de prueba.
+
+Para una presentación, encienda la VM, consulte su nueva IP temporal y abra `http://<IP>/`:
+
+```bash
+gcloud compute instances start notium-demo --project=notium-demo-20260930 --zone=us-central1-c
+gcloud compute instances describe notium-demo --project=notium-demo-20260930 --zone=us-central1-c \
+  --format='get(networkInterfaces[0].accessConfigs[0].natIP)'
+```
+
+Los contenedores arrancan automáticamente con Docker. Al terminar la presentación:
+
+```bash
+gcloud compute instances stop notium-demo --project=notium-demo-20260930 --zone=us-central1-c
+```
+
+Una VM apagada deja de cobrar cómputo y libera su IP temporal. El disco conservado puede
+seguir generando cargos de almacenamiento. El enlace de la presentación será la IP consultada
+después del arranque; los CRUD siguen siendo locales hasta completar los issues #25 a #28.
