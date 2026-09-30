@@ -27,4 +27,25 @@ export class AuthService extends BaseService {
   public static getLoggedUser(): SessionUserDTO | undefined {
     return useAuthStore().loggedUser ?? undefined;
   }
+
+  /** Ends the session when its token already expired; the router guard calls it on each navigation. */
+  public static clearExpiredSession(): void {
+    const token = useAuthStore().token;
+
+    if (token && AuthService.isTokenExpired(token)) {
+      AuthService.logout();
+    }
+  }
+
+  /** Reads the exp claim of the JWT; a token that cannot be read counts as expired. */
+  private static isTokenExpired(token: string): boolean {
+    try {
+      const encodedPayload = (token.split('.')[1] ?? '').replace(/-/g, '+').replace(/_/g, '/');
+      const payload = JSON.parse(atob(encodedPayload)) as { exp?: number };
+
+      return payload.exp !== undefined && payload.exp * 1000 <= Date.now();
+    } catch {
+      return true;
+    }
+  }
 }

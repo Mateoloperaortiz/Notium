@@ -10,11 +10,14 @@ El repositorio tiene dos proyectos:
 
 El inicio de sesión ya funciona contra la API con JWT. Los CRUD de semestres, materias, notas y
 usuarios pasan a la API en la fase 2 de la Entrega 1 Parte 2 (issues #25 a #28); mientras tanto
-siguen leyendo los datos semilla del navegador.
+siguen leyendo los datos semilla del navegador. Por eso, hasta el issue #27, los usuarios que se
+crean, editan o eliminan en `/admin/users` no cambian quién puede iniciar sesión: el login solo
+reconoce las cuentas de la API.
 
 ## Requisitos
 
-- Node.js 22.18 o superior (también compatible con Node.js 24.12 o superior).
+- Frontend: Node.js 22.18 o superior, o 24.12 o superior.
+- Backend: Node.js 22.22.3 o superior, o 24.15 o superior (lo exigen Nest CLI y TypeORM).
 - npm 11 o superior.
 
 ## Ejecución local
@@ -27,6 +30,9 @@ cp .env.example .env
 npm install
 npm run start:dev
 ```
+
+Antes de arrancar, escriba en `backend/.env` un `JWT_SECRET` de al menos 32 caracteres; el
+comando para generarlo está en `.env.example`. La API se niega a arrancar sin él.
 
 La API queda en <http://localhost:3000/api>. Al arrancar aplica las migraciones pendientes, así
 que la primera vez crea `database.sqlite` con las tablas y los datos de prueba.

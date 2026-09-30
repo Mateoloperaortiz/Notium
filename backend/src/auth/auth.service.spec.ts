@@ -1,8 +1,9 @@
 import { AuthService } from './auth.service.js';
+import type { LoginDto } from './dto/login.dto.js';
 import type { User } from '../users/entities/user.entity.js';
 import { Role } from '../users/enums/role.enum.js';
 import type { UsersService } from '../users/users.service.js';
-import { UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, UnauthorizedException } from '@nestjs/common';
 import type { JwtService } from '@nestjs/jwt';
 import { hash } from 'bcrypt';
 import { beforeAll, describe, expect, it, vi } from 'vitest';
@@ -54,6 +55,13 @@ describe('AuthService', (): void => {
     await expect(
       createService(null).login({ email: 'nadie@example.com', password: 'x' }),
     ).rejects.toThrow('Correo o contraseña incorrectos.');
+  });
+
+  it('answers 400 when the body does not have an email and a password', async (): Promise<void> => {
+    await expect(createService(user).login(undefined)).rejects.toBeInstanceOf(BadRequestException);
+    await expect(
+      createService(user).login({ email: 123, password: 'x' } as unknown as LoginDto),
+    ).rejects.toThrow('Escribe tu correo y tu contraseña.');
   });
 
   it('rejects the profile of a deleted account', async (): Promise<void> => {

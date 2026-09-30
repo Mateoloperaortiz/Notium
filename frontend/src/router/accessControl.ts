@@ -4,6 +4,8 @@ import type { NavigationGuardReturn, RouteLocationNormalized, Router } from 'vue
 /** Global guard: asks for login, skips the login page when logged in and checks admin roles. */
 export const configureRouterGuards = (router: Router): void => {
   router.beforeEach((to: RouteLocationNormalized): NavigationGuardReturn => {
+    AuthService.clearExpiredSession();
+
     const loggedUser = AuthService.getLoggedUser();
 
     if (to.meta.requiresAuth && loggedUser === undefined) {

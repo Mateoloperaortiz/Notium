@@ -8,7 +8,7 @@ export class BaseService {
     const authStore = useAuthStore();
     const client = axios.create({
       baseURL: `${import.meta.env.VITE_API_BASE_URL}/api`,
-      headers: authStore.token === null ? {} : { Authorization: `Bearer ${authStore.token}` },
+      headers: authStore.token ? { Authorization: `Bearer ${authStore.token}` } : {},
     });
 
     client.interceptors.response.use(

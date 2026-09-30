@@ -266,7 +266,7 @@ function deleteSemester(id: number): void {
 ## 9. Despliegue `[E1][T08]`
 
 - El despliegue que evalúa el profesor es una VM de GCP que sirve por **HTTP** la imagen del `Dockerfile` (build multietapa y nginx con fallback de SPA). Con el backend, ambos proyectos se levantan con `docker-compose.yml` como en el Tutorial 08 (issue #29). GitHub Pages ya no se usa: la página es HTTPS y el navegador bloquea sus llamadas a una API por HTTP.
-- El código debe funcionar sin HTTPS. `localhost` cuenta como contexto seguro y oculta este tipo de errores: para reproducir la VM, servir el build con `npm run preview -- --host` y abrirlo por la IP de la red.
+- El código debe funcionar sin HTTPS. `localhost` cuenta como contexto seguro y oculta este tipo de errores: para reproducir la VM, compilar el frontend con `VITE_API_BASE_URL=http://<IP>:3000 npm run build`, servirlo con `npm run preview -- --host`, arrancar la API con `http://<IP>:4173` en `CORS_ORIGIN` y abrir la SPA por la IP de la red.
 - Antes de cerrar cualquier cambio que toque autenticación o CRUDs, probar sobre el build: iniciar sesión, cerrar sesión, crear, editar y eliminar.
 - No cambiar la estrategia de despliegue sin que el equipo lo pida.
 
@@ -301,7 +301,9 @@ function deleteSemester(id: number): void {
 - Login con JWT según la guía de Nest.js (https://docs.nestjs.com/security/authentication). `AuthGuard` es global: toda ruta exige `Authorization: Bearer <token>` salvo las marcadas con `@Public()`. Las rutas de administrador usan `@Roles(Role.Admin)`, que verifica `RolesGuard`.
 - El usuario de una petición sale siempre del token (`@CurrentUser()`), nunca del cuerpo, de la URL ni de un parámetro que envíe el frontend.
 - Un estudiante solo ve y modifica sus propios registros: el servicio filtra por el ID del token y responde 404 si el registro es de otro usuario.
-- Variables de entorno: `PORT`, `SQLITE_PATH`, `CORS_ORIGIN` y `JWT_SECRET` (obligatoria). En local se copian de `.env.example` a `.env`, que no se versiona.
+- Variables de entorno: `PORT`, `SQLITE_PATH`, `CORS_ORIGIN` y `JWT_SECRET` (obligatoria, de al menos 32 caracteres; la API no arranca sin ella). En local se copian de `.env.example` a `.env`, que no se versiona.
+- `AuthGuard` vuelve a leer el usuario en cada petición: una cuenta eliminada responde 401 y un cambio de rol aplica de inmediato. El login compara siempre contra un hash, aunque el correo no exista, para no revelar qué cuentas existen, y un cuerpo mal formado responde 400.
+- En el frontend, el guard del router llama a `AuthService.clearExpiredSession()` en cada navegación: si el token venció, cierra la sesión y lleva al login.
 
 ### 10.5 Frontend conectado a la API `[P11][T07][T08]`
 
