@@ -22,6 +22,7 @@ import 'datatables.net-dt/css/dataTables.dataTables.css';
 import DataTable from 'datatables.net-vue3';
 import { createApp } from 'vue';
 
+// Registered once here so every chart and table in the app can use them.
 ChartJS.register(
   ArcElement,
   BarController,

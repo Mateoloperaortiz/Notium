@@ -1,5 +1,6 @@
 import type { SubjectInterface } from '@/interfaces/SubjectInterface.js';
 
+/** Demo subjects; each semesterId points to an entry of semesterSeeder. */
 export const subjectSeeder: SubjectInterface[] = [
   {
     id: 1,

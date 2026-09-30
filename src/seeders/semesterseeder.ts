@@ -1,5 +1,6 @@
 import { type SemesterInterface, StatusSemester } from '@/interfaces/SemesterInterface.js';
 
+/** Demo semesters; each userId points to an entry of userSeeder. */
 export const semesterSeeder: SemesterInterface[] = [
   {
     id: 1,

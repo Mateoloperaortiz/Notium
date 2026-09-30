@@ -9,7 +9,9 @@ import type { GradeInterface } from '@/interfaces/GradeInterface.js';
 import type { SemesterInterface } from '@/interfaces/SemesterInterface.js';
 import type { SubjectInterface } from '@/interfaces/SubjectInterface.js';
 
+/** Calculations for the analytics page and the dashboard charts, on data they receive. */
 export class AnalyticsUtil {
+  /** Plain mean of the values, or null when the list is empty. */
   public static getAverage(values: number[]): number | null {
     if (values.length === 0) {
       return null;
@@ -20,10 +22,12 @@ export class AnalyticsUtil {
     );
   }
 
+  /** Label such as "2026-1 (2026-1)": name, then year and period. */
   public static getSemesterLabel(semester: SemesterInterface): string {
     return `${semester.name} (${semester.year}-${semester.period})`;
   }
 
+  /** Options for the semester selector, newest first. */
   public static getSemesterOptions(semesters: SemesterInterface[]): SemesterOptionDTO[] {
     return [...semesters]
       .sort(
@@ -36,12 +40,14 @@ export class AnalyticsUtil {
       }));
   }
 
+  /** Distinct assessment types, sorted alphabetically. */
   public static getGradeTypes(grades: GradeInterface[]): string[] {
     const types = new Set<string>(grades.map((grade: GradeInterface): string => grade.type));
 
     return [...types].sort((first: string, second: string): number => first.localeCompare(second));
   }
 
+  /** Grades of the given subjects that match the semester and type filters. */
   public static filterGrades(
     grades: GradeInterface[],
     subjects: SubjectInterface[],
@@ -61,6 +67,7 @@ export class AnalyticsUtil {
     );
   }
 
+  /** Grades in date order, for the evolution chart. */
   public static getEvolutionSeries(grades: GradeInterface[]): EvolutionPointDTO[] {
     return [...grades]
       .sort((first: GradeInterface, second: GradeInterface): number =>
@@ -72,6 +79,7 @@ export class AnalyticsUtil {
       }));
   }
 
+  /** Average grade of each assessment type. */
   public static getTypeAverages(grades: GradeInterface[]): TypeAverageDTO[] {
     return AnalyticsUtil.getGradeTypes(grades).map((type: string): TypeAverageDTO => ({
       average:
@@ -84,6 +92,7 @@ export class AnalyticsUtil {
     }));
   }
 
+  /** One comparison row per semester that matches the filters, sorted by label. */
   public static getSemesterComparison(
     semesters: SemesterInterface[],
     subjects: SubjectInterface[],

@@ -9,23 +9,28 @@ import { GradeService } from '@/services/GradeService.js';
 import { useSubjectStore } from '@/stores/SubjectStore.js';
 import { IdUtil } from '@/utils/IdUtil.js';
 
+/** Reads and writes subjects in SubjectStore and validates their data. */
 export class SubjectService {
+  /** Returns the subjects of every user. */
   public static getSubjects(): SubjectInterface[] {
     return useSubjectStore().subjects;
   }
 
+  /** Returns the subject with the given ID, or undefined if it does not exist. */
   public static getSubjectById(id: number): SubjectInterface | undefined {
     return SubjectService.getSubjects().find(
       (subject: SubjectInterface): boolean => subject.id === id,
     );
   }
 
+  /** Returns the subjects of one semester. */
   public static getSubjectsBySemesterId(semesterId: number): SubjectInterface[] {
     return SubjectService.getSubjects().filter(
       (subject: SubjectInterface): boolean => subject.semesterId === semesterId,
     );
   }
 
+  /** Returns the subjects of the given semesters, such as those of one user. */
   public static getSubjectsBySemesters(semesters: SemesterInterface[]): SubjectInterface[] {
     const semesterIds = semesters.map((semester: SemesterInterface): number => semester.id);
 
@@ -34,6 +39,7 @@ export class SubjectService {
     );
   }
 
+  /** Validates the data and saves a new subject in the semester; throws if invalid. */
   public static createSubject(dto: CreateSubjectDTO, semesterId: number): SubjectInterface {
     const validatedDto = SubjectService.validate(dto);
     const timestamp = Date.now();
@@ -50,6 +56,7 @@ export class SubjectService {
     return subject;
   }
 
+  /** Validates and applies the changes; undefined if the subject does not exist. */
   public static updateSubject(id: number, dto: UpdateSubjectDTO): SubjectInterface | undefined {
     const subject = SubjectService.getSubjectById(id);
 
@@ -69,6 +76,7 @@ export class SubjectService {
     return subject;
   }
 
+  /** Deletes the subject and, in cascade, its grades. */
   public static deleteSubject(id: number): boolean {
     const subjects = SubjectService.getSubjects();
     const subjectIndex = subjects.findIndex(
@@ -85,6 +93,7 @@ export class SubjectService {
     return true;
   }
 
+  /** Deletes every subject of a semester; called when the semester is deleted. */
   public static deleteSubjectsBySemesterId(semesterId: number): void {
     SubjectService.getSubjectsBySemesterId(semesterId).forEach(
       (subject: SubjectInterface): void => {
@@ -93,6 +102,7 @@ export class SubjectService {
     );
   }
 
+  /** One message per invalid field; empty strings mean the data is valid. */
   public static validateFields(dto: CreateSubjectDTO): SubjectValidationErrorsDTO {
     return {
       code: dto.code.trim() ? '' : 'El código es obligatorio.',
@@ -105,6 +115,7 @@ export class SubjectService {
     };
   }
 
+  /** Throws the first validation message, or returns the trimmed data. */
   private static validate(dto: CreateSubjectDTO): CreateSubjectDTO {
     const errors = SubjectService.validateFields(dto);
     const firstError = errors.code || errors.name || errors.credits || errors.professor;

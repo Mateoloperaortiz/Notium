@@ -9,7 +9,9 @@ import type { SubjectInterface } from '@/interfaces/SubjectInterface.js';
 import type { UserInterface } from '@/interfaces/UserInterface.js';
 import { AnalyticsUtil } from '@/utils/AnalyticsUtil.js';
 
+/** Calculations for the admin reports page, on data they receive. */
 export class PlatformReportUtil {
+  /** Years with at least one semester, newest first, for the year selector. */
   public static getAvailableYears(semesters: SemesterInterface[]): number[] {
     const years = new Set<number>(
       semesters.map((semester: SemesterInterface): number => semester.year),
@@ -18,6 +20,7 @@ export class PlatformReportUtil {
     return [...years].sort((first: number, second: number): number => second - first);
   }
 
+  /** Semesters that match the year and period filters. */
   public static filterSemesters(
     semesters: SemesterInterface[],
     filter: PlatformReportFilterDTO,
@@ -29,6 +32,7 @@ export class PlatformReportUtil {
     );
   }
 
+  /** One row per user; with an active filter, users without matching semesters are left out. */
   public static getUserSummaries(
     users: UserInterface[],
     semesters: SemesterInterface[],
@@ -64,6 +68,7 @@ export class PlatformReportUtil {
       .filter((summary: UserSummaryDTO): boolean => !hasFilter || summary.semesterCount > 0);
   }
 
+  /** Number of filtered semesters in each status, including statuses with zero. */
   public static getSemesterStatusDistribution(
     semesters: SemesterInterface[],
     filter: PlatformReportFilterDTO,

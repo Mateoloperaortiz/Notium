@@ -1,5 +1,6 @@
 import { Role, type UserInterface } from '@/interfaces/UserInterface.js';
 
+/** Demo accounts loaded on the first run; the passwords are for local testing only. */
 export const userSeeder: UserInterface[] = [
   {
     id: 1,

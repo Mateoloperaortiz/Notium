@@ -1,4 +1,6 @@
+/** Date helpers shared by forms, cards and tables. */
 export class DateFormatUtil {
+  /** Long Spanish date in UTC so the day never shifts; invalid input is returned as is. */
   public static formatDate(isoDate: string): string {
     const normalizedDate = isoDate.slice(0, 10);
     const date = new Date(`${normalizedDate}T00:00:00Z`);
@@ -15,6 +17,7 @@ export class DateFormatUtil {
     }).format(date);
   }
 
+  /** Today's local date as YYYY-MM-DD, the default date of the grade form. */
   public static getTodayIsoDate(): string {
     const today = new Date();
     const month = String(today.getMonth() + 1).padStart(2, '0');
