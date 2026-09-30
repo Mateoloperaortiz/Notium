@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: ['main']
+    branches: ["main"]
   pull_request:
-    branches: ['main']
+    branches: ["main"]
 
 jobs:
   # SPA en Vue: pruebas, ESLint, Prettier, tipos y build
@@ -22,7 +22,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v7
         with:
-          node-version: '24'
+          node-version: "24"
           cache: npm
           cache-dependency-path: frontend/package-lock.json
 
@@ -34,6 +34,51 @@ jobs:
 
       - name: Run checks
         run: npm run check
+
+  docker:
+    runs-on: ubuntu-latest
+    env:
+      JWT_SECRET: ci-only-secret-for-compose-validation-32-characters
+
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v7
+
+      - name: Validate Compose
+        run: docker compose config --quiet
+
+      - name: Build and start production images
+        run: docker compose up --build --wait --wait-timeout 180
+
+      - name: Test frontend, API and login through nginx
+        run: |
+          curl --fail http://localhost/login
+          curl --fail http://localhost:3000/api
+          node --input-type=module <<'JS'
+          import assert from 'node:assert/strict';
+          const html = await (await fetch('http://localhost/login')).text();
+          const script = html.match(/src="([^"]+\.js)"/)[1];
+          const bundle = await (await fetch(`http://localhost${script}`)).text();
+          assert.ok(!bundle.includes('http://localhost:3000'));
+          const response = await fetch('http://localhost/api/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: 'mateo@example.com', password: 'mateo-password' }),
+          });
+          assert.equal(response.status, 200);
+          const { accessToken, user } = await response.json();
+          assert.equal(user.email, 'mateo@example.com');
+          assert.equal(user.password, undefined);
+          const profile = await fetch('http://localhost/api/auth/profile', {
+            headers: { Authorization: `Bearer ${accessToken}` },
+          });
+          assert.equal(profile.status, 200);
+          assert.equal((await profile.json()).id, user.id);
+          JS
+
+      - name: Stop containers
+        if: always()
+        run: docker compose down --volumes
 
   # API en Nest.js: pruebas, Oxlint, Prettier y build
   backend:
@@ -50,7 +95,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v7
         with:
-          node-version: '24'
+          node-version: "24"
           cache: npm
           cache-dependency-path: backend/package-lock.json
 

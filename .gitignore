@@ -40,4 +40,6 @@ __screenshots__/
 
 # Backend: secretos locales y base de datos SQLite
 backend/.env
+/.env
 *.sqlite
+*.sqlite-*
