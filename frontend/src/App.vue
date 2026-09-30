@@ -1,6 +1,7 @@
 <script setup lang="ts">
 // Internal imports
-import { Role, type UserInterface } from '@/interfaces/UserInterface.js';
+import type { SessionUserDTO } from '@/dtos/UserDTOs.js';
+import { Role } from '@/interfaces/UserInterface.js';
 import { AuthService } from '@/services/AuthService.js';
 
 // External imports
@@ -11,7 +12,7 @@ import { RouterLink, RouterView, useRouter } from 'vue-router';
 const router = useRouter();
 
 // Computed
-const loggedUser = computed<UserInterface | undefined>((): UserInterface | undefined =>
+const loggedUser = computed<SessionUserDTO | undefined>((): SessionUserDTO | undefined =>
   AuthService.getLoggedUser(),
 );
 

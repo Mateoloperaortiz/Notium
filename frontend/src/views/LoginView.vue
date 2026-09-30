@@ -2,6 +2,7 @@
 // Internal imports
 import type { LoginDTO } from '@/dtos/UserDTOs.js';
 import { AuthService } from '@/services/AuthService.js';
+import { ErrorUtil } from '@/utils/ErrorUtil.js';
 
 // External imports
 import { ref } from 'vue';
@@ -15,19 +16,24 @@ const form = ref<LoginDTO>({
   password: 'mateo-password',
 });
 const errorMessage = ref<string>('');
+const isSubmitting = ref<boolean>(false);
 
 // Functions
-function submitLogin(): void {
+async function submitLogin(): Promise<void> {
   errorMessage.value = '';
+  isSubmitting.value = true;
 
-  if (AuthService.login(form.value) === undefined) {
-    errorMessage.value = 'El correo o la contraseña no son correctos.';
-    return;
+  try {
+    await AuthService.login(form.value);
+
+    const redirectPath =
+      typeof route.query.redirect === 'string' ? route.query.redirect : '/dashboard';
+    router.push(redirectPath);
+  } catch (error: unknown) {
+    errorMessage.value = ErrorUtil.getErrorMessage(error);
+  } finally {
+    isSubmitting.value = false;
   }
-
-  const redirectPath =
-    typeof route.query.redirect === 'string' ? route.query.redirect : '/dashboard';
-  router.push(redirectPath);
 }
 </script>
 
@@ -53,7 +59,9 @@ function submitLogin(): void {
           {{ errorMessage }}
         </p>
 
-        <button class="button button--primary" type="submit">Entrar</button>
+        <button class="button button--primary" type="submit" :disabled="isSubmitting">
+          {{ isSubmitting ? 'Entrando…' : 'Entrar' }}
+        </button>
       </form>
     </div>
   </section>

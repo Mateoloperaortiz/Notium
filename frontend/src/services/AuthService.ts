@@ -1,33 +1,30 @@
-import type { LoginDTO } from '@/dtos/UserDTOs.js';
-import type { UserInterface } from '@/interfaces/UserInterface.js';
-import { UserService } from '@/services/UserService.js';
+import type { LoginDTO, LoginResponseDTO, SessionUserDTO } from '@/dtos/UserDTOs.js';
+import { BaseService } from '@/services/BaseService.js';
 import { useAuthStore } from '@/stores/AuthStore.js';
 
-/** Logs users in and out and exposes the logged-in user. */
-export class AuthService {
-  /** Starts a session if the credentials match and returns the user; undefined otherwise. */
-  public static login(dto: LoginDTO): UserInterface | undefined {
-    const user = UserService.getUsers().find(
-      (existingUser: UserInterface): boolean =>
-        existingUser.email === dto.email && existingUser.password === dto.password,
-    );
+/** Logs users in against the API and keeps the session in AuthStore. */
+export class AuthService extends BaseService {
+  /** Sends the credentials to POST /auth/login and saves the token and the user; throws on 401. */
+  public static async login(dto: LoginDTO): Promise<SessionUserDTO> {
+    const { data } = await AuthService.getClient().post<LoginResponseDTO>('/auth/login', dto);
+    const authStore = useAuthStore();
 
-    if (user !== undefined) {
-      useAuthStore().loggedUserId = user.id;
-    }
+    authStore.token = data.accessToken;
+    authStore.loggedUser = data.user;
 
-    return user;
+    return data.user;
   }
 
-  /** Clears the session. */
+  /** Clears the token and the user of the session. */
   public static logout(): void {
-    useAuthStore().loggedUserId = null;
+    const authStore = useAuthStore();
+
+    authStore.token = null;
+    authStore.loggedUser = null;
   }
 
   /** Returns the logged-in user, or undefined when there is no session. */
-  public static getLoggedUser(): UserInterface | undefined {
-    const loggedUserId = useAuthStore().loggedUserId;
-
-    return loggedUserId === null ? undefined : UserService.getUserById(loggedUserId);
+  public static getLoggedUser(): SessionUserDTO | undefined {
+    return useAuthStore().loggedUser ?? undefined;
   }
 }

@@ -21,3 +21,12 @@ export interface UserValidationErrorsDTO {
   name: string;
   password: string;
 }
+
+/** User data the API returns for the session; never includes the password. */
+export type SessionUserDTO = Pick<UserInterface, 'email' | 'id' | 'name' | 'role'>;
+
+/** Body the API returns after a successful login. */
+export interface LoginResponseDTO {
+  accessToken: string;
+  user: SessionUserDTO;
+}

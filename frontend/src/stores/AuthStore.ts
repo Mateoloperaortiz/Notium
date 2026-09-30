@@ -1,9 +1,14 @@
+import type { SessionUserDTO } from '@/dtos/UserDTOs.js';
 import { defineStore } from 'pinia';
 import { ref, type Ref } from 'vue';
 
-/** Session state: the logged-in user ID, or null; only AuthService reads or writes it. */
-export const useAuthStore = defineStore('auth', (): { loggedUserId: Ref<number | null> } => {
-  const loggedUserId = ref<number | null>(null);
+/** Session state: the API token and the logged-in user; only the services read or write it. */
+export const useAuthStore = defineStore(
+  'auth',
+  (): { loggedUser: Ref<SessionUserDTO | null>; token: Ref<string | null> } => {
+    const loggedUser = ref<SessionUserDTO | null>(null);
+    const token = ref<string | null>(null);
 
-  return { loggedUserId };
-});
+    return { loggedUser, token };
+  },
+);
