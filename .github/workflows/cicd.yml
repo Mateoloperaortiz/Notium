@@ -1,7 +1,4 @@
-name: CI-CD-Pipeline
-
-permissions:
-  contents: write
+name: CI
 
 on:
   push:
@@ -10,76 +7,58 @@ on:
     branches: ['main']
 
 jobs:
-  # 1. JOB BUILD
-  build:
+  # SPA en Vue: pruebas, ESLint, Prettier, tipos y build
+  frontend:
     runs-on: ubuntu-latest
 
-    # GitHub Pages publica el sitio bajo /Notium/, no en la raíz del dominio
-    env:
-      BASE_PATH: /Notium/
+    defaults:
+      run:
+        working-directory: frontend
 
     steps:
-      # 1. Checkout
       - name: Checkout código
         uses: actions/checkout@v7
 
-      # 2. Setup Node.js
       - name: Setup Node.js
         uses: actions/setup-node@v7
         with:
           node-version: '24'
           cache: npm
+          cache-dependency-path: frontend/package-lock.json
 
-      # 3. Instalar dependencias
       - name: Install dependencies
         run: npm ci
 
-      # 4. Unit tests
       - name: Run unit tests
         run: npm test
 
-      # 5. Checks
       - name: Run checks
         run: npm run check
 
-      # 6. Build
-      - name: Build
-        run: npm run build
-
-      # 7. Fallback de SPA: Pages no reescribe rutas, así que 404.html sirve la app
-      - name: Preparar fallback de SPA
-        run: cp dist/index.html dist/404.html
-
-      # 8. Verificar carpeta dist
-      - name: Verificar carpeta dist
-        run: ls -R dist
-
-      # 9. Upload build artifact
-      - name: Upload build artifact
-        uses: actions/upload-artifact@v7
-        with:
-          name: sitio
-          path: dist/
-
-  # 2. JOB DEPLOY
-  deploy:
+  # API en Nest.js: pruebas, Oxlint, Prettier y build
+  backend:
     runs-on: ubuntu-latest
-    needs: build
 
-    # Solo desplegar cuando hay push a main
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    defaults:
+      run:
+        working-directory: backend
 
     steps:
-      # 1. Descargar artifact del job build
-      - name: Download build artifact
-        uses: actions/download-artifact@v8
-        with:
-          name: sitio
-          path: dist/
+      - name: Checkout código
+        uses: actions/checkout@v7
 
-      # 2. Deploy a GitHub Pages
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run unit tests
+        run: npm test
+
+      - name: Run checks
+        run: npm run check
