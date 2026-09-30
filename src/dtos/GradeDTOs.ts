@@ -1,6 +1,6 @@
 import type { GradeInterface } from '@/interfaces/GradeInterface.js';
 
-type GradeManagedFields = 'createdAt' | 'id' | 'subject' | 'updatetAt';
+type GradeManagedFields = 'createdAt' | 'id' | 'subjectId' | 'updatedAt';
 
 export type CreateGradeDTO = Omit<GradeInterface, GradeManagedFields>;
 

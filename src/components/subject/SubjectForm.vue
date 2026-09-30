@@ -4,51 +4,36 @@ import type { CreateSubjectDTO, SubjectValidationErrorsDTO } from '@/dtos/Subjec
 import type { SemesterInterface } from '@/interfaces/SemesterInterface.js';
 import type { SubjectInterface } from '@/interfaces/SubjectInterface.js';
 import { SubjectService } from '@/services/SubjectService.js';
+
 // External imports
-import { computed, reactive, ref, useId, watch } from 'vue';
+import { computed, ref, useId } from 'vue';
 
-// Interfaces and types
-interface Props {
-  loading?: boolean;
-  semesters: SemesterInterface[];
-  subject?: SubjectInterface;
-}
+// Props
+const props = defineProps<{ semesters: SemesterInterface[]; subject?: SubjectInterface }>();
 
-interface Emits {
+// Emits
+const emit = defineEmits<{
   cancel: [];
-  submit: [subject: CreateSubjectDTO, semesterId: string];
-}
+  submit: [subject: CreateSubjectDTO, semesterId: number];
+}>();
 
-type FormField = keyof SubjectValidationErrorsDTO;
-
-// Props and emits
-const props = withDefaults(defineProps<Props>(), { loading: false });
-const emit = defineEmits<Emits>();
-
-// Form variables
+// State
 const formId = useId();
-const form = reactive<CreateSubjectDTO>({
-  code: '',
-  credits: 3,
-  name: '',
-  professor: '',
-});
-const semesterId = ref<string>('');
-const associationError = ref<string>('');
 const codeInputId = `${formId}-code`;
 const nameInputId = `${formId}-name`;
 const creditsInputId = `${formId}-credits`;
 const professorInputId = `${formId}-professor`;
-
-// Error control variables
-const fieldOrder: FormField[] = ['code', 'name', 'credits', 'professor'];
-const errors = reactive<SubjectValidationErrorsDTO>({
-  code: '',
-  credits: '',
-  name: '',
-  professor: '',
+const fieldOrder: (keyof SubjectValidationErrorsDTO)[] = ['code', 'name', 'credits', 'professor'];
+const form = ref<CreateSubjectDTO>({
+  code: props.subject?.code ?? '',
+  credits: props.subject?.credits ?? 3,
+  name: props.subject?.name ?? '',
+  professor: props.subject?.professor ?? '',
 });
-const touched = reactive<Record<FormField, boolean>>({
+const semesterId = ref<number>(props.subject?.semesterId ?? 0);
+const associationError = ref<string>('');
+const errors = ref<SubjectValidationErrorsDTO>({ code: '', credits: '', name: '', professor: '' });
+const touched = ref<Record<keyof SubjectValidationErrorsDTO, boolean>>({
   code: false,
   credits: false,
   name: false,
@@ -56,69 +41,53 @@ const touched = reactive<Record<FormField, boolean>>({
 });
 const submissionAttempted = ref<boolean>(false);
 
-// Derived form state
-const hasValidationErrors = computed<boolean>((): boolean =>
-  fieldOrder.some((field: FormField): boolean => errors[field] !== ''),
-);
+// Computed
 const isEditing = computed<boolean>((): boolean => props.subject !== undefined);
 
-// Error control functions
-const validateField = (field: FormField): boolean => {
-  touched[field] = true;
-  errors[field] = SubjectService.validateFields({ ...form })[field];
-  return errors[field] === '';
-};
+const hasValidationErrors = computed<boolean>((): boolean =>
+  fieldOrder.some((field: keyof SubjectValidationErrorsDTO): boolean => errors.value[field] !== ''),
+);
 
-const revalidateField = (field: FormField): void => {
-  if (touched[field] || submissionAttempted.value) {
+// Functions
+function validateField(field: keyof SubjectValidationErrorsDTO): boolean {
+  touched.value[field] = true;
+  errors.value[field] = SubjectService.validateFields(form.value)[field];
+
+  return errors.value[field] === '';
+}
+
+function revalidateField(field: keyof SubjectValidationErrorsDTO): void {
+  if (touched.value[field] || submissionAttempted.value) {
     validateField(field);
   }
-};
+}
 
-const validateForm = (): boolean =>
-  fieldOrder.map((field: FormField): boolean => validateField(field)).every(Boolean);
+function validateForm(): boolean {
+  return fieldOrder
+    .map((field: keyof SubjectValidationErrorsDTO): boolean => validateField(field))
+    .every(Boolean);
+}
 
-const resetValidation = (): void => {
-  fieldOrder.forEach((field: FormField): void => {
-    errors[field] = '';
-    touched[field] = false;
-  });
-  submissionAttempted.value = false;
-};
-
-// Form handlers
-const handleSubmit = (): void => {
-  if (props.loading) return;
+function handleSubmit(): void {
   associationError.value = semesterId.value ? '' : 'Selecciona un semestre.';
   submissionAttempted.value = true;
 
-  if (!validateForm() || associationError.value) return;
-  emit('submit', { ...form }, semesterId.value);
-};
+  if (!validateForm() || associationError.value) {
+    return;
+  }
 
-const handleCancel = (): void => emit('cancel');
+  emit('submit', { ...form.value }, semesterId.value);
+}
 
-// Synchronize form data with the selected subject
-watch(
-  (): SubjectInterface | undefined => props.subject,
-  (subject: SubjectInterface | undefined): void => {
-    form.code = subject?.code ?? '';
-    form.credits = subject?.credits ?? 3;
-    form.name = subject?.name ?? '';
-    form.professor = subject?.professor ?? '';
-    semesterId.value = subject?.semester.id ?? '';
-    associationError.value = '';
-    resetValidation();
-  },
-  { immediate: true },
-);
+function handleCancel(): void {
+  emit('cancel');
+}
 </script>
 
 <template>
   <form
     class="subject-form"
     novalidate
-    :aria-busy="loading"
     :aria-label="isEditing ? 'Editar materia' : 'Crear materia'"
     @submit.prevent="handleSubmit"
   >
@@ -128,8 +97,8 @@ watch(
 
     <label class="subject-form__field">
       <span>Semestre</span>
-      <select v-model="semesterId" required :disabled="loading || isEditing">
-        <option value="">Selecciona un semestre</option>
+      <select v-model="semesterId" required :disabled="isEditing">
+        <option :value="0">Selecciona un semestre</option>
         <option v-for="semester in semesters" :key="semester.id" :value="semester.id">
           {{ semester.name }}
         </option>
@@ -147,7 +116,6 @@ watch(
           maxlength="20"
           required
           :aria-invalid="errors.code !== ''"
-          :disabled="loading"
           @blur="validateField('code')"
           @input="revalidateField('code')"
         />
@@ -164,7 +132,6 @@ watch(
           max="30"
           required
           :aria-invalid="errors.credits !== ''"
-          :disabled="loading"
           @blur="validateField('credits')"
           @input="revalidateField('credits')"
         />
@@ -181,7 +148,6 @@ watch(
         maxlength="120"
         required
         :aria-invalid="errors.name !== ''"
-        :disabled="loading"
         @blur="validateField('name')"
         @input="revalidateField('name')"
       />
@@ -197,7 +163,6 @@ watch(
         maxlength="120"
         required
         :aria-invalid="errors.professor !== ''"
-        :disabled="loading"
         @blur="validateField('professor')"
         @input="revalidateField('professor')"
       />
@@ -205,16 +170,9 @@ watch(
     </label>
 
     <footer class="subject-form__actions">
-      <button
-        class="button button--secondary"
-        type="button"
-        :disabled="loading"
-        @click="handleCancel"
-      >
-        Cancelar
-      </button>
-      <button class="button button--primary" type="submit" :disabled="loading">
-        {{ loading ? 'Guardando...' : isEditing ? 'Guardar cambios' : 'Crear materia' }}
+      <button class="button button--secondary" type="button" @click="handleCancel">Cancelar</button>
+      <button class="button button--primary" type="submit">
+        {{ isEditing ? 'Guardar cambios' : 'Crear materia' }}
       </button>
     </footer>
   </form>

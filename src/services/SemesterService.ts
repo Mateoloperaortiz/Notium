@@ -4,92 +4,82 @@ import type {
   UpdateSemesterDTO,
 } from '@/dtos/SemesterDTOs.js';
 import type { SemesterInterface } from '@/interfaces/SemesterInterface.js';
-import { useAuthStore } from '@/stores/AuthStore.js';
+import { SubjectService } from '@/services/SubjectService.js';
 import { useSemesterStore } from '@/stores/SemesterStore.js';
-
-const generateSemesterId = (): string => globalThis.crypto.randomUUID();
+import { IdUtil } from '@/utils/IdUtil.js';
 
 export class SemesterService {
-  public static async findAll(): Promise<SemesterInterface[]> {
-    return [...useSemesterStore().semester];
+  public static getSemesters(): SemesterInterface[] {
+    return useSemesterStore().semesters;
   }
 
-  public static async findAllByCurrentUser(): Promise<SemesterInterface[]> {
-    const currentUser = useAuthStore().currentUser;
-
-    if (currentUser === null) {
-      return [];
-    }
-
-    return useSemesterStore().semester.filter(
-      (semester: SemesterInterface): boolean => semester.user.id === currentUser.id,
+  public static getSemesterById(id: number): SemesterInterface | undefined {
+    return SemesterService.getSemesters().find(
+      (semester: SemesterInterface): boolean => semester.id === id,
     );
   }
 
-  public static async findById(id: string): Promise<SemesterInterface | undefined> {
-    const semesters = await SemesterService.findAllByCurrentUser();
-
-    return semesters.find((semester: SemesterInterface): boolean => semester.id === id);
+  public static getSemestersByUserId(userId: number): SemesterInterface[] {
+    return SemesterService.getSemesters().filter(
+      (semester: SemesterInterface): boolean => semester.userId === userId,
+    );
   }
 
-  public static async create(dto: CreateSemesterDTO): Promise<SemesterInterface> {
-    const validatedDto: CreateSemesterDTO = SemesterService.validate(dto);
-    const user = useAuthStore().currentUser;
-
-    if (user === null) {
-      throw new Error('No existe un usuario para asociar el semestre.');
-    }
-
+  public static createSemester(dto: CreateSemesterDTO, userId: number): SemesterInterface {
+    const validatedDto = SemesterService.validate(dto);
     const timestamp = Date.now();
     const semester: SemesterInterface = {
       ...validatedDto,
       createdAt: timestamp,
-      id: generateSemesterId(),
-      subjects: [],
+      id: IdUtil.getNextId(SemesterService.getSemesters()),
       updatedAt: timestamp,
-      user: user,
+      userId,
     };
 
-    useSemesterStore().semester.push(semester);
+    useSemesterStore().semesters.push(semester);
 
     return semester;
   }
 
-  public static async update(
-    id: string,
-    dto: UpdateSemesterDTO,
-  ): Promise<SemesterInterface | undefined> {
-    const semester = await SemesterService.findById(id);
+  public static updateSemester(id: number, dto: UpdateSemesterDTO): SemesterInterface | undefined {
+    const semester = SemesterService.getSemesterById(id);
 
     if (semester === undefined) {
       return undefined;
     }
 
-    const mergedDto: CreateSemesterDTO = {
+    const validatedDto = SemesterService.validate({
       name: dto.name ?? semester.name,
       period: dto.period ?? semester.period,
       status: dto.status ?? semester.status,
       year: dto.year ?? semester.year,
-    };
-    const validatedDto: CreateSemesterDTO = SemesterService.validate(mergedDto);
+    });
 
     Object.assign(semester, validatedDto, { updatedAt: Date.now() });
 
     return semester;
   }
 
-  public static async delete(id: string): Promise<boolean> {
-    const semesters = useSemesterStore().semester;
-    const semester = await SemesterService.findById(id);
-    const semesterIndex = semester === undefined ? -1 : semesters.indexOf(semester);
+  public static deleteSemester(id: number): boolean {
+    const semesters = SemesterService.getSemesters();
+    const semesterIndex = semesters.findIndex(
+      (semester: SemesterInterface): boolean => semester.id === id,
+    );
 
     if (semesterIndex === -1) {
       return false;
     }
 
-    useSemesterStore().semester.splice(semesterIndex, 1);
+    semesters.splice(semesterIndex, 1);
+    SubjectService.deleteSubjectsBySemesterId(id);
 
     return true;
+  }
+
+  public static deleteSemestersByUserId(userId: number): void {
+    SemesterService.getSemestersByUserId(userId).forEach((semester: SemesterInterface): void => {
+      SemesterService.deleteSemester(semester.id);
+    });
   }
 
   public static validateFields(dto: CreateSemesterDTO): SemesterValidationErrorsDTO {
@@ -123,7 +113,7 @@ export class SemesterService {
   }
 
   private static validate(dto: CreateSemesterDTO): CreateSemesterDTO {
-    const errors: SemesterValidationErrorsDTO = SemesterService.validateFields(dto);
+    const errors = SemesterService.validateFields(dto);
     const firstError = errors.name || errors.year || errors.period || errors.status;
 
     if (firstError !== '') {

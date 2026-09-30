@@ -1,13 +1,11 @@
-import type { SubjectInterface } from './SubjectInterface';
-
 export interface GradeInterface {
-  id: string;
+  id: number;
+  subjectId: number;
   title: string;
   value: number;
   percentage: number;
   type: string;
-  date: Date;
+  date: string;
   createdAt: number;
-  updatetAt: number;
-  subject: SubjectInterface;
+  updatedAt: number;
 }

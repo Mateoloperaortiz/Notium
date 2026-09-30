@@ -1,6 +1,3 @@
-import type { SubjectInterface } from './SubjectInterface.js';
-import type { UserInterface } from './UserInterface.js';
-
 export enum StatusSemester {
   inComing = 'Entrante',
   inProgress = 'En proceso',
@@ -8,13 +5,12 @@ export enum StatusSemester {
 }
 
 export interface SemesterInterface {
-  id: string;
+  id: number;
+  userId: number;
   name: string;
   year: number;
   period: number;
   status: StatusSemester;
   createdAt: number;
   updatedAt: number;
-  user: UserInterface;
-  subjects: SubjectInterface[];
 }

@@ -5,22 +5,17 @@ import AverageBySemesterChart from '@/components/graphs/AverageBySemesterChart.v
 import AverageBySubjectChart from '@/components/graphs/AverageBySubjectChart.vue';
 import CreditsBySemesterChart from '@/components/graphs/CreditsBySemesterChart.vue';
 import GradeTypeDistributionChart from '@/components/graphs/GradeTypeDistributionChart.vue';
-import { useAuthStore } from '@/stores/AuthStore.js';
+import { AuthService } from '@/services/AuthService.js';
+import { SemesterService } from '@/services/SemesterService.js';
+
 // External imports
-import { storeToRefs } from 'pinia';
-import { computed } from 'vue';
 import { RouterLink } from 'vue-router';
 
-// Store state
-const authStore = useAuthStore();
-const { currentUser } = storeToRefs(authStore);
-
-const semesterCount = computed<number>((): number => currentUser.value?.semesters.length ?? 0);
-const semesterCountLabel = computed<string>((): string =>
-  semesterCount.value === 1
-    ? '1 semestre registrado'
-    : `${semesterCount.value} semestres registrados`,
-);
+// State
+const loggedUser = AuthService.getLoggedUser();
+const semesterCount = SemesterService.getSemestersByUserId(loggedUser?.id ?? 0).length;
+const semesterCountLabel =
+  semesterCount === 1 ? '1 semestre registrado' : `${semesterCount} semestres registrados`;
 </script>
 
 <template>
@@ -29,7 +24,7 @@ const semesterCountLabel = computed<string>((): string =>
       <div>
         <p class="eyebrow">Tu espacio académico</p>
         <h1 id="dashboard-title" class="page-title">
-          Hola, {{ currentUser?.name ?? 'estudiante' }}.
+          Hola, {{ loggedUser?.name ?? 'estudiante' }}.
         </h1>
         <p class="page-description">
           Este es tu resumen personal. Desde aquí puedes continuar organizando tu recorrido

@@ -1,6 +1,6 @@
 import type { SemesterInterface } from '@/interfaces/SemesterInterface.js';
 
-type SemesterManagedFields = 'createdAt' | 'id' | 'subjects' | 'updatedAt' | 'user';
+type SemesterManagedFields = 'createdAt' | 'id' | 'updatedAt' | 'userId';
 
 export type CreateSemesterDTO = Omit<SemesterInterface, SemesterManagedFields>;
 

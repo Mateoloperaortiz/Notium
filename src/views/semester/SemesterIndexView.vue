@@ -2,21 +2,22 @@
 // Internal imports
 import SemesterCard from '@/components/semester/SemesterCard.vue';
 import SemesterForm from '@/components/semester/SemesterForm.vue';
-import type { CreateSemesterDTO, UpdateSemesterDTO } from '@/dtos/SemesterDTOs.js';
+import type { CreateSemesterDTO } from '@/dtos/SemesterDTOs.js';
 import type { SemesterInterface } from '@/interfaces/SemesterInterface.js';
+import { AuthService } from '@/services/AuthService.js';
 import { SemesterService } from '@/services/SemesterService.js';
-// External imports
-import { computed, onMounted, ref, shallowRef } from 'vue';
 
-// View state
-const semesters = shallowRef<SemesterInterface[]>([]);
-const editingSemester = shallowRef<SemesterInterface>();
+// External imports
+import { computed, ref } from 'vue';
+
+// State
+const loggedUserId = AuthService.getLoggedUser()?.id ?? 0;
+const semesters = ref<SemesterInterface[]>(SemesterService.getSemestersByUserId(loggedUserId));
+const editingSemester = ref<SemesterInterface>();
 const errorMessage = ref<string>('');
 const isFormOpen = ref<boolean>(false);
-const isLoading = ref<boolean>(true);
-const isSubmitting = ref<boolean>(false);
 
-// Derived view state
+// Computed
 const semesterCountLabel = computed<string>((): string => {
   const count = semesters.value.length;
 
@@ -27,26 +28,15 @@ const formTitle = computed<string>((): string =>
   editingSemester.value ? 'Editar semestre' : 'Crear semestre',
 );
 
-// Error handling
+// Functions
+function loadSemesters(): void {
+  semesters.value = SemesterService.getSemestersByUserId(loggedUserId);
+}
+
 function getErrorMessage(error: unknown): string {
   return error instanceof Error ? error.message : 'Ocurrió un error inesperado.';
 }
 
-// Data loading
-async function loadSemesters(): Promise<void> {
-  isLoading.value = true;
-  errorMessage.value = '';
-
-  try {
-    semesters.value = await SemesterService.findAllByCurrentUser();
-  } catch (error: unknown) {
-    errorMessage.value = getErrorMessage(error);
-  } finally {
-    isLoading.value = false;
-  }
-}
-
-// Form handlers
 function openCreateForm(): void {
   editingSemester.value = undefined;
   isFormOpen.value = true;
@@ -62,66 +52,48 @@ function closeForm(): void {
   isFormOpen.value = false;
 }
 
-async function saveSemester(dto: CreateSemesterDTO): Promise<void> {
-  isSubmitting.value = true;
+function saveSemester(dto: CreateSemesterDTO): void {
   errorMessage.value = '';
 
   try {
     if (editingSemester.value) {
-      const updateDTO: UpdateSemesterDTO = {
-        name: dto.name,
-        period: dto.period,
-        status: dto.status,
-        year: dto.year,
-      };
-      const updatedSemester = await SemesterService.update(editingSemester.value.id, updateDTO);
-
-      if (!updatedSemester) {
+      if (!SemesterService.updateSemester(editingSemester.value.id, dto)) {
         throw new Error('El semestre que intentas editar ya no existe.');
       }
     } else {
-      await SemesterService.create(dto);
+      SemesterService.createSemester(dto, loggedUserId);
     }
 
-    await loadSemesters();
+    loadSemesters();
     closeForm();
   } catch (error: unknown) {
     errorMessage.value = getErrorMessage(error);
-  } finally {
-    isSubmitting.value = false;
   }
 }
 
-async function deleteSemester(semesterId: string): Promise<void> {
-  const semester = semesters.value.find(
-    (currentSemester: SemesterInterface): boolean => currentSemester.id === semesterId,
-  );
-  const semesterName = semester?.name ?? 'este semestre';
+function deleteSemester(semesterId: number): void {
+  const semester = SemesterService.getSemesterById(semesterId);
 
-  if (!window.confirm(`¿Eliminar ${semesterName}? Esta acción no se puede deshacer.`)) {
+  if (
+    !window.confirm(
+      `¿Eliminar ${semester?.name ?? 'este semestre'}? Esta acción no se puede deshacer.`,
+    )
+  ) {
     return;
   }
 
   errorMessage.value = '';
 
-  try {
-    const wasDeleted = await SemesterService.delete(semesterId);
+  if (!SemesterService.deleteSemester(semesterId)) {
+    errorMessage.value = 'El semestre que intentas eliminar ya no existe.';
+  }
 
-    if (!wasDeleted) {
-      throw new Error('El semestre que intentas eliminar ya no existe.');
-    }
+  loadSemesters();
 
-    await loadSemesters();
-
-    if (editingSemester.value?.id === semesterId) {
-      closeForm();
-    }
-  } catch (error: unknown) {
-    errorMessage.value = getErrorMessage(error);
+  if (editingSemester.value?.id === semesterId) {
+    closeForm();
   }
 }
-
-onMounted(loadSemesters);
 </script>
 
 <template>
@@ -163,7 +135,6 @@ onMounted(loadSemesters);
 
       <SemesterForm
         :key="editingSemester?.id ?? 'new-semester'"
-        :loading="isSubmitting"
         :semester="editingSemester"
         @cancel="closeForm"
         @submit="saveSemester"
@@ -175,11 +146,7 @@ onMounted(loadSemesters);
       <span aria-hidden="true"></span>
     </div>
 
-    <div v-if="isLoading" class="semester-grid" aria-label="Cargando semestres" aria-busy="true">
-      <div v-for="index in 2" :key="index" class="semester-skeleton"></div>
-    </div>
-
-    <div v-else-if="semesters.length" class="semester-grid">
+    <div v-if="semesters.length" class="semester-grid">
       <SemesterCard
         v-for="semester in semesters"
         :key="semester.id"
@@ -286,14 +253,6 @@ onMounted(loadSemesters);
   gap: 1.15rem;
 }
 
-.semester-skeleton {
-  min-height: 16rem;
-  border-radius: 1.25rem;
-  background: linear-gradient(105deg, #eeece5 25%, #faf8f1 40%, #eeece5 60%);
-  background-size: 200% 100%;
-  animation: shimmer 1.4s infinite linear;
-}
-
 .semester-empty {
   padding: 4rem 1.5rem;
   border: 1px dashed #bcc9c1;
@@ -322,12 +281,6 @@ onMounted(loadSemesters);
 .semester-empty p {
   margin: 0.55rem auto 1.5rem;
   color: var(--color-muted);
-}
-
-@keyframes shimmer {
-  to {
-    background-position-x: -200%;
-  }
 }
 
 @media (max-width: 720px) {

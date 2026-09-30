@@ -3,14 +3,96 @@ import type {
   SubjectValidationErrorsDTO,
   UpdateSubjectDTO,
 } from '@/dtos/SubjectDTOs.js';
+import type { SemesterInterface } from '@/interfaces/SemesterInterface.js';
 import type { SubjectInterface } from '@/interfaces/SubjectInterface.js';
-import { SemesterService } from '@/services/SemesterService.js';
-import { useAuthStore } from '@/stores/AuthStore.js';
+import { GradeService } from '@/services/GradeService.js';
 import { useSubjectStore } from '@/stores/SubjectStore.js';
-
-const generateSubjectId = (): string => globalThis.crypto.randomUUID();
+import { IdUtil } from '@/utils/IdUtil.js';
 
 export class SubjectService {
+  public static getSubjects(): SubjectInterface[] {
+    return useSubjectStore().subjects;
+  }
+
+  public static getSubjectById(id: number): SubjectInterface | undefined {
+    return SubjectService.getSubjects().find(
+      (subject: SubjectInterface): boolean => subject.id === id,
+    );
+  }
+
+  public static getSubjectsBySemesterId(semesterId: number): SubjectInterface[] {
+    return SubjectService.getSubjects().filter(
+      (subject: SubjectInterface): boolean => subject.semesterId === semesterId,
+    );
+  }
+
+  public static getSubjectsBySemesters(semesters: SemesterInterface[]): SubjectInterface[] {
+    const semesterIds = semesters.map((semester: SemesterInterface): number => semester.id);
+
+    return SubjectService.getSubjects().filter((subject: SubjectInterface): boolean =>
+      semesterIds.includes(subject.semesterId),
+    );
+  }
+
+  public static createSubject(dto: CreateSubjectDTO, semesterId: number): SubjectInterface {
+    const validatedDto = SubjectService.validate(dto);
+    const timestamp = Date.now();
+    const subject: SubjectInterface = {
+      ...validatedDto,
+      createdAt: timestamp,
+      id: IdUtil.getNextId(SubjectService.getSubjects()),
+      semesterId,
+      updatedAt: timestamp,
+    };
+
+    useSubjectStore().subjects.push(subject);
+
+    return subject;
+  }
+
+  public static updateSubject(id: number, dto: UpdateSubjectDTO): SubjectInterface | undefined {
+    const subject = SubjectService.getSubjectById(id);
+
+    if (subject === undefined) {
+      return undefined;
+    }
+
+    const validatedDto = SubjectService.validate({
+      code: dto.code ?? subject.code,
+      credits: dto.credits ?? subject.credits,
+      name: dto.name ?? subject.name,
+      professor: dto.professor ?? subject.professor,
+    });
+
+    Object.assign(subject, validatedDto, { updatedAt: Date.now() });
+
+    return subject;
+  }
+
+  public static deleteSubject(id: number): boolean {
+    const subjects = SubjectService.getSubjects();
+    const subjectIndex = subjects.findIndex(
+      (subject: SubjectInterface): boolean => subject.id === id,
+    );
+
+    if (subjectIndex === -1) {
+      return false;
+    }
+
+    subjects.splice(subjectIndex, 1);
+    GradeService.deleteGradesBySubjectId(id);
+
+    return true;
+  }
+
+  public static deleteSubjectsBySemesterId(semesterId: number): void {
+    SubjectService.getSubjectsBySemesterId(semesterId).forEach(
+      (subject: SubjectInterface): void => {
+        SubjectService.deleteSubject(subject.id);
+      },
+    );
+  }
+
   public static validateFields(dto: CreateSubjectDTO): SubjectValidationErrorsDTO {
     return {
       code: dto.code.trim() ? '' : 'El código es obligatorio.',
@@ -23,90 +105,19 @@ export class SubjectService {
     };
   }
 
-  public static async findAll(): Promise<SubjectInterface[]> {
-    return [...useSubjectStore().subject];
-  }
+  private static validate(dto: CreateSubjectDTO): CreateSubjectDTO {
+    const errors = SubjectService.validateFields(dto);
+    const firstError = errors.code || errors.name || errors.credits || errors.professor;
 
-  public static async findAllByCurrentUser(): Promise<SubjectInterface[]> {
-    const currentUser = useAuthStore().currentUser;
-
-    if (currentUser === null) {
-      return [];
+    if (firstError !== '') {
+      throw new Error(firstError);
     }
 
-    return useSubjectStore().subject.filter(
-      (subject: SubjectInterface): boolean => subject.semester.user.id === currentUser.id,
-    );
-  }
-
-  public static async findBySemesterId(semesterId: string): Promise<SubjectInterface[]> {
-    const subjects = await SubjectService.findAllByCurrentUser();
-
-    return subjects.filter(
-      (subject: SubjectInterface): boolean => subject.semester.id === semesterId,
-    );
-  }
-
-  public static async findById(id: string): Promise<SubjectInterface | undefined> {
-    const subjects = await SubjectService.findAllByCurrentUser();
-
-    return subjects.find((subject: SubjectInterface): boolean => subject.id === id);
-  }
-
-  public static async create(dto: CreateSubjectDTO, semesterId: string): Promise<SubjectInterface> {
-    const semester = await SemesterService.findById(semesterId);
-
-    if (semester === undefined) {
-      throw new Error('El semestre no existe.');
-    }
-
-    const timestamp = Date.now();
-    const subject: SubjectInterface = {
-      ...dto,
-      createdAt: timestamp,
-      grades: [],
-      id: generateSubjectId(),
-      semester,
-      updatedAt: timestamp,
+    return {
+      code: dto.code.trim(),
+      credits: dto.credits,
+      name: dto.name.trim(),
+      professor: dto.professor.trim(),
     };
-
-    useSubjectStore().subject.push(subject);
-    semester.subjects.push(subject);
-
-    return subject;
-  }
-
-  public static async update(
-    id: string,
-    dto: UpdateSubjectDTO,
-  ): Promise<SubjectInterface | undefined> {
-    const subject = await SubjectService.findById(id);
-
-    if (subject === undefined) {
-      return undefined;
-    }
-
-    Object.assign(subject, dto, { updatedAt: Date.now() });
-
-    return subject;
-  }
-
-  public static async delete(id: string): Promise<boolean> {
-    const subjects = useSubjectStore().subject;
-    const subject = await SubjectService.findById(id);
-    const subjectIndex = subject === undefined ? -1 : subjects.indexOf(subject);
-
-    if (subjectIndex === -1) {
-      return false;
-    }
-
-    const [removedSubject] = subjects.splice(subjectIndex, 1);
-    const semesterSubjectIndex = removedSubject?.semester.subjects.indexOf(removedSubject) ?? -1;
-
-    if (semesterSubjectIndex >= 0) {
-      removedSubject?.semester.subjects.splice(semesterSubjectIndex, 1);
-    }
-
-    return true;
   }
 }

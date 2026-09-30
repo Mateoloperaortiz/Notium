@@ -1,105 +1,86 @@
 <script setup lang="ts">
-// Imports internos
+// Internal imports
 import type { CreateUserDTO, UserValidationErrorsDTO } from '@/dtos/UserDTOs.js';
 import { Role, type UserInterface } from '@/interfaces/UserInterface.js';
 import { UserService } from '@/services/UserService.js';
-// Imports externos
-import { computed, reactive, ref, useId, watch } from 'vue';
 
-// Interfaces y tipos
-interface Props {
-  loading?: boolean;
-  user?: UserInterface;
-}
+// External imports
+import { computed, ref, useId } from 'vue';
 
-interface Emits {
+// Props
+const props = defineProps<{ user?: UserInterface }>();
+
+// Emits
+const emit = defineEmits<{
   cancel: [];
   submit: [user: CreateUserDTO];
-}
+}>();
 
-type FormField = keyof UserValidationErrorsDTO;
-
-// Props y eventos
-const props = withDefaults(defineProps<Props>(), { loading: false });
-const emit = defineEmits<Emits>();
-
-// Variables del formulario
+// State
 const formId = useId();
-const form = reactive<CreateUserDTO>({
-  email: '',
-  name: '',
-  password: '',
-  role: Role.User,
-});
 const nameInputId = `${formId}-name`;
 const emailInputId = `${formId}-email`;
 const passwordInputId = `${formId}-password`;
 const roleInputId = `${formId}-role`;
-
-// Variables de control de errores
-const fieldOrder: FormField[] = ['name', 'email', 'password'];
-const errors = reactive<UserValidationErrorsDTO>({ email: '', name: '', password: '' });
-const touched = reactive<Record<FormField, boolean>>({
+const fieldOrder: (keyof UserValidationErrorsDTO)[] = ['name', 'email', 'password'];
+const form = ref<CreateUserDTO>({
+  email: props.user?.email ?? '',
+  name: props.user?.name ?? '',
+  password: props.user?.password ?? '',
+  role: props.user?.role ?? Role.User,
+});
+const errors = ref<UserValidationErrorsDTO>({ email: '', name: '', password: '' });
+const touched = ref<Record<keyof UserValidationErrorsDTO, boolean>>({
   email: false,
   name: false,
   password: false,
 });
 const submissionAttempted = ref<boolean>(false);
 
-// Estado derivado del formulario
+// Computed
 const isEditing = computed<boolean>((): boolean => props.user !== undefined);
+
 const hasValidationErrors = computed<boolean>((): boolean =>
-  fieldOrder.some((field: FormField): boolean => errors[field] !== ''),
+  fieldOrder.some((field: keyof UserValidationErrorsDTO): boolean => errors.value[field] !== ''),
 );
 
-// Funciones de control de errores
-const validateField = (field: FormField): boolean => {
-  touched[field] = true;
-  errors[field] = UserService.validateFields({ ...form }, props.user?.id)[field];
-  return errors[field] === '';
-};
+// Functions
+function validateField(field: keyof UserValidationErrorsDTO): boolean {
+  touched.value[field] = true;
+  errors.value[field] = UserService.validateFields(form.value, props.user?.id)[field];
 
-const revalidateField = (field: FormField): void => {
-  if (touched[field] || submissionAttempted.value) validateField(field);
-};
+  return errors.value[field] === '';
+}
 
-const validateForm = (): boolean =>
-  fieldOrder.map((field: FormField): boolean => validateField(field)).every(Boolean);
+function revalidateField(field: keyof UserValidationErrorsDTO): void {
+  if (touched.value[field] || submissionAttempted.value) {
+    validateField(field);
+  }
+}
 
-const resetValidation = (): void => {
-  fieldOrder.forEach((field: FormField): void => {
-    errors[field] = '';
-    touched[field] = false;
-  });
-  submissionAttempted.value = false;
-};
+function validateForm(): boolean {
+  return fieldOrder
+    .map((field: keyof UserValidationErrorsDTO): boolean => validateField(field))
+    .every(Boolean);
+}
 
-// Manejadores del formulario
-const handleSubmit = (): void => {
-  if (props.loading) return;
+function handleSubmit(): void {
   submissionAttempted.value = true;
-  if (!validateForm()) return;
-  emit('submit', { ...form });
-};
 
-const handleCancel = (): void => emit('cancel');
+  if (!validateForm()) {
+    return;
+  }
 
-// Sincroniza el formulario con el usuario seleccionado
-watch(
-  (): UserInterface | undefined => props.user,
-  (user: UserInterface | undefined): void => {
-    form.email = user?.email ?? '';
-    form.name = user?.name ?? '';
-    form.password = user?.password ?? '';
-    form.role = user?.role ?? Role.User;
-    resetValidation();
-  },
-  { immediate: true },
-);
+  emit('submit', { ...form.value });
+}
+
+function handleCancel(): void {
+  emit('cancel');
+}
 </script>
 
 <template>
-  <form class="user-form" novalidate :aria-busy="loading" @submit.prevent="handleSubmit">
+  <form class="user-form" novalidate @submit.prevent="handleSubmit">
     <div v-if="submissionAttempted && hasValidationErrors" class="user-form__alert" role="alert">
       Revisa los datos del usuario antes de continuar.
     </div>
@@ -112,7 +93,6 @@ watch(
           v-model="form.name"
           type="text"
           required
-          :disabled="loading"
           @blur="validateField('name')"
           @input="revalidateField('name')"
         />
@@ -125,7 +105,6 @@ watch(
           v-model="form.email"
           type="email"
           required
-          :disabled="loading"
           @blur="validateField('email')"
           @input="revalidateField('email')"
         />
@@ -142,7 +121,6 @@ watch(
           type="password"
           autocomplete="new-password"
           required
-          :disabled="loading"
           @blur="validateField('password')"
           @input="revalidateField('password')"
         />
@@ -150,7 +128,7 @@ watch(
       </label>
       <label class="user-form__field" :for="roleInputId">
         <span>Rol</span>
-        <select :id="roleInputId" v-model="form.role" :disabled="loading">
+        <select :id="roleInputId" v-model="form.role">
           <option :value="Role.User">Estudiante</option>
           <option :value="Role.Admin">Administrador</option>
         </select>
@@ -158,16 +136,9 @@ watch(
     </div>
 
     <footer class="user-form__actions">
-      <button
-        class="button button--secondary"
-        type="button"
-        :disabled="loading"
-        @click="handleCancel"
-      >
-        Cancelar
-      </button>
-      <button class="button button--primary" type="submit" :disabled="loading">
-        {{ loading ? 'Guardando...' : isEditing ? 'Guardar cambios' : 'Crear usuario' }}
+      <button class="button button--secondary" type="button" @click="handleCancel">Cancelar</button>
+      <button class="button button--primary" type="submit">
+        {{ isEditing ? 'Guardar cambios' : 'Crear usuario' }}
       </button>
     </footer>
   </form>

@@ -1,41 +1,32 @@
 <script setup lang="ts">
-// Imports internos
+// Internal imports
 import ChartPanel from '@/components/common/ChartPanel.vue';
 import type {
   PlatformReportFilterDTO,
   SemesterStatusCountDTO,
   UserSummaryDTO,
 } from '@/dtos/PlatformReportDTOs.js';
-import { StatusSemester } from '@/interfaces/SemesterInterface.js';
 import { Role } from '@/interfaces/UserInterface.js';
-import { PlatformReportService } from '@/services/PlatformReportService.js';
-import TableRenderUtil from '@/utils/TableRenderUtil.js';
-// Imports externos
+import { GradeService } from '@/services/GradeService.js';
+import { SemesterService } from '@/services/SemesterService.js';
+import { SubjectService } from '@/services/SubjectService.js';
+import { UserService } from '@/services/UserService.js';
+import { PlatformReportUtil } from '@/utils/PlatformReportUtil.js';
+import { TableRenderUtil } from '@/utils/TableRenderUtil.js';
+
+// External imports
 import type { ChartData } from 'chart.js';
-import DataTablesCore from 'datatables.net-dt';
-import 'datatables.net-dt/css/dataTables.dataTables.css';
 import DataTable from 'datatables.net-vue3';
-import { computed, onMounted, ref, shallowRef, watch } from 'vue';
+import { computed, ref } from 'vue';
 
-DataTable.use(DataTablesCore);
-
-// Estado de la vista
-const availableYears = shallowRef<number[]>([]);
-const userSummaries = shallowRef<UserSummaryDTO[]>([]);
-const statusCounts = shallowRef<Map<StatusSemester, number>>(new Map());
-const errorMessage = ref<string>('');
-const isLoading = ref<boolean>(true);
-const selectedYear = ref<string>('');
-const selectedPeriod = ref<string>('');
-
-// Estado derivado de la vista
-const activeFilter = computed<PlatformReportFilterDTO>((): PlatformReportFilterDTO => ({
-  period: selectedPeriod.value === '' ? undefined : Number(selectedPeriod.value),
-  year: selectedYear.value === '' ? undefined : Number(selectedYear.value),
-}));
-
-const roleLabel = (role: Role): string => (role === Role.Admin ? 'Administrador' : 'Estudiante');
-
+// State
+const users = UserService.getUsers();
+const semesters = SemesterService.getSemesters();
+const subjects = SubjectService.getSubjects();
+const grades = GradeService.getGrades();
+const availableYears = PlatformReportUtil.getAvailableYears(semesters);
+const selectedYear = ref<number>(0);
+const selectedPeriod = ref<number>(0);
 const userTableColumns = [
   {
     data: 'name',
@@ -47,7 +38,11 @@ const userTableColumns = [
     render: (email: string): string => TableRenderUtil.renderText(email),
     title: 'Correo',
   },
-  { data: 'role', render: (role: Role): string => roleLabel(role), title: 'Rol' },
+  {
+    data: 'role',
+    render: (role: Role): string => (role === Role.Admin ? 'Administrador' : 'Estudiante'),
+    title: 'Rol',
+  },
   { data: 'semesterCount', title: 'Semestres' },
   { data: 'subjectCount', title: 'Materias' },
   {
@@ -58,18 +53,33 @@ const userTableColumns = [
   },
 ];
 
-const statusChartData = computed<ChartData<'bar' | 'line'>>((): ChartData<'bar' | 'line'> => ({
-  datasets: [
-    {
-      backgroundColor: '#236b56',
-      data: Object.values(StatusSemester).map(
-        (status: StatusSemester): number => statusCounts.value.get(status) ?? 0,
-      ),
-      label: 'Semestres',
-    },
-  ],
-  labels: Object.values(StatusSemester),
+// Computed
+const activeFilter = computed<PlatformReportFilterDTO>((): PlatformReportFilterDTO => ({
+  period: selectedPeriod.value === 0 ? undefined : selectedPeriod.value,
+  year: selectedYear.value === 0 ? undefined : selectedYear.value,
 }));
+
+const userSummaries = computed<UserSummaryDTO[]>((): UserSummaryDTO[] =>
+  PlatformReportUtil.getUserSummaries(users, semesters, subjects, grades, activeFilter.value),
+);
+
+const statusChartData = computed<ChartData<'bar' | 'line'>>((): ChartData<'bar' | 'line'> => {
+  const distribution = PlatformReportUtil.getSemesterStatusDistribution(
+    semesters,
+    activeFilter.value,
+  );
+
+  return {
+    datasets: [
+      {
+        backgroundColor: '#236b56',
+        data: distribution.map((entry: SemesterStatusCountDTO): number => entry.count),
+        label: 'Semestres',
+      },
+    ],
+    labels: distribution.map((entry: SemesterStatusCountDTO): string => entry.status),
+  };
+});
 
 const roleChartData = computed<ChartData<'bar' | 'line'>>((): ChartData<'bar' | 'line'> => {
   const adminCount = userSummaries.value.filter(
@@ -81,41 +91,6 @@ const roleChartData = computed<ChartData<'bar' | 'line'>>((): ChartData<'bar' | 
     datasets: [{ backgroundColor: '#e7a547', data: [studentCount, adminCount], label: 'Usuarios' }],
     labels: ['Estudiantes', 'Administradores'],
   };
-});
-
-// Carga de datos
-async function loadReport(): Promise<void> {
-  isLoading.value = true;
-  errorMessage.value = '';
-
-  try {
-    const [years, summaries, distribution] = await Promise.all([
-      PlatformReportService.getAvailableYears(),
-      PlatformReportService.getUserSummaries(activeFilter.value),
-      PlatformReportService.getSemesterStatusDistribution(activeFilter.value),
-    ]);
-
-    availableYears.value = years;
-    userSummaries.value = summaries;
-    statusCounts.value = new Map(
-      distribution.map((entry: SemesterStatusCountDTO): [StatusSemester, number] => [
-        entry.status,
-        entry.count,
-      ]),
-    );
-  } catch (error: unknown) {
-    errorMessage.value =
-      error instanceof Error ? error.message : 'No fue posible cargar el reporte.';
-  } finally {
-    isLoading.value = false;
-  }
-}
-
-watch(activeFilter, (): void => {
-  void loadReport();
-});
-onMounted((): void => {
-  void loadReport();
 });
 </script>
 
@@ -133,8 +108,8 @@ onMounted((): void => {
       <label>
         Año
         <select v-model="selectedYear">
-          <option value="">Todos</option>
-          <option v-for="year in availableYears" :key="year" :value="String(year)">
+          <option :value="0">Todos</option>
+          <option v-for="year in availableYears" :key="year" :value="year">
             {{ year }}
           </option>
         </select>
@@ -143,45 +118,37 @@ onMounted((): void => {
       <label>
         Periodo
         <select v-model="selectedPeriod">
-          <option value="">Todos</option>
-          <option value="1">1</option>
-          <option value="2">2</option>
+          <option :value="0">Todos</option>
+          <option :value="1">1</option>
+          <option :value="2">2</option>
         </select>
       </label>
     </div>
 
-    <p v-if="errorMessage" class="status-message status-message--error" role="alert">
-      {{ errorMessage }}
-    </p>
+    <div class="admin-reports-page__charts">
+      <ChartPanel title="Semestres por estado" type="bar" :data="statusChartData" />
+      <ChartPanel title="Usuarios por rol" type="bar" :data="roleChartData" />
+    </div>
 
-    <p v-if="isLoading" class="status-message">Cargando reporte…</p>
-
-    <template v-else>
-      <div class="admin-reports-page__charts">
-        <ChartPanel title="Semestres por estado" type="bar" :data="statusChartData" />
-        <ChartPanel title="Usuarios por rol" type="bar" :data="roleChartData" />
-      </div>
-
-      <div class="admin-reports-page__table-wrap">
-        <DataTable
-          class="display admin-reports-table"
-          :data="userSummaries"
-          :columns="userTableColumns"
-          :options="{
-            language: {
-              emptyTable: 'No hay usuarios para los filtros seleccionados.',
-              info: 'Mostrando _START_ a _END_ de _TOTAL_ usuarios',
-              infoEmpty: 'No hay usuarios para mostrar',
-              lengthMenu: 'Mostrar _MENU_ usuarios',
-              search: 'Buscar:',
-              zeroRecords: 'No se encontraron usuarios.',
-            },
-            order: [[0, 'asc']],
-            pageLength: 10,
-          }"
-        />
-      </div>
-    </template>
+    <div class="admin-reports-page__table-wrap">
+      <DataTable
+        class="display admin-reports-table"
+        :data="userSummaries"
+        :columns="userTableColumns"
+        :options="{
+          language: {
+            emptyTable: 'No hay usuarios para los filtros seleccionados.',
+            info: 'Mostrando _START_ a _END_ de _TOTAL_ usuarios',
+            infoEmpty: 'No hay usuarios para mostrar',
+            lengthMenu: 'Mostrar _MENU_ usuarios',
+            search: 'Buscar:',
+            zeroRecords: 'No se encontraron usuarios.',
+          },
+          order: [[0, 'asc']],
+          pageLength: 10,
+        }"
+      />
+    </div>
   </section>
 </template>
 

@@ -1,88 +1,72 @@
 <script setup lang="ts">
-// Imports internos
+// Internal imports
 import UserForm from '@/components/admin/UserForm.vue';
 import type { CreateUserDTO } from '@/dtos/UserDTOs.js';
 import { Role, type UserInterface } from '@/interfaces/UserInterface.js';
+import { AuthService } from '@/services/AuthService.js';
 import { UserService } from '@/services/UserService.js';
-import { useAuthStore } from '@/stores/AuthStore.js';
-import TableRenderUtil from '@/utils/TableRenderUtil.js';
-// Imports externos
-import DataTablesCore from 'datatables.net-dt';
-import 'datatables.net-dt/css/dataTables.dataTables.css';
+import { TableRenderUtil } from '@/utils/TableRenderUtil.js';
+
+// External imports
 import DataTable from 'datatables.net-vue3';
-import { storeToRefs } from 'pinia';
-import { computed, onMounted, ref, shallowRef } from 'vue';
+import { computed, ref } from 'vue';
 
-DataTable.use(DataTablesCore);
-
-// Estado del store
-const { currentUser } = storeToRefs(useAuthStore());
-
-// Estado de la vista
-const users = shallowRef<UserInterface[]>([]);
-const editingUser = shallowRef<UserInterface>();
+// State
+const loggedUserId = AuthService.getLoggedUser()?.id ?? 0;
+const users = ref<UserInterface[]>([...UserService.getUsers()]);
+const editingUser = ref<UserInterface>();
 const errorMessage = ref<string>('');
 const isFormOpen = ref<boolean>(false);
-const isLoading = ref<boolean>(true);
-const isSubmitting = ref<boolean>(false);
-
-// Estado derivado de la vista
-const userCountLabel = computed<string>((): string => {
-  const count = users.value.length;
-  return count === 1 ? '1 usuario registrado' : `${count} usuarios registrados`;
-});
-const formTitle = computed<string>((): string =>
-  editingUser.value ? 'Editar usuario' : 'Crear usuario',
-);
-
-const roleLabel = (role: Role): string => (role === Role.Admin ? 'Administrador' : 'Estudiante');
-
 const tableColumns = [
-  { data: 'name', title: 'Nombre' },
-  { data: 'email', title: 'Correo' },
+  {
+    data: 'name',
+    render: (name: string): string => TableRenderUtil.renderText(name),
+    title: 'Nombre',
+  },
+  {
+    data: 'email',
+    render: (email: string): string => TableRenderUtil.renderText(email),
+    title: 'Correo',
+  },
   {
     data: 'role',
-    render: (role: Role): string => roleLabel(role),
+    render: (role: Role): string => (role === Role.Admin ? 'Administrador' : 'Estudiante'),
     title: 'Rol',
   },
   {
     data: null,
     orderable: false,
-    render: (_data: null, _type: string, user: UserInterface): string => {
-      const userId = TableRenderUtil.escapeHtml(user.id);
-
-      return `
-        <div class="user-table__actions">
-          <button type="button" data-action="edit" data-user-id="${userId}">Editar</button>
-          <button type="button" data-action="delete" data-user-id="${userId}">Eliminar</button>
-        </div>
-      `;
-    },
+    render: (_data: null, _type: string, user: UserInterface): string => `
+      <div class="user-table__actions">
+        <button type="button" data-action="edit" data-user-id="${user.id}">Editar</button>
+        <button type="button" data-action="delete" data-user-id="${user.id}">Eliminar</button>
+      </div>
+    `,
     searchable: false,
     title: 'Acciones',
   },
 ];
 
-// Manejo de errores
+// Computed
+const userCountLabel = computed<string>((): string => {
+  const count = users.value.length;
+
+  return count === 1 ? '1 usuario registrado' : `${count} usuarios registrados`;
+});
+
+const formTitle = computed<string>((): string =>
+  editingUser.value ? 'Editar usuario' : 'Crear usuario',
+);
+
+// Functions
+function loadUsers(): void {
+  users.value = [...UserService.getUsers()];
+}
+
 function getErrorMessage(error: unknown): string {
   return error instanceof Error ? error.message : 'Ocurrió un error inesperado.';
 }
 
-// Carga de datos
-async function loadData(): Promise<void> {
-  isLoading.value = true;
-  errorMessage.value = '';
-
-  try {
-    users.value = await UserService.findAll();
-  } catch (error: unknown) {
-    errorMessage.value = getErrorMessage(error);
-  } finally {
-    isLoading.value = false;
-  }
-}
-
-// Manejadores del formulario
 function openCreateForm(): void {
   editingUser.value = undefined;
   isFormOpen.value = true;
@@ -99,55 +83,53 @@ function closeForm(): void {
 }
 
 function handleTableClick(event: MouseEvent): void {
-  if (!(event.target instanceof Element)) return;
+  if (!(event.target instanceof Element)) {
+    return;
+  }
 
   const actionButton = event.target.closest<HTMLButtonElement>('[data-action]');
-  const userId = actionButton?.dataset.userId;
+  const userId = Number(actionButton?.dataset.userId);
   const action = actionButton?.dataset.action;
 
-  if (!userId || !action) return;
-
   if (action === 'edit') {
-    const user = users.value.find(
-      (currentUserRow: UserInterface): boolean => currentUserRow.id === userId,
-    );
-    if (user) openEditForm(user);
+    const user = UserService.getUserById(userId);
+
+    if (user) {
+      openEditForm(user);
+    }
   }
 
   if (action === 'delete') {
-    void deleteUser(userId);
+    deleteUser(userId);
   }
 }
 
-async function saveUser(dto: CreateUserDTO): Promise<void> {
-  isSubmitting.value = true;
+function saveUser(dto: CreateUserDTO): void {
   errorMessage.value = '';
 
   try {
     if (editingUser.value) {
-      const updatedUser = await UserService.update(editingUser.value.id, dto);
-      if (!updatedUser) throw new Error('El usuario que intentas editar ya no existe.');
+      if (!UserService.updateUser(editingUser.value.id, dto)) {
+        throw new Error('El usuario que intentas editar ya no existe.');
+      }
     } else {
-      await UserService.create(dto);
+      UserService.createUser(dto);
     }
-    await loadData();
+
+    loadUsers();
     closeForm();
   } catch (error: unknown) {
     errorMessage.value = getErrorMessage(error);
-  } finally {
-    isSubmitting.value = false;
   }
 }
 
-async function deleteUser(userId: string): Promise<void> {
-  const user = users.value.find(
-    (currentUserRow: UserInterface): boolean => currentUserRow.id === userId,
-  );
-
-  if (userId === currentUser.value?.id) {
+function deleteUser(userId: number): void {
+  if (userId === loggedUserId) {
     errorMessage.value = 'No puedes eliminar tu propia cuenta mientras tienes la sesión abierta.';
     return;
   }
+
+  const user = UserService.getUserById(userId);
 
   if (
     !window.confirm(
@@ -157,18 +139,18 @@ async function deleteUser(userId: string): Promise<void> {
     return;
   }
 
-  try {
-    if (!(await UserService.delete(userId))) {
-      throw new Error('El usuario que intentas eliminar ya no existe.');
-    }
-    await loadData();
-    if (editingUser.value?.id === userId) closeForm();
-  } catch (error: unknown) {
-    errorMessage.value = getErrorMessage(error);
+  errorMessage.value = '';
+
+  if (!UserService.deleteUser(userId)) {
+    errorMessage.value = 'El usuario que intentas eliminar ya no existe.';
+  }
+
+  loadUsers();
+
+  if (editingUser.value?.id === userId) {
+    closeForm();
   }
 }
-
-onMounted(loadData);
 </script>
 
 <template>
@@ -212,7 +194,6 @@ onMounted(loadData);
       <UserForm
         :key="editingUser?.id ?? 'new-user'"
         :user="editingUser"
-        :loading="isSubmitting"
         @cancel="closeForm"
         @submit="saveUser"
       />
@@ -221,10 +202,7 @@ onMounted(loadData);
     <div class="admin-users-page__summary">
       <p>{{ userCountLabel }}</p>
     </div>
-    <div v-if="isLoading" class="admin-users-grid" aria-label="Cargando usuarios" aria-busy="true">
-      <div v-for="index in 2" :key="index" class="admin-users-skeleton"></div>
-    </div>
-    <div v-else-if="users.length" class="admin-users-table-wrap" @click="handleTableClick">
+    <div v-if="users.length" class="admin-users-table-wrap" @click="handleTableClick">
       <DataTable
         :data="users"
         :columns="tableColumns"
@@ -317,11 +295,6 @@ onMounted(loadData);
   background: var(--color-surface);
   color: var(--color-ink);
   cursor: pointer;
-}
-.admin-users-skeleton {
-  min-height: 16rem;
-  border-radius: 1rem;
-  background: color-mix(in srgb, var(--color-border) 60%, transparent);
 }
 .admin-users-empty {
   padding: 3rem 1.5rem;

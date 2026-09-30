@@ -1,29 +1,11 @@
 import type { CreateSemesterDTO } from '@/dtos/SemesterDTOs.js';
 import { type SemesterInterface, StatusSemester } from '@/interfaces/SemesterInterface.js';
-import { Role, type UserInterface } from '@/interfaces/UserInterface.js';
+import { GradeService } from '@/services/GradeService.js';
 import { SemesterService } from '@/services/SemesterService.js';
-import { useAuthStore } from '@/stores/AuthStore.js';
+import { SubjectService } from '@/services/SubjectService.js';
 import { useSemesterStore } from '@/stores/SemesterStore.js';
 import { createPinia, setActivePinia } from 'pinia';
 import { beforeEach, describe, expect, it } from 'vitest';
-
-const currentUser: UserInterface = {
-  createdAt: 0,
-  email: 'student@example.com',
-  id: 'user-1',
-  name: 'Student',
-  password: 'password',
-  role: Role.User,
-  semesters: [],
-  updatedAt: 0,
-};
-
-const otherUser: UserInterface = {
-  ...currentUser,
-  email: 'other@example.com',
-  id: 'user-2',
-  name: 'Other student',
-};
 
 const semesterDTO: CreateSemesterDTO = {
   name: '  2026-1  ',
@@ -32,64 +14,66 @@ const semesterDTO: CreateSemesterDTO = {
   year: 2026,
 };
 
-const buildSemester = (id: string, user: UserInterface): SemesterInterface => ({
-  ...semesterDTO,
-  createdAt: 0,
-  id,
-  subjects: [],
-  updatedAt: 0,
-  user,
-});
-
 describe('SemesterService', (): void => {
   beforeEach((): void => {
     setActivePinia(createPinia());
-    useAuthStore().login(currentUser);
   });
 
-  it('returns only the semesters belonging to the current user', async (): Promise<void> => {
-    const semesterStore = useSemesterStore();
-    semesterStore.semester.push(buildSemester('semester-1', currentUser));
-    semesterStore.semester.push(buildSemester('semester-2', otherUser));
+  it('returns only the semesters of the given user', (): void => {
+    SemesterService.createSemester(semesterDTO, 1);
+    SemesterService.createSemester(semesterDTO, 2);
 
-    const semesters = await SemesterService.findAllByCurrentUser();
+    const semesters = SemesterService.getSemestersByUserId(1);
 
-    expect(semesters.map((semester: SemesterInterface): string => semester.id)).toEqual([
-      'semester-1',
-    ]);
+    expect(semesters.map((semester: SemesterInterface): number => semester.userId)).toEqual([1]);
   });
 
-  it('creates a semester with normalized data and the current user', async (): Promise<void> => {
-    const semester = await SemesterService.create(semesterDTO);
+  it('creates semesters with normalized data and sequential ids', (): void => {
+    const firstSemester = SemesterService.createSemester(semesterDTO, 1);
+    const secondSemester = SemesterService.createSemester(semesterDTO, 1);
 
-    expect(semester).toMatchObject({
+    expect(firstSemester).toMatchObject({
+      id: 1,
       name: '2026-1',
       period: 1,
       status: StatusSemester.inProgress,
-      user: currentUser,
+      userId: 1,
       year: 2026,
     });
-    expect(semester.id).toEqual(expect.any(String));
-    expect(
-      useSemesterStore().semester.some(
-        (storedSemester: SemesterInterface): boolean => storedSemester.id === semester.id,
-      ),
-    ).toBe(true);
+    expect(secondSemester.id).toBe(2);
+    expect(useSemesterStore().semesters).toHaveLength(2);
   });
 
-  it('updates and deletes a semester owned by the current user', async (): Promise<void> => {
-    const semester = await SemesterService.create(semesterDTO);
+  it('updates and deletes a semester', (): void => {
+    const semester = SemesterService.createSemester(semesterDTO, 1);
     const originalUpdatedAt = semester.updatedAt;
 
-    const updatedSemester = await SemesterService.update(semester.id, {
+    const updatedSemester = SemesterService.updateSemester(semester.id, {
       name: '2026-2',
       period: 2,
     });
 
     expect(updatedSemester).toMatchObject({ name: '2026-2', period: 2 });
     expect(updatedSemester?.updatedAt).toBeGreaterThanOrEqual(originalUpdatedAt);
-    expect(await SemesterService.delete(semester.id)).toBe(true);
-    expect(await SemesterService.findById(semester.id)).toBeUndefined();
+    expect(SemesterService.deleteSemester(semester.id)).toBe(true);
+    expect(SemesterService.getSemesterById(semester.id)).toBeUndefined();
+  });
+
+  it('deletes the subjects and grades of a deleted semester', (): void => {
+    const semester = SemesterService.createSemester(semesterDTO, 1);
+    const subject = SubjectService.createSubject(
+      { code: 'DW-01', credits: 3, name: 'Desarrollo Web', professor: 'Daniel Correa' },
+      semester.id,
+    );
+    GradeService.createGrade(
+      { date: '2026-03-10', percentage: 30, title: 'Parcial', type: 'Parcial', value: 4.5 },
+      subject.id,
+    );
+
+    SemesterService.deleteSemester(semester.id);
+
+    expect(SubjectService.getSubjects()).toHaveLength(0);
+    expect(GradeService.getGrades()).toHaveLength(0);
   });
 
   it('reports validation errors for invalid semester data', (): void => {
@@ -108,11 +92,9 @@ describe('SemesterService', (): void => {
     });
   });
 
-  it('rejects creation when there is no authenticated user', async (): Promise<void> => {
-    useAuthStore().logout();
-
-    await expect(SemesterService.create(semesterDTO)).rejects.toThrow(
-      'No existe un usuario para asociar el semestre.',
-    );
+  it('rejects the creation of an invalid semester', (): void => {
+    expect((): SemesterInterface =>
+      SemesterService.createSemester({ ...semesterDTO, name: '' }, 1),
+    ).toThrow('Escribe un nombre para identificar el semestre.');
   });
 });

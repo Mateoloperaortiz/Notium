@@ -1,49 +1,45 @@
 <script setup lang="ts">
 // Internal imports
 import GradeForm from '@/components/grade/GradeForm.vue';
-import type { CreateGradeDTO, UpdateGradeDTO } from '@/dtos/GradeDTOs.js';
+import type { CreateGradeDTO } from '@/dtos/GradeDTOs.js';
 import type { GradeInterface } from '@/interfaces/GradeInterface.js';
-import type { SubjectInterface } from '@/interfaces/SubjectInterface.js';
+import { AuthService } from '@/services/AuthService.js';
 import { GradeService } from '@/services/GradeService.js';
+import { SemesterService } from '@/services/SemesterService.js';
 import { SubjectService } from '@/services/SubjectService.js';
+import { DateFormatUtil } from '@/utils/DateFormatUtil.js';
+import { TableRenderUtil } from '@/utils/TableRenderUtil.js';
+
 // External imports
-import DataTablesCore from 'datatables.net-dt';
-import 'datatables.net-dt/css/dataTables.dataTables.css';
 import DataTable from 'datatables.net-vue3';
-import { computed, onMounted, ref, shallowRef } from 'vue';
+import { computed, ref } from 'vue';
 
-DataTable.use(DataTablesCore);
-
-// View state
-const subjects = shallowRef<SubjectInterface[]>([]);
-const grades = shallowRef<GradeInterface[]>([]);
-const editingGrade = shallowRef<GradeInterface>();
-const selectedSubjectId = ref<string>('');
+// State
+const loggedUserId = AuthService.getLoggedUser()?.id ?? 0;
+const semesters = SemesterService.getSemestersByUserId(loggedUserId);
+const subjects = SubjectService.getSubjectsBySemesters(semesters);
+const grades = ref<GradeInterface[]>(GradeService.getGradesBySubjects(subjects));
+const editingGrade = ref<GradeInterface>();
+const selectedSubjectId = ref<number>(0);
 const errorMessage = ref<string>('');
 const isFormOpen = ref<boolean>(false);
-const isLoading = ref<boolean>(true);
-const isSubmitting = ref<boolean>(false);
-
-// Derived view state
-const filteredGrades = computed<GradeInterface[]>((): GradeInterface[] =>
-  selectedSubjectId.value === ''
-    ? grades.value
-    : grades.value.filter(
-        (grade: GradeInterface): boolean => grade.subject.id === selectedSubjectId.value,
-      ),
-);
-const gradeCountLabel = computed<string>((): string => {
-  const count = filteredGrades.value.length;
-  return count === 1 ? '1 nota registrada' : `${count} notas registradas`;
-});
-const formTitle = computed<string>((): string =>
-  editingGrade.value ? 'Editar nota' : 'Crear nota',
-);
-
 const tableColumns = [
-  { data: 'title', title: 'Título' },
-  { data: 'type', title: 'Tipo' },
-  { data: 'subject.name', title: 'Materia' },
+  {
+    data: 'title',
+    render: (title: string): string => TableRenderUtil.renderText(title),
+    title: 'Título',
+  },
+  {
+    data: 'type',
+    render: (type: string): string => TableRenderUtil.renderText(type),
+    title: 'Tipo',
+  },
+  {
+    data: 'subjectId',
+    render: (subjectId: number): string =>
+      TableRenderUtil.renderText(SubjectService.getSubjectById(subjectId)?.name ?? '—'),
+    title: 'Materia',
+  },
   { data: 'value', title: 'Nota' },
   {
     data: 'percentage',
@@ -52,7 +48,8 @@ const tableColumns = [
   },
   {
     data: 'date',
-    render: (date: Date): string => new Date(date).toLocaleDateString('es-CO'),
+    render: (date: string, type: string): string =>
+      type === 'display' ? DateFormatUtil.formatDate(date) : date,
     title: 'Fecha',
   },
   {
@@ -68,36 +65,41 @@ const tableColumns = [
     title: 'Acciones',
   },
 ];
-// Error handling
+
+// Computed
+const filteredGrades = computed<GradeInterface[]>((): GradeInterface[] =>
+  selectedSubjectId.value === 0
+    ? grades.value
+    : grades.value.filter(
+        (grade: GradeInterface): boolean => grade.subjectId === selectedSubjectId.value,
+      ),
+);
+
+const gradeCountLabel = computed<string>((): string => {
+  const count = filteredGrades.value.length;
+
+  return count === 1 ? '1 nota registrada' : `${count} notas registradas`;
+});
+
+const formTitle = computed<string>((): string =>
+  editingGrade.value ? 'Editar nota' : 'Crear nota',
+);
+
+// Functions
+function loadGrades(): void {
+  grades.value = GradeService.getGradesBySubjects(subjects);
+}
+
 function getErrorMessage(error: unknown): string {
   return error instanceof Error ? error.message : 'Ocurrió un error inesperado.';
 }
 
-// Data loading
-async function loadData(): Promise<void> {
-  isLoading.value = true;
-  errorMessage.value = '';
-
-  try {
-    const [loadedSubjects, loadedGrades] = await Promise.all([
-      SubjectService.findAllByCurrentUser(),
-      GradeService.findAllByCurrentUser(),
-    ]);
-    subjects.value = loadedSubjects;
-    grades.value = loadedGrades;
-  } catch (error: unknown) {
-    errorMessage.value = getErrorMessage(error);
-  } finally {
-    isLoading.value = false;
-  }
-}
-
-// Form handlers
 function openCreateForm(): void {
-  if (subjects.value.length === 0) {
+  if (subjects.length === 0) {
     errorMessage.value = 'Crea una materia antes de registrar una nota.';
     return;
   }
+
   editingGrade.value = undefined;
   isFormOpen.value = true;
 }
@@ -113,68 +115,67 @@ function closeForm(): void {
 }
 
 function handleTableClick(event: MouseEvent): void {
-  if (!(event.target instanceof Element)) return;
+  if (!(event.target instanceof Element)) {
+    return;
+  }
 
   const actionButton = event.target.closest<HTMLButtonElement>('[data-action]');
-  const gradeId = actionButton?.dataset.gradeId;
+  const gradeId = Number(actionButton?.dataset.gradeId);
   const action = actionButton?.dataset.action;
 
-  if (!gradeId || !action) return;
-
   if (action === 'edit') {
-    const grade = grades.value.find(
-      (currentGrade: GradeInterface): boolean => currentGrade.id === gradeId,
-    );
-    if (grade) openEditForm(grade);
+    const grade = GradeService.getGradeById(gradeId);
+
+    if (grade) {
+      openEditForm(grade);
+    }
   }
 
   if (action === 'delete') {
-    void deleteGrade(gradeId);
+    deleteGrade(gradeId);
   }
 }
 
-async function saveGrade(dto: CreateGradeDTO, subjectId: string): Promise<void> {
-  isSubmitting.value = true;
+function saveGrade(dto: CreateGradeDTO, subjectId: number): void {
   errorMessage.value = '';
 
   try {
     if (editingGrade.value) {
-      const updatedGrade = await GradeService.update(editingGrade.value.id, dto as UpdateGradeDTO);
-      if (!updatedGrade) throw new Error('La nota que intentas editar ya no existe.');
+      if (!GradeService.updateGrade(editingGrade.value.id, dto)) {
+        throw new Error('La nota que intentas editar ya no existe.');
+      }
     } else {
-      await GradeService.create(dto, subjectId);
+      GradeService.createGrade(dto, subjectId);
     }
-    await loadData();
+
+    loadGrades();
     closeForm();
   } catch (error: unknown) {
     errorMessage.value = getErrorMessage(error);
-  } finally {
-    isSubmitting.value = false;
   }
 }
 
-async function deleteGrade(gradeId: string): Promise<void> {
-  const grade = grades.value.find(
-    (currentGrade: GradeInterface): boolean => currentGrade.id === gradeId,
-  );
+function deleteGrade(gradeId: number): void {
+  const grade = GradeService.getGradeById(gradeId);
+
   if (
     !window.confirm(`¿Eliminar ${grade?.title ?? 'esta nota'}? Esta acción no se puede deshacer.`)
   ) {
     return;
   }
 
-  try {
-    if (!(await GradeService.delete(gradeId))) {
-      throw new Error('La nota que intentas eliminar ya no existe.');
-    }
-    await loadData();
-    if (editingGrade.value?.id === gradeId) closeForm();
-  } catch (error: unknown) {
-    errorMessage.value = getErrorMessage(error);
+  errorMessage.value = '';
+
+  if (!GradeService.deleteGrade(gradeId)) {
+    errorMessage.value = 'La nota que intentas eliminar ya no existe.';
+  }
+
+  loadGrades();
+
+  if (editingGrade.value?.id === gradeId) {
+    closeForm();
   }
 }
-
-onMounted(loadData);
 </script>
 
 <template>
@@ -193,7 +194,7 @@ onMounted(loadData);
     <div class="grade-page__toolbar">
       <label for="subject-filter">Filtrar por materia</label>
       <select id="subject-filter" v-model="selectedSubjectId">
-        <option value="">Todas las materias</option>
+        <option :value="0">Todas las materias</option>
         <option v-for="subject in subjects" :key="subject.id" :value="subject.id">
           {{ subject.code }} · {{ subject.name }}
         </option>
@@ -222,7 +223,6 @@ onMounted(loadData);
       <GradeForm
         :key="editingGrade?.id ?? 'new-grade'"
         :grade="editingGrade"
-        :loading="isSubmitting"
         :subjects="subjects"
         @cancel="closeForm"
         @submit="saveGrade"
@@ -232,10 +232,7 @@ onMounted(loadData);
     <div class="grade-page__summary">
       <p>{{ gradeCountLabel }}</p>
     </div>
-    <div v-if="isLoading" class="grade-grid" aria-label="Cargando notas" aria-busy="true">
-      <div v-for="index in 2" :key="index" class="grade-skeleton"></div>
-    </div>
-    <div v-else-if="filteredGrades.length" class="grade-table-wrap" @click="handleTableClick">
+    <div v-if="filteredGrades.length" class="grade-table-wrap" @click="handleTableClick">
       <DataTable
         :data="filteredGrades"
         :columns="tableColumns"
@@ -349,11 +346,6 @@ onMounted(loadData);
   background: var(--color-surface);
   color: var(--color-ink);
   cursor: pointer;
-}
-.grade-skeleton {
-  min-height: 16rem;
-  border-radius: 1rem;
-  background: color-mix(in srgb, var(--color-border) 60%, transparent);
 }
 .grade-empty {
   padding: 3rem 1.5rem;

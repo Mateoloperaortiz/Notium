@@ -2,48 +2,30 @@
 // Internal imports
 import SubjectCard from '@/components/subject/SubjectCard.vue';
 import type { SemesterInterface } from '@/interfaces/SemesterInterface.js';
+import type { SubjectInterface } from '@/interfaces/SubjectInterface.js';
+import { AuthService } from '@/services/AuthService.js';
 import { SemesterService } from '@/services/SemesterService.js';
+import { SubjectService } from '@/services/SubjectService.js';
+
 // External imports
-import { computed, ref, shallowRef, watch } from 'vue';
+import { computed } from 'vue';
 import { RouterLink } from 'vue-router';
 
-// Interfaces and types
-interface Props {
-  id: string;
-}
-
 // Props
-const props = defineProps<Props>();
+const props = defineProps<{ id: string }>();
 
-// View state
-const semester = shallowRef<SemesterInterface>();
-const errorMessage = ref<string>('');
-const isLoading = ref<boolean>(true);
+// State
+const loggedUserId = AuthService.getLoggedUser()?.id ?? 0;
 
-const subjectCount = computed<number>((): number => semester.value?.subjects.length ?? 0);
+// Computed
+const semester = computed<SemesterInterface | undefined>((): SemesterInterface | undefined =>
+  SemesterService.getSemestersByUserId(loggedUserId).find(
+    (userSemester: SemesterInterface): boolean => userSemester.id === Number(props.id),
+  ),
+);
 
-// Data loading
-async function loadSemester(semesterId: string): Promise<void> {
-  isLoading.value = true;
-  errorMessage.value = '';
-
-  try {
-    semester.value = await SemesterService.findById(semesterId);
-  } catch (error: unknown) {
-    errorMessage.value =
-      error instanceof Error ? error.message : 'No fue posible cargar el semestre.';
-    semester.value = undefined;
-  } finally {
-    isLoading.value = false;
-  }
-}
-
-watch(
-  (): string => props.id,
-  (semesterId: string): void => {
-    void loadSemester(semesterId);
-  },
-  { immediate: true },
+const subjects = computed<SubjectInterface[]>((): SubjectInterface[] =>
+  semester.value ? SubjectService.getSubjectsBySemesterId(semester.value.id) : [],
 );
 </script>
 
@@ -54,13 +36,7 @@ watch(
       Todos los semestres
     </RouterLink>
 
-    <div v-if="isLoading" class="semester-detail__loading" aria-busy="true">Cargando semestre…</div>
-
-    <p v-else-if="errorMessage" class="status-message status-message--error" role="alert">
-      {{ errorMessage }}
-    </p>
-
-    <div v-else-if="semester">
+    <div v-if="semester">
       <header class="semester-detail__hero">
         <div>
           <p class="eyebrow">Detalle del semestre</p>
@@ -71,8 +47,8 @@ watch(
         </div>
 
         <div class="semester-detail__metric" aria-label="Cantidad de materias">
-          <strong>{{ subjectCount }}</strong>
-          <span>{{ subjectCount === 1 ? 'materia' : 'materias' }}</span>
+          <strong>{{ subjects.length }}</strong>
+          <span>{{ subjects.length === 1 ? 'materia' : 'materias' }}</span>
         </div>
       </header>
 
@@ -87,9 +63,9 @@ watch(
           </RouterLink>
         </div>
 
-        <div v-if="semester.subjects.length" class="semester-detail__subject-list">
+        <div v-if="subjects.length" class="semester-detail__subject-list">
           <SubjectCard
-            v-for="subject in semester.subjects"
+            v-for="subject in subjects"
             :key="subject.id"
             :subject="subject"
             :show-actions="false"
@@ -247,7 +223,6 @@ watch(
   line-height: 1.6;
 }
 
-.semester-detail__loading,
 .semester-detail__not-found {
   padding: 5rem 1.5rem;
   border: 1px solid var(--color-border);

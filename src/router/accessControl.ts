@@ -1,22 +1,21 @@
-import { useAuthStore } from '@/stores/AuthStore.js';
+import { AuthService } from '@/services/AuthService.js';
 import type { NavigationGuardReturn, RouteLocationNormalized, Router } from 'vue-router';
 
 export const configureRouterGuards = (router: Router): void => {
   router.beforeEach((to: RouteLocationNormalized): NavigationGuardReturn => {
-    const authStore = useAuthStore();
+    const loggedUser = AuthService.getLoggedUser();
 
-    if (to.meta.requiresAuth && !authStore.isAuthenticated()) {
+    if (to.meta.requiresAuth && loggedUser === undefined) {
       return { name: 'login', query: { redirect: to.fullPath } };
     }
 
-    if (to.name === 'login' && authStore.isAuthenticated()) {
+    if (to.name === 'login' && loggedUser !== undefined) {
       return { name: 'dashboard' };
     }
 
     const allowedRoles = to.meta.roles;
-    const currentRole = authStore.currentUser?.role;
 
-    if (allowedRoles && (currentRole === undefined || !allowedRoles.includes(currentRole))) {
+    if (allowedRoles && (loggedUser === undefined || !allowedRoles.includes(loggedUser.role))) {
       return { name: 'dashboard' };
     }
 

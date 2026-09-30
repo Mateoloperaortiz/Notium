@@ -9,7 +9,7 @@ export interface PlatformReportFilterDTO {
 export interface UserSummaryDTO {
   averageGrade: number | null;
   email: string;
-  id: string;
+  id: number;
   name: string;
   role: Role;
   semesterCount: number;

@@ -2,8 +2,8 @@ import type { GradeInterface } from '@/interfaces/GradeInterface.js';
 import { defineStore } from 'pinia';
 import { ref, type Ref } from 'vue';
 
-export const useGradeStore = defineStore('grade', (): { grade: Ref<GradeInterface[]> } => {
-  const grade = ref<GradeInterface[]>([]);
+export const useGradeStore = defineStore('grade', (): { grades: Ref<GradeInterface[]> } => {
+  const grades = ref<GradeInterface[]>([]);
 
-  return { grade };
+  return { grades };
 });

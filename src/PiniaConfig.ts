@@ -2,7 +2,6 @@ import { gradeSeeder } from './seeders/gradeseeder.js';
 import { semesterSeeder } from './seeders/semesterseeder.js';
 import { subjectSeeder } from './seeders/subjectseeder.js';
 import { userSeeder } from './seeders/userseeder.js';
-import { parse, stringify } from 'flatted';
 import { createPinia, type Pinia } from 'pinia';
 import { watch } from 'vue';
 
@@ -10,9 +9,9 @@ export default class PiniaConfig {
   public static init(): Pinia {
     const pinia = createPinia();
 
-    const savedState = localStorage.getItem('piniaState');
+    const savedState = localStorage.getItem('piniaStateV2');
     if (savedState) {
-      pinia.state.value = parse(savedState);
+      pinia.state.value = JSON.parse(savedState);
     } else {
       // initialize the state with the seeders
       pinia.state.value = {
@@ -20,25 +19,25 @@ export default class PiniaConfig {
           users: userSeeder,
         },
         semester: {
-          semester: semesterSeeder,
+          semesters: semesterSeeder,
         },
         subject: {
-          subject: subjectSeeder,
+          subjects: subjectSeeder,
         },
         grade: {
-          grade: gradeSeeder,
+          grades: gradeSeeder,
         },
       };
 
       // save the initial state to localStorage
-      localStorage.setItem('piniaState', stringify(pinia.state.value));
+      localStorage.setItem('piniaStateV2', JSON.stringify(pinia.state.value));
     }
 
     // watch for changes and save to localStorage
     watch(
       pinia.state,
       (state: typeof pinia.state.value): void => {
-        localStorage.setItem('piniaState', stringify(state));
+        localStorage.setItem('piniaStateV2', JSON.stringify(state));
       },
       { deep: true },
     );

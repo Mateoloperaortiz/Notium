@@ -4,9 +4,9 @@ import { ref, type Ref } from 'vue';
 
 export const useSemesterStore = defineStore(
   'semester',
-  (): { semester: Ref<SemesterInterface[]> } => {
-    const semester = ref<SemesterInterface[]>([]);
+  (): { semesters: Ref<SemesterInterface[]> } => {
+    const semesters = ref<SemesterInterface[]>([]);
 
-    return { semester };
+    return { semesters };
   },
 );

@@ -1,166 +1,96 @@
 <script setup lang="ts">
-// External imports
+// Internal imports
 import type { CreateSemesterDTO, SemesterValidationErrorsDTO } from '@/dtos/SemesterDTOs.js';
-import { StatusSemester } from '@/interfaces/SemesterInterface.js';
-import type { SemesterInterface } from '@/interfaces/SemesterInterface.js';
+import { type SemesterInterface, StatusSemester } from '@/interfaces/SemesterInterface.js';
 import { SemesterService } from '@/services/SemesterService.js';
-import { computed, reactive, ref, useId, watch } from 'vue';
 
-// Interfaces and types
-interface Props {
-  loading?: boolean;
-  semester?: SemesterInterface;
-}
+// External imports
+import { computed, ref, useId } from 'vue';
 
-interface Emits {
+// Props
+const props = defineProps<{ semester?: SemesterInterface }>();
+
+// Emits
+const emit = defineEmits<{
   cancel: [];
   submit: [semester: CreateSemesterDTO];
-}
+}>();
 
-type FormField = keyof SemesterValidationErrorsDTO;
-
-// Props and emits
-const props = withDefaults(defineProps<Props>(), {
-  loading: false,
-});
-
-const emit = defineEmits<Emits>();
-
-// Form variables
-const fieldOrder: FormField[] = ['name', 'year', 'period', 'status'];
+// State
 const formId = useId();
-const form = reactive<CreateSemesterDTO>({
-  name: '',
-  period: 1,
-  status: StatusSemester.inComing,
-  year: new Date().getFullYear(),
-});
-const nameInput = ref<HTMLInputElement | null>(null);
 const nameInputId = `${formId}-name`;
 const yearInputId = `${formId}-year`;
 const periodInputId = `${formId}-period`;
 const statusInputId = `${formId}-status`;
-
-// Error control variables
-const errors = reactive<SemesterValidationErrorsDTO>({
-  name: '',
-  period: '',
-  status: '',
-  year: '',
+const fieldOrder: (keyof SemesterValidationErrorsDTO)[] = ['name', 'year', 'period', 'status'];
+const nameInput = ref<HTMLInputElement | null>(null);
+const form = ref<CreateSemesterDTO>({
+  name: props.semester?.name ?? '',
+  period: props.semester?.period ?? 1,
+  status: props.semester?.status ?? StatusSemester.inComing,
+  year: props.semester?.year ?? new Date().getFullYear(),
 });
-
-const touched = reactive<Record<FormField, boolean>>({
+const errors = ref<SemesterValidationErrorsDTO>({ name: '', period: '', status: '', year: '' });
+const touched = ref<Record<keyof SemesterValidationErrorsDTO, boolean>>({
   name: false,
   period: false,
   status: false,
   year: false,
 });
-
 const submissionAttempted = ref<boolean>(false);
 
-// Derived form state
-const hasValidationErrors = computed<boolean>((): boolean =>
-  fieldOrder.some((field: FormField): boolean => errors[field] !== ''),
-);
-
+// Computed
 const isEditing = computed<boolean>((): boolean => props.semester !== undefined);
 
-const getSemesterDTO = (): CreateSemesterDTO => ({ ...form });
+const hasValidationErrors = computed<boolean>((): boolean =>
+  fieldOrder.some(
+    (field: keyof SemesterValidationErrorsDTO): boolean => errors.value[field] !== '',
+  ),
+);
 
-// Error control functions
-const validateField = (field: FormField): boolean => {
-  touched[field] = true;
+// Functions
+function validateField(field: keyof SemesterValidationErrorsDTO): boolean {
+  touched.value[field] = true;
+  errors.value[field] = SemesterService.validateFields(form.value)[field];
 
-  const semesterDTO: CreateSemesterDTO = getSemesterDTO();
-  const validationErrors: SemesterValidationErrorsDTO = SemesterService.validateFields(semesterDTO);
-  errors[field] = validationErrors[field];
+  return errors.value[field] === '';
+}
 
-  return errors[field] === '';
-};
-
-const revalidateField = (field: FormField): void => {
-  if (touched[field] || submissionAttempted.value) {
+function revalidateField(field: keyof SemesterValidationErrorsDTO): void {
+  if (touched.value[field] || submissionAttempted.value) {
     validateField(field);
   }
-};
+}
 
-const validateForm = (): boolean => {
+function validateForm(): boolean {
   return fieldOrder
-    .map((field: FormField): boolean => validateField(field))
-    .every((fieldIsValid: boolean): boolean => fieldIsValid);
-};
+    .map((field: keyof SemesterValidationErrorsDTO): boolean => validateField(field))
+    .every(Boolean);
+}
 
-const focusField = (field: FormField): void => {
-  if (field === 'name') {
-    nameInput.value?.focus();
-  }
-};
-
-const resetValidation = (): void => {
-  fieldOrder.forEach((field: FormField): void => {
-    errors[field] = '';
-    touched[field] = false;
-  });
-
-  submissionAttempted.value = false;
-};
-
-// Form handlers
-const handleSubmit = (): void => {
-  if (props.loading) {
-    return;
-  }
-
+function handleSubmit(): void {
   submissionAttempted.value = true;
 
   if (!validateForm()) {
-    const firstInvalidField = fieldOrder.find((field: FormField): boolean => errors[field] !== '');
-
-    if (firstInvalidField !== undefined) {
-      focusField(firstInvalidField);
+    if (errors.value.name !== '') {
+      nameInput.value?.focus();
     }
 
     return;
   }
 
-  const semesterDTO: CreateSemesterDTO = getSemesterDTO();
+  emit('submit', { ...form.value });
+}
 
-  emit('submit', semesterDTO);
-};
-
-const handleCancel = (): void => {
+function handleCancel(): void {
   emit('cancel');
-};
-
-// Synchronize form data with the selected semester
-watch(
-  (): readonly [string, number, number, StatusSemester] => [
-    props.semester?.name ?? '',
-    props.semester?.year ?? new Date().getFullYear(),
-    props.semester?.period ?? 1,
-    props.semester?.status ?? StatusSemester.inComing,
-  ],
-  ([semesterName, semesterYear, semesterPeriod, semesterStatus]: readonly [
-    string,
-    number,
-    number,
-    StatusSemester,
-  ]): void => {
-    form.name = semesterName;
-    form.year = semesterYear;
-    form.period = semesterPeriod;
-    form.status = semesterStatus;
-    resetValidation();
-  },
-  { immediate: true },
-);
+}
 </script>
 
 <template>
   <form
     class="semester-form"
     novalidate
-    :aria-busy="loading"
     :aria-label="isEditing ? 'Editar semestre' : 'Crear semestre'"
     @submit.prevent="handleSubmit"
   >
@@ -198,7 +128,6 @@ watch(
             errors.name ? `${nameInputId}-hint ${nameInputId}-error` : `${nameInputId}-hint`
           "
           :aria-invalid="errors.name !== ''"
-          :disabled="loading"
           @blur="validateField('name')"
           @input="revalidateField('name')"
         />
@@ -224,7 +153,6 @@ watch(
             required
             :aria-describedby="errors.year ? `${yearInputId}-error` : undefined"
             :aria-invalid="errors.year !== ''"
-            :disabled="loading"
             @blur="validateField('year')"
             @input="revalidateField('year')"
           />
@@ -255,7 +183,6 @@ watch(
             required
             :aria-describedby="errors.period ? `${periodInputId}-error` : undefined"
             :aria-invalid="errors.period !== ''"
-            :disabled="loading"
             @blur="validateField('period')"
             @change="revalidateField('period')"
           >
@@ -284,7 +211,6 @@ watch(
           required
           :aria-describedby="errors.status ? `${statusInputId}-error` : undefined"
           :aria-invalid="errors.status !== ''"
-          :disabled="loading"
           @blur="validateField('status')"
           @change="revalidateField('status')"
         >
@@ -315,22 +241,16 @@ watch(
       <button
         class="semester-form__button semester-form__button--secondary"
         type="button"
-        :disabled="loading"
         @click="handleCancel"
       >
         Cancelar
       </button>
 
-      <button
-        class="semester-form__button semester-form__button--primary"
-        type="submit"
-        :disabled="loading"
-      >
-        <span v-if="loading" class="semester-form__spinner" aria-hidden="true"></span>
-        <svg v-else viewBox="0 0 20 20" fill="none" aria-hidden="true">
+      <button class="semester-form__button semester-form__button--primary" type="submit">
+        <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
           <path d="M4 10.5 8 14l8-8" />
         </svg>
-        {{ loading ? 'Guardando…' : isEditing ? 'Guardar cambios' : 'Crear semestre' }}
+        {{ isEditing ? 'Guardar cambios' : 'Crear semestre' }}
       </button>
     </footer>
   </form>
@@ -459,15 +379,6 @@ watch(
   color: #98a2b3;
 }
 
-.semester-form__input-wrap input:disabled {
-  cursor: not-allowed;
-  opacity: 0.62;
-}
-
-.semester-form__input-wrap:has(input:disabled) {
-  background: #f2f4f7;
-}
-
 .semester-form__hint,
 .semester-form__error {
   margin: 0.4rem 0 0;
@@ -559,7 +470,7 @@ watch(
   color: var(--form-text);
 }
 
-.semester-form__button--secondary:hover:not(:disabled) {
+.semester-form__button--secondary:hover {
   background: #f8fafc;
   color: var(--form-text);
 }
@@ -570,7 +481,7 @@ watch(
   color: white;
 }
 
-.semester-form__button--primary:hover:not(:disabled) {
+.semester-form__button--primary:hover {
   background: color-mix(in srgb, var(--form-accent) 88%, black);
   box-shadow: 0 4px 10px color-mix(in srgb, var(--form-accent) 22%, transparent);
   transform: translateY(-1px);
@@ -579,26 +490,6 @@ watch(
 .semester-form__button:focus-visible {
   outline: 3px solid color-mix(in srgb, var(--form-accent) 25%, transparent);
   outline-offset: 2px;
-}
-
-.semester-form__button:disabled {
-  cursor: not-allowed;
-  opacity: 0.58;
-}
-
-.semester-form__spinner {
-  width: 0.9rem;
-  height: 0.9rem;
-  border: 2px solid rgb(255 255 255 / 45%);
-  border-top-color: white;
-  border-radius: 50%;
-  animation: semester-form-spin 700ms linear infinite;
-}
-
-@keyframes semester-form-spin {
-  to {
-    transform: rotate(360deg);
-  }
 }
 
 @media (max-width: 40rem) {
@@ -625,12 +516,8 @@ watch(
     transition: none;
   }
 
-  .semester-form__button--primary:hover:not(:disabled) {
+  .semester-form__button--primary:hover {
     transform: none;
-  }
-
-  .semester-form__spinner {
-    animation-duration: 1.5s;
   }
 }
 </style>

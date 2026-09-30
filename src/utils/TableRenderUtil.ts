@@ -1,18 +1,16 @@
-const HTML_ESCAPES: Record<string, string> = {
-  '&': '&amp;',
-  '"': '&quot;',
-  "'": '&#39;',
-  '<': '&lt;',
-  '>': '&gt;',
-};
-
-export default class TableRenderUtil {
-  private constructor() {}
-
+export class TableRenderUtil {
   public static escapeHtml(value: string): string {
+    const htmlEscapes: Record<string, string> = {
+      '&': '&amp;',
+      '"': '&quot;',
+      "'": '&#39;',
+      '<': '&lt;',
+      '>': '&gt;',
+    };
+
     return value.replace(
       /[&"'<>]/g,
-      (character: string): string => HTML_ESCAPES[character] ?? character,
+      (character: string): string => htmlEscapes[character] ?? character,
     );
   }
 
