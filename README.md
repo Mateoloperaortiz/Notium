@@ -3,32 +3,67 @@
 Aplicación académica para organizar semestres, materias y calificaciones, con autenticación por
 roles, analítica visual y un panel de administración.
 
-Los módulos `Semester`, `Subject` y `Grade` tienen CRUD completo. Los datos se siembran desde
-`src/seeders/` y persisten en el navegador mediante `localStorage`, sin backend.
+El repositorio tiene dos proyectos:
+
+- `frontend/`: SPA en Vue 3, TypeScript y Vite.
+- `backend/`: API REST en Nest.js con TypeORM y SQLite.
+
+El inicio de sesión ya funciona contra la API con JWT. Los CRUD de semestres, materias, notas y
+usuarios pasan a la API en la fase 2 de la Entrega 1 Parte 2 (issues #25 a #28); mientras tanto
+siguen leyendo los datos semilla del navegador. Por eso, hasta el issue #27, los usuarios que se
+crean, editan o eliminan en `/admin/users` no cambian quién puede iniciar sesión: el login solo
+reconoce las cuentas de la API.
 
 ## Requisitos
 
-- Node.js 22.18 o superior (también compatible con Node.js 24.12 o superior).
+- Frontend: Node.js 22.18 o superior, o 24.12 o superior.
+- Backend: Node.js 22.22.3 o superior, o 24.15 o superior (lo exigen Nest CLI y TypeORM).
 - npm 11 o superior.
 
-## Comandos
+## Ejecución local
+
+Backend, en una terminal:
 
 ```bash
+cd backend
+cp .env.example .env
+npm install
+npm run start:dev
+```
+
+Antes de arrancar, escriba en `backend/.env` un `JWT_SECRET` de al menos 32 caracteres; el
+comando para generarlo está en `.env.example`. La API se niega a arrancar sin él.
+
+La API queda en <http://localhost:3000/api>. Al arrancar aplica las migraciones pendientes, así
+que la primera vez crea `database.sqlite` con las tablas y los datos de prueba.
+
+Frontend, en otra terminal:
+
+```bash
+cd frontend
 npm install
 npm run dev
+```
+
+La SPA queda en <http://localhost:5173> y llama a la API indicada en `frontend/.env`
+(`VITE_API_BASE_URL`).
+
+## Verificación
+
+Antes de cada push, dentro de cada proyecto:
+
+```bash
 npm test
 npm run check
 ```
 
-Para comprobar el formato sin modificar archivos:
-
-```bash
-npm run format:check
-```
+En `frontend/`, `npm run check` ejecuta ESLint, Prettier, la verificación de tipos y el build. En
+`backend/`, ejecuta Oxlint, Prettier y el build. El workflow `.github/workflows/cicd.yml` repite
+lo mismo para los dos proyectos en cada push y pull request contra `main`.
 
 ## Usuarios de prueba
 
-Las credenciales viven en `src/seeders/userseeder.ts` y solo sirven para la demostración local.
+Los crea la migración `SeedDemoData` del backend; las contraseñas se guardan con bcrypt.
 
 | Correo              | Contraseña       | Rol     |
 | ------------------- | ---------------- | ------- |
@@ -38,18 +73,8 @@ Las credenciales viven en `src/seeders/userseeder.ts` y solo sirven para la demo
 
 ## Reglas del proyecto
 
-Las reglas de programación están en `AGENTS.md` y se explican en la
-[wiki](https://github.com/Mateoloperaortiz/Notium/wiki). Antes de entregar cambios, ejecutar
-`npm test` y `npm run check`: ESLint sin advertencias, Prettier, verificación de tipos y
-compilación de producción. El workflow `.github/workflows/cicd.yml` ejecuta las pruebas y el mismo
-comando en los pushes y pull requests contra `main`.
-
-ESLint exige tipos explícitos en parámetros, retornos y atributos, evita `any`, usa `interface`
-para objetos, ordena imports por ruta y comprueba convenciones de Vue, Setup Stores y separación
-de la UI respecto a infraestructura. Las variables locales simples pueden mantener inferencia.
-Los miembros de cada import también se ordenan alfabéticamente, sin distinguir mayúsculas.
-
-Los módulos TypeScript locales se importan con la extensión `.js` y los componentes con `.vue`.
+Las reglas de programación de los dos proyectos y el contrato de la API están en `AGENTS.md` y se
+explican en la [wiki](https://github.com/Mateoloperaortiz/Notium/wiki).
 
 ## Arquitectura
 
@@ -57,69 +82,38 @@ Los diagramas de arquitectura (`notium-arquitectura`) y de clases (`notium-clase
 `docs/diagrams/`, cada uno como archivo editable de draw.io y como PNG.
 
 ```text
-src/
-├── assets/                 # Estilos y recursos visuales
+frontend/src/
 ├── components/             # Piezas reutilizables por dominio
-│   ├── admin/              # Formularios del panel de administración
-│   ├── common/             # Envoltorios compartidos, como ChartPanel
-│   ├── grade/              # Tarjeta y formulario de calificaciones
-│   ├── graphs/             # Gráficas de Chart.js por indicador
-│   ├── semester/           # Tarjeta y formulario de semestres
-│   └── subject/            # Tarjeta y formulario de materias
 ├── dtos/                   # Contratos de entrada y salida
 ├── interfaces/             # Entidades del dominio y enumeraciones
-├── router/                 # Rutas de la SPA y control de acceso
-├── seeders/                # Datos semilla planos, uno por entidad
-├── services/               # Lógica de negocio y acceso a datos
+├── router/                 # Rutas de la SPA y guards
+├── services/               # BaseService (axios) y un servicio por entidad
 ├── stores/                 # Estado global en Setup Stores
-├── utils/                  # Utilidades puras: IDs, fechas, errores, tablas, analítica y reportes
+├── utils/                  # Utilidades puras
 └── views/                  # Pantallas asociadas a rutas
+
+backend/src/
+├── auth/                   # Login con JWT, guards y decoradores
+├── database/               # Configuración de TypeORM y migraciones
+├── home/                   # GET /api
+├── users/                  # Entidad y servicio de usuarios
+├── semesters/              # Entidad de semestres (el módulo llega en la fase 2)
+├── subjects/               # Entidad de materias (el módulo llega en la fase 2)
+└── grades/                 # Entidad de notas (el módulo llega en la fase 2)
 ```
 
 El acceso a datos sigue este flujo:
 
 ```text
-View / Component → Service → Store (Pinia) → localStorage
+Vista → Servicio del frontend → API (/api) → Controlador → Servicio de Nest → TypeORM → SQLite
 ```
-
-Las vistas no dependen de la fuente concreta: solo hablan con los servicios. `PiniaConfig` es el
-único punto que conoce el navegador, así que sustituir `localStorage` por una API posterior no
-cambia el contrato que consume la UI.
-
-## Alcance actual
-
-- Entidades `User`, `Semester`, `Subject` y `Grade` como interfaces planas relacionadas solo por
-  ID (`userId`, `semesterId`, `subjectId`), con los enums `Role` y `StatusSemester`.
-- DTOs de creación, actualización, analítica y reportes de plataforma.
-- CRUD completo de semestres, materias y calificaciones, con validación en los servicios.
-- Autenticación con `AuthService` (inicio y cierre de sesión) y guards de router: rutas
-  protegidas y área `/admin` restringida al rol `admin`.
-- `AnalyticsUtil` y cinco gráficas: promedio por semestre y por materia, créditos por
-  semestre, distribución por tipo de calificación y cobertura de evaluación.
-- Panel de administración con gestión de usuarios y reportes de plataforma.
-- Listados con DataTables y stores de Pinia persistidos en `localStorage`.
-- Pruebas unitarias de `SemesterService` con Vitest.
-
-No hay backend ni base de datos: el estado vive en el navegador. Para volver a los datos semilla,
-borra la clave `piniaStateV2` de `localStorage`.
 
 ## Despliegue
 
-El sitio está publicado en <https://mateoloperaortiz.github.io/Notium/>. Cada push a `main`
-ejecuta `.github/workflows/cicd.yml`, que instala dependencias, corre las pruebas y
-`npm run check`, construye el sitio y lo publica en la rama `gh-pages`.
+El despliegue evaluado es una máquina virtual de GCP servida por HTTP. Con el backend, ambos
+proyectos se levantarán con `docker-compose.yml` como en el Tutorial 08 (issue #29). GitHub Pages
+ya no se usa: la página es HTTPS y el navegador bloquea sus llamadas a una API por HTTP.
 
-GitHub Pages sirve el proyecto bajo `/Notium/`, así que el pipeline compila con
-`BASE_PATH=/Notium/`. Sin esa variable la base es la raíz, que es lo que necesita la imagen de
-Docker. El pipeline también copia `index.html` a `404.html` porque Pages no reescribe rutas: sin
-ese archivo, los enlaces directos a rutas del cliente no cargarían la aplicación.
-
-El `Dockerfile` usa una construcción multietapa. La primera etapa parte de `node:24-alpine`,
-instala las dependencias con `npm ci` y compila la SPA; la imagen final solo contiene nginx con
-los archivos estáticos y la configuración de `nginx.conf` para rutas de SPA. La carpeta `dist/`
-no está versionada porque la imagen se compila a partir del código fuente.
-
-```bash
-docker build -t notium .
-docker run --rm -p 8080:80 notium
-```
+La imagen del frontend (`frontend/Dockerfile`) se construye en dos etapas: la primera compila la
+SPA con `node:24-alpine` y la segunda la sirve con nginx y la configuración de `nginx.conf` para
+rutas de SPA.

@@ -26,9 +26,6 @@ coverage
 
 *.tsbuildinfo
 
-# Generador de diagramas (Python)
-__pycache__/
-
 .eslintcache
 
 # Cypress
@@ -40,3 +37,7 @@ __screenshots__/
 
 # Vite
 *.timestamp-*-*.mjs
+
+# Backend: secretos locales y base de datos SQLite
+backend/.env
+*.sqlite
