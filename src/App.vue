@@ -40,7 +40,7 @@ function logout(): void {
     <a class="skip-link" href="#main-content">Saltar al contenido</a>
 
     <header class="app-header">
-      <div class="app-header__content">
+      <div class="app-header__content" :class="{ 'app-header__content--stacked': isAdmin }">
         <RouterLink class="brand" :to="{ name: 'home' }" aria-label="Ir al inicio de Notium">
           <span class="brand__mark" aria-hidden="true">N</span>
           <span class="brand__wordmark">Notium</span>

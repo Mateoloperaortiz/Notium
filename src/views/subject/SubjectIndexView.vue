@@ -7,6 +7,7 @@ import type { SubjectInterface } from '@/interfaces/SubjectInterface.js';
 import { AuthService } from '@/services/AuthService.js';
 import { SemesterService } from '@/services/SemesterService.js';
 import { SubjectService } from '@/services/SubjectService.js';
+import { ErrorUtil } from '@/utils/ErrorUtil.js';
 
 // External imports
 import { computed, ref } from 'vue';
@@ -44,10 +45,6 @@ function loadSubjects(): void {
   subjects.value = SubjectService.getSubjectsBySemesters(semesters);
 }
 
-function getErrorMessage(error: unknown): string {
-  return error instanceof Error ? error.message : 'Ocurrió un error inesperado.';
-}
-
 function openCreateForm(): void {
   if (semesters.length === 0) {
     errorMessage.value = 'Crea un semestre antes de registrar una materia.';
@@ -83,7 +80,7 @@ function saveSubject(dto: CreateSubjectDTO, semesterId: number): void {
     loadSubjects();
     closeForm();
   } catch (error: unknown) {
-    errorMessage.value = getErrorMessage(error);
+    errorMessage.value = ErrorUtil.getErrorMessage(error);
   }
 }
 

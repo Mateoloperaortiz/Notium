@@ -1,3 +1,5 @@
+import { Role } from '@/interfaces/UserInterface.js';
+
 export class TableRenderUtil {
   public static escapeHtml(value: string): string {
     const htmlEscapes: Record<string, string> = {
@@ -16,5 +18,13 @@ export class TableRenderUtil {
 
   public static renderText(value: unknown): string {
     return TableRenderUtil.escapeHtml(String(value ?? ''));
+  }
+
+  public static renderAverage(average: number | null): string {
+    return average === null ? '—' : average.toFixed(2);
+  }
+
+  public static renderRole(role: Role): string {
+    return role === Role.Admin ? 'Administrador' : 'Estudiante';
   }
 }

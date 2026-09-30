@@ -6,6 +6,7 @@ import type { CreateSemesterDTO } from '@/dtos/SemesterDTOs.js';
 import type { SemesterInterface } from '@/interfaces/SemesterInterface.js';
 import { AuthService } from '@/services/AuthService.js';
 import { SemesterService } from '@/services/SemesterService.js';
+import { ErrorUtil } from '@/utils/ErrorUtil.js';
 
 // External imports
 import { computed, ref } from 'vue';
@@ -31,10 +32,6 @@ const formTitle = computed<string>((): string =>
 // Functions
 function loadSemesters(): void {
   semesters.value = SemesterService.getSemestersByUserId(loggedUserId);
-}
-
-function getErrorMessage(error: unknown): string {
-  return error instanceof Error ? error.message : 'Ocurrió un error inesperado.';
 }
 
 function openCreateForm(): void {
@@ -67,7 +64,7 @@ function saveSemester(dto: CreateSemesterDTO): void {
     loadSemesters();
     closeForm();
   } catch (error: unknown) {
-    errorMessage.value = getErrorMessage(error);
+    errorMessage.value = ErrorUtil.getErrorMessage(error);
   }
 }
 

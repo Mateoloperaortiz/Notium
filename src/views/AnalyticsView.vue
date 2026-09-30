@@ -39,8 +39,7 @@ const comparisonColumns = [
   { data: 'gradeCount', title: 'Evaluaciones' },
   {
     data: 'averageGrade',
-    render: (averageGrade: number | null): string =>
-      averageGrade === null ? '—' : averageGrade.toFixed(2),
+    render: (averageGrade: number | null): string => TableRenderUtil.renderAverage(averageGrade),
     title: 'Nota promedio',
   },
 ];

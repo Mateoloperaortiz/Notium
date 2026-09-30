@@ -2,9 +2,10 @@
 // Internal imports
 import UserForm from '@/components/admin/UserForm.vue';
 import type { CreateUserDTO } from '@/dtos/UserDTOs.js';
-import { Role, type UserInterface } from '@/interfaces/UserInterface.js';
+import type { Role, UserInterface } from '@/interfaces/UserInterface.js';
 import { AuthService } from '@/services/AuthService.js';
 import { UserService } from '@/services/UserService.js';
+import { ErrorUtil } from '@/utils/ErrorUtil.js';
 import { TableRenderUtil } from '@/utils/TableRenderUtil.js';
 
 // External imports
@@ -30,7 +31,7 @@ const tableColumns = [
   },
   {
     data: 'role',
-    render: (role: Role): string => (role === Role.Admin ? 'Administrador' : 'Estudiante'),
+    render: (role: Role): string => TableRenderUtil.renderRole(role),
     title: 'Rol',
   },
   {
@@ -61,10 +62,6 @@ const formTitle = computed<string>((): string =>
 // Functions
 function loadUsers(): void {
   users.value = [...UserService.getUsers()];
-}
-
-function getErrorMessage(error: unknown): string {
-  return error instanceof Error ? error.message : 'Ocurrió un error inesperado.';
 }
 
 function openCreateForm(): void {
@@ -119,7 +116,7 @@ function saveUser(dto: CreateUserDTO): void {
     loadUsers();
     closeForm();
   } catch (error: unknown) {
-    errorMessage.value = getErrorMessage(error);
+    errorMessage.value = ErrorUtil.getErrorMessage(error);
   }
 }
 

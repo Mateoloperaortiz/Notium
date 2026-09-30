@@ -40,15 +40,14 @@ const userTableColumns = [
   },
   {
     data: 'role',
-    render: (role: Role): string => (role === Role.Admin ? 'Administrador' : 'Estudiante'),
+    render: (role: Role): string => TableRenderUtil.renderRole(role),
     title: 'Rol',
   },
   { data: 'semesterCount', title: 'Semestres' },
   { data: 'subjectCount', title: 'Materias' },
   {
     data: 'averageGrade',
-    render: (averageGrade: number | null): string =>
-      averageGrade === null ? '—' : averageGrade.toFixed(2),
+    render: (averageGrade: number | null): string => TableRenderUtil.renderAverage(averageGrade),
     title: 'Nota promedio',
   },
 ];

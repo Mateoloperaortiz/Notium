@@ -8,6 +8,7 @@ import { GradeService } from '@/services/GradeService.js';
 import { SemesterService } from '@/services/SemesterService.js';
 import { SubjectService } from '@/services/SubjectService.js';
 import { DateFormatUtil } from '@/utils/DateFormatUtil.js';
+import { ErrorUtil } from '@/utils/ErrorUtil.js';
 import { TableRenderUtil } from '@/utils/TableRenderUtil.js';
 
 // External imports
@@ -90,10 +91,6 @@ function loadGrades(): void {
   grades.value = GradeService.getGradesBySubjects(subjects);
 }
 
-function getErrorMessage(error: unknown): string {
-  return error instanceof Error ? error.message : 'Ocurrió un error inesperado.';
-}
-
 function openCreateForm(): void {
   if (subjects.length === 0) {
     errorMessage.value = 'Crea una materia antes de registrar una nota.';
@@ -151,7 +148,7 @@ function saveGrade(dto: CreateGradeDTO, subjectId: number): void {
     loadGrades();
     closeForm();
   } catch (error: unknown) {
-    errorMessage.value = getErrorMessage(error);
+    errorMessage.value = ErrorUtil.getErrorMessage(error);
   }
 }
 
