@@ -1,521 +1,268 @@
+
 # AGENTS.md
 
-## Propósito
+Reglas para agentes de código (Claude Code, Codex, Cursor u otros) que trabajen en este repositorio. Provienen de las presentaciones y tutoriales del curso **Desarrollo Web (EAFIT, 2026-2, prof. Daniel Correa)**, que define una "dictadura" de estándares: no basta con que el programa funcione, debe estar construido con los patrones acordados en clase. El código generado con IA que no los siga, o que el equipo no pueda explicar, se penaliza.
 
-Este archivo define las reglas de desarrollo que deben seguir los agentes de IA al modificar o generar código para este proyecto.
+**Prioridad ante conflicto:** (1) instrucción explícita del equipo, (2) este archivo, (3) patrones ya presentes en el repositorio, (4) buenas prácticas genéricas. Si un caso no está cubierto, replica el patrón existente más cercano en lugar de inventar uno nuevo.
 
-Estas reglas se derivan de las presentaciones del curso **Ingeniería de Software para Aplicaciones Web (2026)** del profesor Daniel Correa. En este curso no basta con que el código funcione: el código autogenerado debe adaptarse a los patrones, estándares y buenas prácticas definidos en clase.
-
-### Lenguaje normativo
-
-- **MUST / DEBE**: regla explícita del curso o consecuencia directa de una instrucción presentada como obligatoria.
-- **SHOULD / DEBERÍA**: recomendación explícita del profesor, normalmente presentada como mejora, recomendación o criterio de diseño.
-- **MAY / PUEDE**: alternativa permitida por el material.
-
-Cuando una regla específica de una tecnología contradiga una regla general, se debe aplicar la regla más específica.
+**Etiquetas de origen** (para justificar decisiones en la sustentación): `[P01]` Presentación del curso · `[P03]` Intro MPA/SSR · `[P04]` Fundamentos MPA/SSR · `[P05]` Intro SPA/CSR · `[P06]` Fundamentos SPA/CSR · `[P07]` Elementos avanzados SPA/CSR · `[P10]` Intro APIs REST · `[P11]` Intro FullStack · `[T01]`–`[T08]` Tutoriales 01 a 08.
 
 ---
 
-# 1. Reglas generales del curso
+## 1. Contexto del proyecto
 
-## 1.1. El código debe ajustarse a los estándares del curso
+- Proyecto semestral en equipo tipo "Dashboard": aplicación de seguimiento de notas académicas. Actores: **Estudiante** y **Administrador**. Modelos de dominio: `User`, `Semester`, `Subject`, `Grade`.
+- Estructura del repositorio:
 
-- El agente **DEBE** priorizar los patrones y convenciones definidos en estas reglas por encima de preferencias personales o estilos alternativos.
-- El agente **DEBE** producir código mantenible, escalable y fácil de leer.
-- El agente **DEBE** buscar consistencia en todo el proyecto: nombres, formato, estructura, responsabilidades y estilo.
-- El agente **NO DEBE** considerar que una solución es correcta únicamente porque funciona.
-- El código generado con IA **DEBE** quedar comprensible para los integrantes del proyecto y adaptado a las convenciones del curso.
-
-## 1.2. Consistencia
-
-El profesor enfatiza que el proyecto debe permitir que todos “hablemos un mismo idioma”. Por tanto:
-
-- El agente **DEBE** mantener consistencia en nombres de clases, métodos, funciones, variables y archivos.
-- El agente **DEBE** mantener consistencia en la ubicación de llaves.
-- El agente **DEBE** mantener consistencia en indentación y espaciado.
-- El agente **DEBE** mantener consistencia en el uso de punto y coma.
-- El agente **DEBE** mantener consistencia en la forma de exportar/importar módulos.
-- El agente **DEBE** mantener consistencia en el uso de `default export`; no mezclar exports por defecto y nombrados de forma arbitraria.
-- El agente **DEBE** mantener consistencia en el uso explícito de modificadores como `public`; no declararlo en unas clases/métodos y omitirlo en otros sin una convención clara.
-- El agente **DEBE** mantener consistencia en la forma en que se pasan datos entre capas y hacia las vistas.
-- El agente **DEBE** evitar que una misma responsabilidad se resuelva con múltiples estrategias diferentes sin una razón clara.
-
-## 1.3. Código limpio y legibilidad
-
-- El código **DEBE** tener suficiente espacio visual para “respirar”.
-- El agente **DEBE** corregir indentación inconsistente.
-- Los nombres **DEBEN** expresar claramente la responsabilidad del elemento.
-- El agente **DEBE** evitar nombres ambiguos o inconsistentes.
-- Cuando una clase o archivo acumule responsabilidades distintas, el agente **DEBERÍA** separar esas responsabilidades.
-
----
-
-# 2. TypeScript
-
-## 2.1. Tipado obligatorio
-
-El tipado es especialmente importante en código que define contratos o comportamiento reutilizable.
-
-El agente **DEBE** tipar explícitamente:
-
-- modelos;
-- entidades;
-- DTOs;
-- contratos de API;
-- parámetros de funciones y métodos;
-- retornos de funciones y métodos;
-- servicios;
-- helpers;
-- librerías internas.
-
-## 2.2. Evitar `any`
-
-- El agente **DEBE** evitar `any`.
-- Si existe información suficiente para representar un dato mediante un tipo concreto, interface, type, DTO u otro tipo de TypeScript, se **DEBE** utilizar ese tipo.
-
-## 2.3. Inferencia de tipos
-
-No todo requiere anotaciones explícitas.
-
-El agente **PUEDE** dejar que TypeScript infiera el tipo cuando:
-
-- se trata de una variable local;
-- el tipo es obvio por el valor asignado;
-- agregar el tipo no aporta claridad adicional.
-
-El agente **NO DEBE** eliminar tipado explícito de contratos, dominio, funciones, métodos o APIs únicamente porque TypeScript pueda inferirlo internamente.
-
-## 2.4. `interface` vs `type`
-
-- Usar **`interface`** para describir objetos y contratos.
-- Usar **`type`** cuando se necesiten tipos más flexibles o compuestos, por ejemplo uniones, literales u otras composiciones de tipos.
-
-## 2.5. Importaciones
-
-- Las importaciones **DEBEN** mantenerse en orden alfabético.
-- El agente **DEBE** respetar el sistema de módulos configurado en el proyecto.
-
-### Proyectos Node con ESM
-
-Cuando `package.json` utilice:
-
-```json
-{
-  "type": "module"
-}
+```
+/
+├── frontend/            Vue 3 + TypeScript + Vite + Vue Router + Pinia + Tailwind
+├── backend/             Nest.js (ESM) + TypeORM + SQLite
+└── docker-compose.yml
 ```
 
-entonces:
+- Requisitos de la Entrega 1 que el proyecto debe seguir cumpliendo (no eliminar la funcionalidad que los cubre):
+  - Entre 7 y 14 páginas (Home, Login y mínimo 5 del sistema); mínimo 2 páginas solo para administradores.
+  - Mínimo 2 páginas con selectores de filtrado + tabla + gráfica.
+  - Mínimo 2 componentes reutilizables y mínimo 2 CRUDs.
+  - Todas las clases del diagrama de clases implementadas.
+  - Chart.js (obligatoria) y DataTables.
+  - Datos ficticios sembrados en la primera carga.
+  - `README.md` en la raíz y página de wiki con pantallazos enlazada desde la principal.
+  - Principios DRY y ETC (*The Pragmatic Programmer*).
+
+## 2. Comandos
+
+| Proyecto      | Acción                                                  | Comando                  |
+| ------------- | -------------------------------------------------------- | ------------------------ |
+| `frontend/` | Servidor de desarrollo (`http://localhost:5173`)       | `npm run dev`          |
+| `frontend/` | Build de producción (incluye chequeo de tipos)          | `npm run build`        |
+| `frontend/` | Formatear                                                | `npm run format`       |
+| `frontend/` | Linter                                                   | `npm run lint`         |
+| `backend/`  | Servidor en modo escucha (`http://localhost:3000/api`) | `npm run start:dev`    |
+| `backend/`  | Build                                                    | `npm run build`        |
+| `backend/`  | Formatear                                                | `npm run format`       |
+| `backend/`  | Linter (oxlint)                                          | `npm run lint`         |
+| raíz         | Levantar todo con Docker                                 | `docker compose up -d` |
 
-- las importaciones **DEBEN** usar sintaxis ESM (`import` / `export`);
-- las rutas de archivos locales en imports **DEBEN** incluir la extensión `.js`, incluso cuando el archivo fuente sea TypeScript.
+Una tarea no está terminada hasta que `format`, `lint` y `build` pasan sin errores en cada proyecto modificado. [P06][T03][T06]
 
----
+## 3. Reglas generales (todo el código TypeScript)
 
-# 3. Arquitectura y responsabilidades
+### 3.1 Consistencia
 
-## 3.1. SRP — Single Responsibility Principle
+- Un mismo problema se resuelve siempre de la misma forma en todo el repositorio: nombres, exports, modificadores de acceso, paso de datos y generación de IDs. Usar `default` o `public` "algunas veces sí y otras no", o tener dos mecanismos distintos para calcular `nextId`, cuenta como error. [P04][P07]
+- Identificadores en inglés, como en todo el material del curso. camelCase para variables, funciones, métodos y propiedades (`category`, nunca `Category`); PascalCase para clases, interfaces, tipos y componentes. Prohibido `Main_Point`, snake_case o mezclas. [P04]
+- Nombres que describan el dominio. Prohibidos los contenedores genéricos (`OtherService`, `Helpers`, `Misc`): cada función va en el servicio o util de su entidad o tema. [P07]
+- Exports: servicios, utils, DTOs y controladores con export nombrado (`export class BookService`). `export default` solo donde el framework lo espera (router, SFC, clases de configuración como `PiniaConfig`). [P07][T04]
+- Modificadores de acceso explícitos en todos los miembros de clase (`public static`, `private static readonly`, `private readonly`). [P07][T07]
 
-- Cada módulo, clase, componente, controlador, servicio o utilidad **DEBE** tener una responsabilidad clara.
-- El agente **DEBE** evitar mezclar responsabilidades de diferentes capas.
-- Si una pieza de código empieza a encargarse de tareas no relacionadas con su responsabilidad principal, el agente **DEBERÍA** moverlas a la capa o clase correspondiente.
+### 3.2 Formato
 
-## 3.2. Evitar acoplamiento con infraestructura
+- Prettier es la autoridad: `semi: true`, `singleQuote: true`, `printWidth: 100` en `.prettierrc.json`. [T03]
+- Llaves de apertura en la misma línea, indentación uniforme, espacio entre palabra de control y paréntesis (`if (cond) {`). [P04]
+- "Espacio para respirar": una línea en blanco entre bloques lógicos, entre métodos y después de los imports. [P04][P07]
+- Imports ordenados alfabéticamente, `import type` para lo que solo se usa como tipo y extensión explícita (`.js` para módulos TypeScript en ESM, `.vue` para SFC). [P04][P10][P11]
+- Las secciones de un archivo se separan con comentarios cortos en inglés (`// functions`, `// watchers`). No se escriben comentarios que narren lo que el código ya dice. [T05][P11]
 
-- La UI **NO DEBE** depender directamente de la fuente de datos.
-- Los componentes **NO DEBEN** importar directamente una base de datos, almacenamiento o infraestructura cuando esa responsabilidad corresponda a un servicio.
-- El agente **DEBE** favorecer diseños donde la fuente de datos pueda cambiar sin modificar múltiples componentes.
+### 3.3 Tipado [P04][P06]
 
-## 3.3. Testing y mocking
+- Siempre tipar el dominio: interfaces, modelos, entidades, DTOs y contratos de API.
+- Siempre tipar parámetros y retornos de funciones y métodos (servicios, utils, controladores, stores). Los asíncronos retornan `Promise<T>`.
+- No tipar lo que TypeScript infiere en variables locales obvias.
+- Prohibido `any` (incluidos `req: any`, `res: any`, `viewData: any`). Si el tipo es desconocido, `unknown` y estrechamiento.
+- `interface` para describir objetos y contratos (`BookInterface`). `type` para tipos flexibles o compuestos: uniones, literales, `Omit`, `Pick` (`CreateBookDTO`). [P06]
 
-- El diseño **DEBERÍA** permitir reemplazar dependencias por mocks durante testing.
-- El agente **DEBERÍA** evitar dependencias rígidas que hagan difícil mockear servicios o infraestructura.
-- Cuando el proyecto utilice instancias para facilitar testing, el agente **DEBE** preservar ese patrón.
+### 3.4 Clases de dominio [P04]
 
----
+- Si se implementan clases del diagrama de clases: atributos privados, acceso mediante getters y setters, propiedades en camelCase.
+- Las búsquedas (`findById`, filtros) no viven en el modelo: van al servicio o repositorio correspondiente.
 
-# 4. Express / MPA / SSR
+### 3.5 Principios
 
-Estas reglas aplican cuando se trabaje en la parte Express/MPA/SSR del proyecto.
+- SRP, DRY, bajo acoplamiento y ETC. Si una lógica aparece en dos lugares, se mueve a un servicio o a un util. [P06][P07]
 
-## 4.1. Rutas
+## 4. Frontend (Vue 3)
 
-Los archivos de rutas **DEBEN** concentrarse en routing y delegación.
+### 4.1 Arquitectura modular por capas (MVVM) [P07]
 
-- Una ruta **DEBE** delegar el trabajo a métodos de controladores.
-- Los archivos de rutas **NO DEBEN** acumular lógica de negocio.
-- Las rutas y métodos **DEBEN** tener nombres claros y consistentes.
-- Si un conjunto de rutas pertenece a otra responsabilidad, **DEBERÍA** moverse a otro controlador.
-- Si el número de rutas crece demasiado, **DEBERÍAN** separarse en múltiples archivos de rutas.
-- Las funciones relacionadas con rutas **DEBEN** tener sus tipos de retorno correctamente definidos.
+| Carpeta         | Contenido                                                                                 | Regla                                                                                              |
+| --------------- | ----------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| `views/`      | Una vista por ruta:`BooksIndexView.vue`, `BooksShowView.vue`, `BooksCreateView.vue` | Pantalla completa, no reutilizable, cargada por el router. Orquesta componentes y llama servicios. |
+| `components/` | Componentes hijos reutilizables                                                           | Reciben datos por`props` y notifican al padre con `emit`.                                      |
+| `services/`   | `BookService.ts`                                                                        | Única capa que conoce la fuente de datos (store/localStorage o API).                              |
+| `interfaces/` | `BookInterface.ts`                                                                      | Contratos de las entidades.                                                                        |
+| `dtos/`       | `CreateBookDTO.ts`                                                                      | Datos que viajan entre capas o hacia el backend.                                                   |
+| `stores/`     | `bookstore.ts`, `bookseeder.ts`                                                       | Estado global con Pinia.                                                                           |
+| `utils/`      | p. ej.`PriceFormatUtil.ts`                                                              | Funciones puras reutilizables agrupadas en clases.                                                 |
+| `router/`     | `index.ts`                                                                              | Definición de rutas.                                                                              |
 
-## 4.2. Controladores
+Flujo obligatorio: **View / Component → Service → (Store | API)**. Una vista o componente nunca importa `stores`, `data`, `axios` ni `localStorage` para datos de dominio; si cambia la fuente de datos, ningún componente debe modificarse. [P06][P11]
 
-- Los parámetros y retornos de los métodos del controlador **DEBEN** estar tipados.
-- El agente **DEBE** evitar `any`.
-- Los métodos **DEBEN** seguir una convención de nombres consistente.
-- La forma de enviar datos hacia las vistas **DEBE** ser consistente.
-- Un controlador **NO DEBE** acumular acciones que correspondan claramente a otra responsabilidad.
+Si las vistas crecen, se agrupan en subcarpetas por recurso (`views/books/`). [P04]
 
-## 4.3. Modelos
+### 4.2 Single-File Components [P05][T03]
+
+- Composition API con `<script setup lang="ts">`. Options API prohibida.
+- Orden de bloques: `<script setup>` y luego `<template>`. Estilos con clases utilitarias de Tailwind; sin CSS propio salvo necesidad real. [P03]
+- Orden dentro del script: imports → `// props` (y emits) → `// state` → `// computed` → `// functions` → `// watchers` → `// lifecycle`.
+- `defineProps<{ ... }>()` y `defineEmits<{ ... }>()` siempre tipados. Padre → hijo por props; hijo → padre por emit. [P07]
+- Navegación interna con `<RouterLink>`; nunca `<a href>` para rutas internas porque recarga la página. [P05]
+- `v-for` siempre con `:key`; inputs numéricos con `v-model.number`. [T04][T05]
+- El formateo de datos (precios, fechas) se hace con utils, no con funciones repetidas en cada vista. [P07][T05]
 
-- Los atributos de los modelos **DEBEN** ser privados.
-- El acceso a atributos privados **DEBE** realizarse mediante getters y setters cuando corresponda.
-- Las propiedades **DEBEN** utilizar nombres consistentes con las convenciones del proyecto.
-- Los atributos/propiedades de instancia **NO DEBEN** comenzar en mayúscula; por ejemplo, preferir `category` sobre `Category`.
-- Si un modelo crece demasiado o empieza a contener lógica de acceso a datos que excede su responsabilidad, esa lógica **DEBERÍA** moverse a otra clase, por ejemplo un repositorio.
+### 4.3 Reactividad [P07]
 
-## 4.4. Vistas EJS
+- `const` normal: valores que no cambian o que no afectan la vista.
+- `ref`: estado que afecta la interfaz (acceso con `.value` en el script).
+- `computed`: solo valores derivados de variables reactivas (p. ej. lista filtrada por un selector). Nunca para llamar APIs, escribir en localStorage ni modificar otras variables.
+- `watch`: efectos secundarios cuando algo cambia (llamadas a API, persistencia, validaciones, redirecciones).
 
-- Las vistas **DEBEN** acceder a los datos del modelo mediante sus getters cuando el modelo exponga ese mecanismo.
-- Las vistas **DEBEN** mantener indentación y espaciado consistentes.
-- Cuando existan múltiples vistas de un mismo dominio, **DEBERÍAN** agruparse en un subdirectorio correspondiente al dominio.
-- Si la aplicación evoluciona a múltiples idiomas, **DEBERÍA** configurarse correctamente el atributo `lang`.
-- EJS **PUEDE** utilizarse para reutilizar vistas parciales como headers y footers.
+### 4.4 Carga de datos y asincronía [P11][T07]
 
-## 4.5. MPA/SSR
+- Los datos se obtienen invocando el servicio dentro de `onMounted(async () => { ... })` y se guardan en un `ref` tipado (`ref<BookInterface | null>(null)`, `ref<BookInterface[]>([])`).
+- Prohibido `await` en el nivel superior de `<script setup>`: bloquea la inicialización del componente.
+- Toda llamada `await` a un servicio va dentro de `try/catch` en la vista o componente.
 
-- En una MPA, la navegación normal implica una nueva petición y una recarga completa de la página.
-- En SSR, el servidor genera el HTML completo utilizando lógica, datos y plantillas.
-- El agente **NO DEBE** convertir accidentalmente una solución MPA/SSR en una SPA si el ejercicio exige MPA/SSR.
+### 4.5 Router [P04][P05][T03][T04]
 
----
+- `src/router/index.ts` con `createWebHistory(import.meta.env.BASE_URL)`.
+- Cada ruta declara `path`, `name`, `component` y `meta: { title }`.
+- Paths por recurso en plural (`/books`, `/books/create`, `/books/:id`); rutas estáticas antes que las dinámicas.
+- Nombres de ruta con un único patrón `recurso.accion` (p. ej. `books.create`); no mezclar estilos.
+- Las páginas de administrador se protegen con route guards basados en `meta`.
+- Si el archivo crece demasiado, las rutas se separan por módulo.
 
-# 5. Vue / SPA / CSR
+### 4.6 Pinia [P06][T04][T07]
 
-Estas reglas aplican cuando se trabaje en la parte Vue/SPA/CSR del proyecto.
+- Solo Setup Stores; los `ref` definidos en el store son su state:
 
-## 5.1. Arquitectura del frontend
+```ts
+export const useBookStore = defineStore('book', () => {
+  const books = ref<BookInterface[]>([]);
 
-El frontend del curso utiliza una arquitectura modular por capas/módulos.
-
-El agente **DEBE** respetar la separación entre carpetas/responsabilidades como:
-
-- `views/`;
-- `components/`;
-- `services/`;
-- `dtos/`;
-- `stores/`;
-- utilidades.
-
-El agente **NO DEBE** colocar lógica arbitrariamente en componentes si existe una capa específica para esa responsabilidad.
-
-## 5.2. Single File Components
-
-Los componentes Vue se organizan como SFC (`.vue`) con:
-
-- `<script>` para lógica;
-- `<template>` para la vista;
-- `<style>` para estilos cuando sean necesarios.
-
-Para los ejercicios del curso, el agente **DEBE** seguir el enfoque de **Composition API** utilizado en las presentaciones.
-
-## 5.3. Vue Router
-
-Para navegación interna de una SPA que utiliza Vue Router:
-
-- El agente **DEBE** usar `RouterLink` para enlaces internos.
-- El agente **NO DEBE** usar `<a href="...">` para navegación interna controlada por Vue Router, ya que provocaría una recarga completa de la página.
-- Las rutas **DEBEN** mantener claramente diferenciados `path`, `name`, `component` y, cuando se utilice, `meta`.
-
-## 5.4. SPA/CSR
-
-- En una SPA, la navegación interna **NO DEBE** provocar recargas completas de la página.
-- El servidor normalmente entrega datos a la SPA y el navegador actualiza dinámicamente el DOM.
-- El agente **NO DEBE** introducir comportamientos que rompan accidentalmente el enfoque SPA/CSR exigido por el ejercicio.
-
----
-
-# 6. Capa de servicios
-
-La capa de servicios es una regla arquitectónica central del curso.
-
-## 6.1. Responsabilidad
-
-Los servicios **DEBEN** separar la lógica de negocio y acceso a datos de la UI.
-
-Los componentes/vistas **NO DEBEN** conocer directamente:
-
-- la base de datos;
-- `localStorage` como fuente de dominio;
-- mocks de infraestructura;
-- detalles concretos de APIs;
-- otra fuente de datos que pueda ser encapsulada por un servicio.
-
-## 6.2. Qué debe ir en servicios
-
-Cuando corresponda, los servicios **DEBEN** centralizar:
-
-- acceso a datos;
-- reglas de negocio relacionadas con la operación;
-- validaciones relacionadas con la operación;
-- transformaciones;
-- logging relacionado con la operación;
-- integración con infraestructura.
-
-Esto debe permitir:
-
-- reducir acoplamiento;
-- reutilizar lógica;
-- facilitar testing y mocking;
-- cambiar la fuente de datos sin modificar componentes;
-- escalar la aplicación de manera ordenada.
-
----
-
-# 7. DTOs
-
-## 7.1. Uso de DTOs
-
-Un DTO tiene como única responsabilidad transportar datos entre capas o sistemas.
-
-El agente **DEBE** utilizar DTOs cuando los datos crucen límites entre capas y el curso/proyecto haya definido ese contrato mediante DTOs.
-
-Los DTOs **DEBEN** ayudar a:
-
-- separar el modelo interno del modelo expuesto;
-- controlar qué campos se envían;
-- evitar exponer datos sensibles;
-- validar la estructura de entrada;
-- estandarizar respuestas;
-- realizar mapping o transformaciones entre representaciones.
-
-## 7.2. No sustituir DTOs por modelos arbitrariamente
-
-- El agente **NO DEBE** reutilizar automáticamente una interface de modelo como DTO solo porque tenga campos parecidos.
-- Cuando el flujo espere un DTO, el agente **DEBE** enviar una variable tipada con el DTO correspondiente.
-
----
-
-# 8. Pinia y estado compartido
-
-## 8.1. Store
-
-- El estado verdaderamente global o compartido **DEBE** centralizarse en un store cuando corresponda.
-- La lógica relacionada con ese estado global **DEBE** mantenerse organizada dentro del store o las capas correspondientes.
-
-## 8.2. Estilo de store
-
-En este curso:
-
-- Los stores de Pinia **DEBEN** definirse con `defineStore`.
-- El store **DEBE** tener un `id` identificador.
-- Se **DEBE** utilizar el estilo **Setup Store** en lugar de Option Store.
-- Las variables declaradas con `ref` dentro del store representan el `state`.
-
-## 8.3. Persistencia del store
-
-Cuando el ejercicio requiera persistencia en el navegador:
-
-1. crear la instancia global del store;
-2. buscar estado previamente guardado;
-3. hidratar el store si existe información persistida;
-4. usar una estructura inicial si no existe;
-5. observar cambios del store;
-6. persistir los cambios en el navegador.
-
-El agente **NO DEBE** asumir persistencia si el ejercicio no la requiere.
-
----
-
-# 9. Capa Util
-
-## 9.1. Qué es una utilidad
-
-Una utilidad **DEBE** encapsular lógica técnica o repetitiva que no pertenece directamente a:
-
-- una vista;
-- un componente;
-- un store;
-- un servicio de dominio.
-
-Las funciones utilitarias **DEBEN** ser:
-
-- independientes;
-- reutilizables;
-- sin estado propio;
-- sin dependencia directa de Vue.
-
-## 9.2. Organización
-
-- Aunque una utilidad podría implementarse como función suelta, el curso **RECOMIENDA** agrupar funciones relacionadas en clases para hacer explícito qué utilidades pertenecen juntas.
-- Si una transformación o formateo se repite o ensucia un componente, **DEBERÍA** moverse a una utilidad cuando esa responsabilidad no pertenezca a un servicio.
-
----
-
-# 10. Reactividad en Vue
-
-## 10.1. Variables no reactivas
-
-Usar una variable normal de JavaScript cuando:
-
-- Vue no necesita observarla;
-- sus cambios no deben actualizar la UI;
-- se utiliza para lógica interna que no afecta la vista.
-
-Una variable que no cambia **NO NECESITA** convertirse en `ref`.
-
-## 10.2. Variables reactivas
-
-Usar `ref` cuando:
-
-- el valor cambia;
-- el cambio afecta la interfaz;
-- Vue debe observar el valor y actualizar el DOM.
-
-En código JavaScript/TypeScript del `<script>`, los valores creados con `ref` **DEBEN** manipularse mediante `.value`.
-
-## 10.3. `computed`
-
-Usar `computed` únicamente para valores derivados de estado reactivo.
-
-Un `computed`:
-
-- **DEBE** calcular y retornar un valor;
-- **DEBE** depender de variables reactivas;
-- **NO DEBE** utilizarse para efectos secundarios.
-
-Un `computed` **NO DEBE**:
-
-- llamar una API;
-- guardar datos en `localStorage`;
-- modificar otra variable como efecto secundario;
-- utilizarse cuando el valor ni siquiera depende de estado reactivo.
-
-## 10.4. `watch`
-
-Usar `watch` cuando se necesite ejecutar una acción como consecuencia de un cambio.
-
-Los watchers son apropiados para:
-
-- llamadas a API;
-- persistencia en `localStorage`;
-- validaciones;
-- redirecciones;
-- otros efectos secundarios disparados por cambios reactivos.
-
-Regla práctica del curso:
-
-> Si necesitamos **hacer algo** cuando algo cambie, probablemente corresponde usar `watch`.
-
----
-
-# 11. Componentes y vistas en Vue
-
-## 11.1. Componentes
-
-Un componente **DEBE** tener una responsabilidad específica.
-
-Un componente puede:
-
-- ser reutilizable;
-- recibir propiedades;
-- emitir eventos;
-- contener componentes hijos.
-
-## 11.2. Views
-
-Una View representa normalmente:
-
-- una pantalla completa;
-- una ruta del sistema de navegación.
-
-Por tanto:
-
-- las Views **DEBEN** vivir en `views/`;
-- normalmente **NO SON** componentes reutilizables;
-- normalmente son cargadas desde el router.
-
-## 11.3. Componentes hijos
-
-Los componentes hijos reutilizables **DEBEN** vivir en `components/`.
-
-La comunicación típica **DEBE** seguir:
-
-- **Parent → Child:** `props`;
-- **Child → Parent:** `emit`.
-
-El padre pasa datos al hijo mediante props y el hijo comunica eventos al padre mediante emits.
-
----
-
-# 12. Prettier y ESLint
-
-## 12.1. Prettier
-
-- El proyecto **DEBE** mantener formato consistente.
-- Cuando Prettier esté configurado, el agente **DEBE** respetar su resultado en lugar de imponer formato manual incompatible.
-- Prettier se utiliza para formato; el agente **NO DEBE** tratarlo como una herramienta que corrige errores lógicos.
-
-## 12.2. ESLint
-
-- Cuando ESLint esté configurado, el agente **DEBE** respetar sus reglas.
-- El agente **DEBE** corregir errores y malas prácticas detectadas por ESLint que sean consecuencia de sus cambios.
-- La configuración de reglas del proyecto se encuentra en `eslint.config.ts` cuando esa estructura sea la utilizada.
-
----
-
-# 13. Tailwind CSS
-
-Cuando el proyecto utilice Tailwind:
-
-- El agente **DEBERÍA** preferir utilidades de Tailwind para estilos que pueden expresarse directamente mediante sus clases.
-- El agente **DEBERÍA** evitar crear CSS personalizado innecesario si la combinación de utilidades de Tailwind resuelve el caso de forma clara.
-- Las clases deben combinarse para construir el diseño, manteniendo el enfoque `utility-first`.
-
----
-
-# 14. Checklist obligatorio antes de terminar una tarea
-
-Antes de dar una tarea por terminada, el agente debe verificar:
-
-- [ ] ¿El código sigue las convenciones ya presentes en el proyecto?
-- [ ] ¿Los imports están ordenados alfabéticamente?
-- [ ] ¿Los parámetros y retornos importantes están tipados?
-- [ ] ¿Se evitó `any`?
-- [ ] ¿Los modelos, entidades, DTOs y contratos están tipados?
-- [ ] ¿Cada archivo/clase/componente mantiene una responsabilidad clara?
-- [ ] ¿La UI está desacoplada de la fuente concreta de datos?
-- [ ] ¿La lógica reutilizable está en servicios o utilidades según corresponda?
-- [ ] ¿Los datos entre capas utilizan los DTOs definidos cuando corresponde?
-- [ ] ¿Se evitó duplicar lógica?
-- [ ] ¿La solución es fácil de mockear y testear?
-- [ ] ¿Los componentes Vue usan correctamente `ref`, `computed` y `watch`?
-- [ ] ¿Los componentes hijos reciben datos por `props` y notifican por `emit`?
-- [ ] ¿Las Views están en `views/` y los componentes reutilizables en `components/`?
-- [ ] ¿La navegación interna Vue usa `RouterLink`?
-- [ ] ¿Los stores Pinia siguen Setup Store?
-- [ ] ¿El formato, llaves, indentación, espaciado y punto y coma son consistentes?
-- [ ] ¿El código respeta Prettier y ESLint si están configurados?
-- [ ] ¿El agente entiende y puede explicar el código que generó?
-- [ ] ¿La solución respeta el enfoque solicitado (MPA/SSR o SPA/CSR) sin mezclar arquitecturas accidentalmente?
-
----
-
-# 15. Criterio de decisión ante dudas
-
-Si una regla no está completamente especificada:
-
-1. preservar la consistencia con el código cercano que ya siga las convenciones del curso;
-2. preferir SRP y bajo acoplamiento;
-3. mantener tipado explícito en contratos y límites entre capas;
-4. ubicar la lógica en la capa que tenga esa responsabilidad;
-5. evitar introducir una estrategia diferente para resolver un problema que el proyecto ya resuelve de manera consistente.
-
-No utilizar una preferencia personal del agente para reemplazar una convención establecida por el curso o por el proyecto.
-
-
----
-
-# 16. Trazabilidad con las presentaciones del curso
-
-Estas reglas fueron consolidadas únicamente a partir de las presentaciones disponibles en el material fuente:
-
-- **Presentación 01 — Presentación del Curso**: objetivos de mantenibilidad/usabilidad/portabilidad; metodología de la “dictadura”; consistencia de patrones; uso responsable de IA y obligación de adaptar código autogenerado a los estándares de clase (diapositivas 5, 6, 14 y 15).
-- **Presentación 03 — Introducción a Aplicaciones MPA/SSR**: MPA/SSR, ESM mediante `type: module`, uso de `import`, Express/EJS y enfoque utility-first de Tailwind (diapositivas 8-10, 19, 24, 28 y 37-38).
-- **Presentación 04 — Fundamentos de Aplicaciones MPA/SSR**: TypeScript; SRP en rutas; imports alfabéticos; tipado de parámetros/retornos; evitar `any`; consistencia de nombres/formato; atributos privados; getters/setters; posible repositorio; organización y limpieza de vistas (diapositivas 3, 6-7, 11, 13, 17 y 19-20).
-- **Presentación 05 — Introducción a Aplicaciones SPA/CSR**: SPA/CSR, Vue, Composition API, Vue Router, `RouterLink`, SFC y uso de valores reactivos mediante `ref` (diapositivas 8-10, 15-17, 21, 23-30).
-- **Presentación 06 — Fundamentos de Aplicaciones SPA/CSR**: Prettier, ESLint, recomendaciones de tipado, `interface` vs `type`, capa de servicios, SRP, desacoplamiento, testing/mocking, DTOs, Pinia y Setup Stores (diapositivas 4-9, 11-18, 20-25 y 27-31).
-- **Presentación 07 — Elementos Avanzados de Aplicaciones SPA/CSR**: arquitectura modular por capas, capa Util, variables no reactivas/reactivas/computadas, watchers, componentes, views, props/emits y observaciones de consistencia en servicios/DTOs (diapositivas 6-12, 14-18 y 20-32).
-
-No se añadieron como obligaciones aquellas ideas que en las diapositivas aparecen únicamente como descripción conceptual de una tecnología. Cuando el profesor presentó algo como “quizás”, “recomendamos” o posible mejora, este archivo lo conserva como **DEBERÍA** en vez de convertirlo arbitrariamente en **DEBE**.
+  return { books };
+});
+```
+
+- Modo local (sin backend): seeders en `stores/<entidad>seeder.ts`; `PiniaConfig.init()` hidrata el estado desde `localStorage` (clave `piniaState`), siembra en la primera carga y persiste los cambios con `watch(pinia.state, ..., { deep: true })`.
+- Modo FullStack: los datos de dominio viven en la API y se consultan por servicios. Los stores quedan para estado global compartido (p. ej. usuario autenticado) y no duplican lo que sirve el backend.
+
+### 4.7 Servicios, interfaces y DTOs [P06][P07][P11][T04][T07][T08]
+
+- Un servicio por entidad, con métodos `public static` tipados y nombrados de forma uniforme: `getBooks()`, `getBookById(id)`, `createBook(dto)`, `updateBook(id, dto)`, `deleteBook(id)`.
+- Los métodos de escritura reciben DTOs con nombre; nunca `Omit<...>` en línea ni objetos anónimos en la firma.
+- Interfaces: `export interface BookInterface { ... }` en `interfaces/BookInterface.ts`.
+- DTOs: `export type CreateBookDTO = Omit<BookInterface, 'id'>;` en `dtos/CreateBookDTO.ts`.
+- Modo FullStack: los servicios usan `axios`, retornan `Promise<T>` y toman la URL base de `import.meta.env.VITE_API_BASE_URL`. Nunca `http://localhost:3000` escrito en el código.
+- La configuración común (URL base, cliente axios) se centraliza en un `BaseService` para no repetirla en cada servicio. [P11]
+- Un único mecanismo de generación de IDs; en modo FullStack lo asigna la base de datos.
+
+### 4.8 Utils [P07]
+
+- Funciones puras: independientes, reutilizables, sin estado propio y sin dependencia de Vue.
+- Agrupadas por tema en clases con métodos `public static` (p. ej. `PriceFormatUtil.formatToCOP(price: number): string`).
+
+## 5. Backend (Nest.js)
+
+### 5.1 Estructura [P10][T06][T07]
+
+```
+backend/src/
+├── main.ts                 prefijo global, CORS y puerto
+├── app.module.ts           solo conecta módulos y TypeORM
+└── books/
+    ├── books.module.ts
+    ├── books.controller.ts
+    ├── books.service.ts
+    ├── entities/book.entity.ts
+    └── dto/create-book.dto.ts
+```
+
+- Un módulo por conjunto de funcionalidades altamente relacionadas; `AppModule` solo importa módulos.
+- Proyecto en ESM: imports relativos con extensión `.js`.
+- Archivos en kebab-case con sufijo de rol (`.module.ts`, `.controller.ts`, `.service.ts`, `.entity.ts`, `.dto.ts`).
+
+### 5.2 Controladores [P10]
+
+- Reciben la petición, delegan en el servicio y retornan la respuesta. Sin lógica de negocio ni acceso directo a repositorios.
+- Un controlador por recurso, ruta base en plural (`@Controller('books')`).
+- Métodos con nombres uniformes: `findAll`, `findOne`, `create`, `update`, `remove` (más consultas específicas como `findByBookId`).
+- Verbos REST: `GET` colección, `GET /:id` elemento, `POST` crear, `PUT`/`PATCH` actualizar, `DELETE` eliminar. [P11]
+- Retornos tipados (`Promise<Book[]>`, `Promise<Book | null>`); entradas con `@Param` y `@Body` tipadas con DTO.
+- `import type` para lo que solo aparece como anotación (p. ej. la entidad en el tipo de retorno). Los servicios inyectados y los DTO de `@Body()` se importan como valor.
+
+### 5.3 Providers [P10]
+
+- La lógica de negocio vive en servicios `@Injectable()`, registrados en `providers` del módulo.
+- Dependencias por inyección en el constructor, siempre `private readonly`:
+
+```ts
+constructor(
+  @InjectRepository(Book)
+  private readonly booksRepository: Repository<Book>,
+) {}
+```
+
+### 5.4 Entidades y TypeORM [P10][P11][T07]
+
+- Entidades en `entities/<entidad>.entity.ts`, registradas en `TypeOrmModule.forFeature([...])` del módulo.
+- Relaciones siempre envueltas en `Relation<T>` (importado como tipo) en ambos lados para evitar referencias circulares: `book: Relation<Book>`, `reviews: Relation<Review[]>`.
+- En el proyecto el esquema se gestiona con migraciones de TypeORM y con el historial de migraciones activado; `synchronize: true` solo es aceptable en los tutoriales.
+
+### 5.5 DTOs [P06][T06]
+
+- `dto/create-<entidad>.dto.ts` → `export class CreateBookDto`.
+- Los DTO controlan qué entra y qué sale: la entidad no se usa como DTO de entrada y nunca se exponen campos sensibles (contraseñas, tokens) en las respuestas.
+
+### 5.6 Configuración [T07][T08]
+
+- `main.ts`: `app.setGlobalPrefix('api')`; CORS con orígenes leídos de `process.env.CORS_ORIGIN` (lista separada por comas) y fallback a orígenes locales; `app.listen(process.env.PORT ?? 3000)`.
+- Ruta de la base de datos desde `process.env.SQLITE_PATH ?? 'database.sqlite'`.
+- Nunca escribir IPs ni URLs de despliegue en el código.
+
+## 6. Despliegue [T08]
+
+- Docker Compose en una VM de GCP: servicio `backend` (puerto 3000, volumen para SQLite) y servicio `frontend` (puerto 80, `depends_on: backend`).
+- Cada proyecto tiene su `.dockerignore` (`node_modules`, `.git`, `.gitignore`, `*.md`; el backend además `coverage`, `test` y `.env*`).
+- `frontend/.env` define `VITE_API_BASE_URL`. Vite la incrusta en el build, así que cualquier cambio exige volver a ejecutar `npm run build`.
+- No cambiar la estrategia de despliegue (build local o en Dockerfile, SQLite o MySQL) sin que el equipo lo pida.
+
+## 7. Anti-patrones señalados en clase
+
+| No hacer                                                  | Hacer                                       | Origen     |
+| --------------------------------------------------------- | ------------------------------------------- | ---------- |
+| Misma función copiada en varias vistas (`formatToCOP`) | Método estático en un util                | [T05][P07] |
+| Búsqueda o acceso a datos dentro del componente          | Método del servicio                        | [P06]      |
+| `axios` invocado desde un SFC                           | Llamada desde el servicio                   | [P11]      |
+| `await` en el nivel superior de `<script setup>`      | `onMounted(async () => ...)`              | [P11]      |
+| `computed` que invoca un servicio                       | `ref` cargado en `onMounted`            | [P07][T05] |
+| `OtherService` con lógica de libros                    | Método en`BookService`                   | [P07]      |
+| `Omit<ReviewInterface, 'id'>` en la firma del servicio  | `CreateReviewDTO`                         | [P07][T07] |
+| Dos sistemas distintos para calcular`nextId`            | Un único mecanismo                         | [P07]      |
+| `default` o `public` usados de forma inconsistente    | Mismo estilo en todos los archivos del tipo | [P07]      |
+| `any` en parámetros o variables                        | Tipos explícitos                           | [P04]      |
+| `Main_Point`, `Category`, rutas como `/main-point`  | camelCase y rutas por recurso               | [P04]      |
+| Controlador que mezcla recursos                           | Un controlador por recurso                  | [P04]      |
+| `<a href="/books">`                                     | `<RouterLink to="/books">`                | [P05]      |
+| Options API                                               | Composition API con`<script setup>`       | [P05]      |
+| URL de la API escrita en el servicio                      | `VITE_API_BASE_URL` + `BaseService`     | [T08][P11] |
+| Relaciones sin`Relation<T>`                             | `Relation<T>` en ambos lados              | [P11]      |
+| Imports desordenados o sin extensión                     | Orden alfabético y extensión completa     | [P04][P11] |
+| `synchronize: true` en el proyecto                      | Migraciones con historial                   | [P10]      |
+
+## 8. Forma de trabajar del agente
+
+- Antes de crear un archivo, leer los archivos vecinos del mismo tipo y replicar su estructura.
+- Cambios pequeños y enfocados. No refactorizar zonas no pedidas; si se detecta una violación de estas reglas fuera del alcance, se reporta en lugar de corregirla en silencio.
+- No agregar dependencias, librerías ni patrones no vistos en el curso sin preguntar. Stack aprobado: Vue 3, Vue Router, Pinia, Vite, TypeScript, Tailwind, Font Awesome, Axios, Chart.js, DataTables, Nest.js, TypeORM, better-sqlite3, Docker.
+- La nota de cada entrega es NF × NS y la sustentación es individual. Al terminar, resumir qué se cambió, en qué archivos y qué regla de este documento se aplicó, para que cualquier integrante pueda explicarlo. [P01]
+
+### Checklist de cierre
+
+- [ ] `npm run format`, `npm run lint` y `npm run build` sin errores en cada proyecto modificado.
+- [ ] Sin `any`; imports ordenados, con `import type` donde aplica y extensiones completas.
+- [ ] Ninguna vista o componente accede a datos sin pasar por un servicio.
+- [ ] Nada duplicado que debería vivir en un util o servicio.
+- [ ] Nombres, exports y modificadores consistentes con el resto del repositorio.
+- [ ] Sin URLs, IPs ni credenciales escritas en el código.
