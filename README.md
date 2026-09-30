@@ -28,7 +28,7 @@ npm run format:check
 
 ## Usuarios de prueba
 
-Las credenciales viven en `src/data/seedData.ts` y solo sirven para la demostración local.
+Las credenciales viven en `src/seeders/userseeder.ts` y solo sirven para la demostración local.
 
 | Correo              | Contraseña       | Rol     |
 | ------------------- | ---------------- | ------- |
@@ -67,14 +67,13 @@ src/
 │   ├── graphs/             # Gráficas de Chart.js por indicador
 │   ├── semester/           # Tarjeta y formulario de semestres
 │   └── subject/            # Tarjeta y formulario de materias
-├── data/                   # Datos semilla de la demostración
 ├── dtos/                   # Contratos de entrada y salida
 ├── interfaces/             # Entidades del dominio y enumeraciones
 ├── router/                 # Rutas de la SPA y control de acceso
-├── seeders/                # Estado inicial que consume PiniaConfig
+├── seeders/                # Datos semilla planos, uno por entidad
 ├── services/               # Lógica de negocio y acceso a datos
 ├── stores/                 # Estado global en Setup Stores
-├── utils/                  # Utilidades puras y reutilizables
+├── utils/                  # Utilidades puras: IDs, fechas, tablas, analítica y reportes
 └── views/                  # Pantallas asociadas a rutas
 ```
 
@@ -90,19 +89,20 @@ cambia el contrato que consume la UI.
 
 ## Alcance actual
 
-- Entidades `User`, `Semester`, `Subject` y `Grade` como interfaces, con el enum `Role`.
+- Entidades `User`, `Semester`, `Subject` y `Grade` como interfaces planas relacionadas solo por
+  ID (`userId`, `semesterId`, `subjectId`), con los enums `Role` y `StatusSemester`.
 - DTOs de creación, actualización, analítica y reportes de plataforma.
 - CRUD completo de semestres, materias y calificaciones, con validación en los servicios.
-- Autenticación con `AuthService` y guards de router: rutas protegidas y área `/admin`
-  restringida al rol `admin`.
-- `AnalyticsService` y cinco gráficas: promedio por semestre y por materia, créditos por
+- Autenticación con `AuthService` (inicio y cierre de sesión) y guards de router: rutas
+  protegidas y área `/admin` restringida al rol `admin`.
+- `AnalyticsUtil` y cinco gráficas: promedio por semestre y por materia, créditos por
   semestre, distribución por tipo de calificación y cobertura de evaluación.
 - Panel de administración con gestión de usuarios y reportes de plataforma.
 - Listados con DataTables y stores de Pinia persistidos en `localStorage`.
 - Pruebas unitarias de `SemesterService` con Vitest.
 
 No hay backend ni base de datos: el estado vive en el navegador. Para volver a los datos semilla,
-borra la clave `piniaState` de `localStorage`.
+borra la clave `piniaStateV2` de `localStorage`.
 
 ## Despliegue
 
