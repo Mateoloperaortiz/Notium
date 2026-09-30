@@ -15,6 +15,7 @@ import SubjectIndexView from '@/views/subject/SubjectIndexView.vue';
 import SubjectShowView from '@/views/subject/SubjectShowView.vue';
 import { createRouter, createWebHistory } from 'vue-router';
 
+/** SPA routes: protected ones set meta.requiresAuth and admin ones also set meta.roles. */
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [

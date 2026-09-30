@@ -72,7 +72,7 @@ Una tarea no está terminada hasta que `npm test` y `npm run check` pasan sin er
 - Modificadores de acceso explícitos en todos los miembros de clase (`public static`, `private static`).
 - Nada de contenedores genéricos (`OtherService`, `Helpers`, `Misc`). `[P07]`
 
-### 3.4 Comentarios de sección `[E1]`
+### 3.4 Comentarios `[E1]`
 
 - Solo en archivos `.vue`, siempre en inglés, con este vocabulario fijo y en este orden. Se escriben únicamente las secciones que existen, cada una precedida por una línea en blanco (salvo la primera):
 
@@ -90,6 +90,8 @@ Una tarea no está terminada hasta que `npm test` y `npm run check` pasan sin er
 
 - Prohibidas las variantes (`// View state`, `// Estado de la vista`, `// Form handlers`, `// Data loading`, `// Imports internos`…) y los comentarios que narran lo que el código ya dice.
 - Los archivos `.ts` no llevan comentarios de sección.
+- Decisión del equipo: los archivos `.ts` de `src/` documentan cada clase, interfaz, `type`, `enum`, store, seeder y método con un comentario TSDoc de una sola línea en inglés (`/** ... */`) que dice para qué sirve o por qué existe, sin repetir el nombre. En las interfaces solo se comentan las propiedades cuya unidad, rango o formato no es obvio (`percentage`, `createdAt`). Dentro de los métodos no se comenta línea por línea.
+- Un comentario `//` fuera de los comentarios de sección solo se usa para explicar un porqué que el código no muestra, como el registro único de librerías en `main.ts`.
 
 ### 3.5 Formato e imports `[P04][P10][P11][T03]`
 
@@ -301,6 +303,7 @@ function deleteSemester(id: number): void {
 - [ ] Servicios síncronos, sin filtros por sesión y con nombres `get…`/`create…`/`update…`/`delete…`.
 - [ ] Interfaces con relaciones solo por ID; seeders planos, uno por entidad.
 - [ ] Comentarios de sección con el vocabulario fijo y línea en blanco antes de cada uno.
+- [ ] Cada clase, interfaz, DTO, store, seeder y método de los `.ts` tiene su comentario TSDoc de una línea en inglés.
 - [ ] Ninguna vista o componente importa stores, seeders ni `localStorage`.
 - [ ] Nada que exija HTTPS; login, logout y CRUDs probados sobre el build.
 - [ ] Ninguna abstracción, archivo o librería que el requisito no pida.

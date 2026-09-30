@@ -8,23 +8,28 @@ import { SubjectService } from '@/services/SubjectService.js';
 import { useSemesterStore } from '@/stores/SemesterStore.js';
 import { IdUtil } from '@/utils/IdUtil.js';
 
+/** Reads and writes semesters in SemesterStore and validates their data. */
 export class SemesterService {
+  /** Returns the semesters of every user. */
   public static getSemesters(): SemesterInterface[] {
     return useSemesterStore().semesters;
   }
 
+  /** Returns the semester with the given ID, or undefined if it does not exist. */
   public static getSemesterById(id: number): SemesterInterface | undefined {
     return SemesterService.getSemesters().find(
       (semester: SemesterInterface): boolean => semester.id === id,
     );
   }
 
+  /** Returns the semesters that belong to one user. */
   public static getSemestersByUserId(userId: number): SemesterInterface[] {
     return SemesterService.getSemesters().filter(
       (semester: SemesterInterface): boolean => semester.userId === userId,
     );
   }
 
+  /** Validates the data and saves a new semester for the user; throws if invalid. */
   public static createSemester(dto: CreateSemesterDTO, userId: number): SemesterInterface {
     const validatedDto = SemesterService.validate(dto);
     const timestamp = Date.now();
@@ -41,6 +46,7 @@ export class SemesterService {
     return semester;
   }
 
+  /** Validates and applies the changes; undefined if the semester does not exist. */
   public static updateSemester(id: number, dto: UpdateSemesterDTO): SemesterInterface | undefined {
     const semester = SemesterService.getSemesterById(id);
 
@@ -60,6 +66,7 @@ export class SemesterService {
     return semester;
   }
 
+  /** Deletes the semester and, in cascade, its subjects and grades. */
   public static deleteSemester(id: number): boolean {
     const semesters = SemesterService.getSemesters();
     const semesterIndex = semesters.findIndex(
@@ -76,12 +83,14 @@ export class SemesterService {
     return true;
   }
 
+  /** Deletes every semester of a user; called when the user is deleted. */
   public static deleteSemestersByUserId(userId: number): void {
     SemesterService.getSemestersByUserId(userId).forEach((semester: SemesterInterface): void => {
       SemesterService.deleteSemester(semester.id);
     });
   }
 
+  /** One message per invalid field; empty strings mean the data is valid. */
   public static validateFields(dto: CreateSemesterDTO): SemesterValidationErrorsDTO {
     const errors: SemesterValidationErrorsDTO = {
       name: '',
@@ -112,6 +121,7 @@ export class SemesterService {
     return errors;
   }
 
+  /** Throws the first validation message, or returns the trimmed data. */
   private static validate(dto: CreateSemesterDTO): CreateSemesterDTO {
     const errors = SemesterService.validateFields(dto);
     const firstError = errors.name || errors.year || errors.period || errors.status;

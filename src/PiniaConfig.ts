@@ -5,7 +5,9 @@ import { userSeeder } from './seeders/userseeder.js';
 import { createPinia, type Pinia } from 'pinia';
 import { watch } from 'vue';
 
+/** Creates Pinia and keeps its state in localStorage between visits. */
 export default class PiniaConfig {
+  /** Restores the saved state or loads the seeders on the first run, then saves every change. */
   public static init(): Pinia {
     const pinia = createPinia();
 

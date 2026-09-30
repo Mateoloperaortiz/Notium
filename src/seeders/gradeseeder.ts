@@ -1,5 +1,6 @@
 import type { GradeInterface } from '@/interfaces/GradeInterface.js';
 
+/** Demo grades; each subjectId points to an entry of subjectSeeder. */
 export const gradeSeeder: GradeInterface[] = [
   {
     id: 1,

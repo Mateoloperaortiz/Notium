@@ -4,21 +4,26 @@ import type { SubjectInterface } from '@/interfaces/SubjectInterface.js';
 import { useGradeStore } from '@/stores/GradeStore.js';
 import { IdUtil } from '@/utils/IdUtil.js';
 
+/** Reads and writes grades in GradeStore and validates their data. */
 export class GradeService {
+  /** Returns the grades of every user. */
   public static getGrades(): GradeInterface[] {
     return useGradeStore().grades;
   }
 
+  /** Returns the grade with the given ID, or undefined if it does not exist. */
   public static getGradeById(id: number): GradeInterface | undefined {
     return GradeService.getGrades().find((grade: GradeInterface): boolean => grade.id === id);
   }
 
+  /** Returns the grades of one subject. */
   public static getGradesBySubjectId(subjectId: number): GradeInterface[] {
     return GradeService.getGrades().filter(
       (grade: GradeInterface): boolean => grade.subjectId === subjectId,
     );
   }
 
+  /** Returns the grades of the given subjects, such as those of one user. */
   public static getGradesBySubjects(subjects: SubjectInterface[]): GradeInterface[] {
     const subjectIds = subjects.map((subject: SubjectInterface): number => subject.id);
 
@@ -27,6 +32,7 @@ export class GradeService {
     );
   }
 
+  /** Validates the data and saves a new grade in the subject; throws if invalid. */
   public static createGrade(dto: CreateGradeDTO, subjectId: number): GradeInterface {
     const validatedDto = GradeService.validate(dto);
     const timestamp = Date.now();
@@ -43,6 +49,7 @@ export class GradeService {
     return grade;
   }
 
+  /** Validates and applies the changes; undefined if the grade does not exist. */
   public static updateGrade(id: number, dto: UpdateGradeDTO): GradeInterface | undefined {
     const grade = GradeService.getGradeById(id);
 
@@ -63,6 +70,7 @@ export class GradeService {
     return grade;
   }
 
+  /** Deletes the grade with the given ID; false if it does not exist. */
   public static deleteGrade(id: number): boolean {
     const grades = GradeService.getGrades();
     const gradeIndex = grades.findIndex((grade: GradeInterface): boolean => grade.id === id);
@@ -76,12 +84,14 @@ export class GradeService {
     return true;
   }
 
+  /** Deletes every grade of a subject; called when the subject is deleted. */
   public static deleteGradesBySubjectId(subjectId: number): void {
     GradeService.getGradesBySubjectId(subjectId).forEach((grade: GradeInterface): void => {
       GradeService.deleteGrade(grade.id);
     });
   }
 
+  /** One message per invalid field; empty strings mean the data is valid. */
   public static validateFields(dto: CreateGradeDTO): GradeValidationErrorsDTO {
     return {
       date: Number.isNaN(Date.parse(dto.date)) ? 'Ingresa una fecha válida.' : '',
@@ -98,6 +108,7 @@ export class GradeService {
     };
   }
 
+  /** Throws the first validation message, or returns the trimmed data. */
   private static validate(dto: CreateGradeDTO): CreateGradeDTO {
     const errors = GradeService.validateFields(dto);
     const firstError =
