@@ -1,5 +1,5 @@
-import { CreateUserDto } from './dto/create-user.dto.js';
-import { UpdateUserDto } from './dto/update-user.dto.js';
+import type { CreateUserDto } from './dto/create-user.dto.js';
+import type { UpdateUserDto } from './dto/update-user.dto.js';
 import { User } from './entities/user.entity.js';
 import { Role } from './enums/role.enum.js';
 import {
@@ -30,7 +30,7 @@ export class UsersService {
 
   /** Returns the user with the given ID, or null if it does not exist. */
   public findOne(id: number): Promise<User | null> {
-    return this.usersRepository.findOneBy({ id });
+    return Number.isInteger(id) ? this.usersRepository.findOneBy({ id }) : Promise.resolve(null);
   }
 
   /** Returns the user with the given ID; throws 404 if it does not exist. */
@@ -54,47 +54,44 @@ export class UsersService {
   }
 
   /** Validates the data and saves a new user; throws 409 if the email already exists. */
-  public async create(dto: CreateUserDto): Promise<User> {
-    UsersService.validate(dto);
-    const email = dto.email.trim().toLowerCase();
+  public async create(dto: CreateUserDto | undefined): Promise<User> {
+    const data = UsersService.validate(dto);
 
-    await this.assertEmailFree(email);
+    await this.assertEmailFree(data.email);
 
     const user = this.usersRepository.create({
-      email,
-      name: dto.name.trim(),
-      password: await hash(dto.password, UsersService.SALT_ROUNDS),
-      role: dto.role,
+      ...data,
+      password: await hash(data.password, UsersService.SALT_ROUNDS),
     });
-
     const saved = await this.usersRepository.save(user);
 
     return this.findOneOrFail(saved.id);
   }
 
   /** Validates and applies the changes; throws 404 if the user does not exist, 409 on a taken email. */
-  public async update(id: number, dto: UpdateUserDto): Promise<User> {
+  public async update(id: number, dto: UpdateUserDto | undefined): Promise<User> {
     const user = await this.findOneOrFail(id);
-    const merged = {
-      email: dto.email ?? user.email,
-      name: dto.name ?? user.name,
-      password: dto.password ?? '',
-      role: dto.role ?? user.role,
-    };
+    const keepsPassword = dto?.password === undefined;
+    const data = UsersService.validate(
+      {
+        email: dto?.email ?? user.email,
+        name: dto?.name ?? user.name,
+        password: dto?.password ?? '',
+        role: dto?.role ?? user.role,
+      },
+      keepsPassword,
+    );
 
-    UsersService.validate(merged, dto.password === undefined);
-    const email = merged.email.trim().toLowerCase();
-
-    if (email !== user.email) {
-      await this.assertEmailFree(email);
+    if (data.email !== user.email) {
+      await this.assertEmailFree(data.email);
     }
 
-    user.email = email;
-    user.name = merged.name.trim();
-    user.role = merged.role;
+    user.email = data.email;
+    user.name = data.name;
+    user.role = data.role;
 
-    if (dto.password !== undefined) {
-      user.password = await hash(dto.password, UsersService.SALT_ROUNDS);
+    if (!keepsPassword) {
+      user.password = await hash(data.password, UsersService.SALT_ROUNDS);
     }
 
     await this.usersRepository.save(user);
@@ -118,18 +115,22 @@ export class UsersService {
     }
   }
 
-  /** Throws the first validation message in Spanish; skipPassword leaves the current one untouched. */
-  private static validate(
-    dto: { name: string; email: string; password: string; role: Role },
-    skipPassword = false,
-  ): void {
-    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  /** Returns the data trimmed or throws 400; with skipPassword the current password stays. */
+  private static validate(dto: CreateUserDto | undefined, skipPassword = false): CreateUserDto {
+    if (dto === undefined) {
+      throw new BadRequestException('Envía los datos del usuario.');
+    }
 
-    if ((dto.name?.trim() ?? '') === '') {
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const name = typeof dto.name === 'string' ? dto.name.trim() : '';
+    const email = typeof dto.email === 'string' ? dto.email.trim().toLowerCase() : '';
+    const password = typeof dto.password === 'string' ? dto.password : '';
+
+    if (name === '') {
       throw new BadRequestException('El nombre es obligatorio.');
     }
 
-    if (!emailPattern.test(dto.email?.trim().toLowerCase() ?? '')) {
+    if (!emailPattern.test(email)) {
       throw new BadRequestException('Ingresa un correo válido.');
     }
 
@@ -137,8 +138,10 @@ export class UsersService {
       throw new BadRequestException('Selecciona un rol válido.');
     }
 
-    if (!skipPassword && (dto.password?.trim().length ?? 0) < 6) {
+    if (!skipPassword && password.trim().length < 6) {
       throw new BadRequestException('La contraseña debe tener al menos 6 caracteres.');
     }
+
+    return { email, name, password, role: dto.role };
   }
 }

@@ -1,8 +1,8 @@
-import { SubjectsService } from './subjects.service.js';
 import type { CreateSubjectDto } from './dto/create-subject.dto.js';
 import { Subject } from './entities/subject.entity.js';
+import { SubjectsService } from './subjects.service.js';
 import { Semester } from '../semesters/entities/semester.entity.js';
-import { NotFoundException } from '@nestjs/common';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 import type { Repository, SelectQueryBuilder } from 'typeorm';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -62,14 +62,14 @@ describe('SubjectsService', (): void => {
     const subjects = [ownedSubject()];
     queryBuilder.getMany.mockResolvedValue(subjects);
 
-    await expect(service.findAllByUserId(1)).resolves.toBe(subjects);
+    await expect(service.findAll(1)).resolves.toBe(subjects);
     expect(queryBuilder.where).toHaveBeenCalledWith('semester.userId = :userId', { userId: 1 });
   });
 
   it('filters the subjects by semester when semesterId is given', async (): Promise<void> => {
     queryBuilder.getMany.mockResolvedValue([]);
 
-    await service.findAllByUserId(1, 10);
+    await service.findAll(1, 10);
 
     expect(queryBuilder.andWhere).toHaveBeenCalledWith('subject.semesterId = :semesterId', {
       semesterId: 10,
@@ -79,13 +79,13 @@ describe('SubjectsService', (): void => {
   it('returns one subject of the user', async (): Promise<void> => {
     queryBuilder.getOne.mockResolvedValue(ownedSubject());
 
-    await expect(service.findOneByUserId(20, 1)).resolves.toMatchObject({ id: 20 });
+    await expect(service.findOne(20, 1)).resolves.toMatchObject({ id: 20 });
   });
 
   it("answers 404 when the subject does not exist or is another user's", async (): Promise<void> => {
     queryBuilder.getOne.mockResolvedValue(null);
 
-    await expect(service.findOneByUserId(20, 1)).rejects.toBeInstanceOf(NotFoundException);
+    await expect(service.findOne(20, 1)).rejects.toBeInstanceOf(NotFoundException);
   });
 
   it('creates a subject in a semester the user owns', async (): Promise<void> => {
@@ -117,5 +117,17 @@ describe('SubjectsService', (): void => {
     await service.remove(20, 1);
 
     expect(subjectsRepository.remove).toHaveBeenCalledWith(subject);
+  });
+
+  it('answers 400 when the semester is missing', async (): Promise<void> => {
+    const dto = { ...validDto(), semesterId: undefined } as unknown as CreateSubjectDto;
+
+    await expect(service.create(dto, 1)).rejects.toThrow('Selecciona un semestre.');
+    expect(semestersRepository.findOneBy).not.toHaveBeenCalled();
+  });
+
+  it('answers 400 when the semester filter is not a number', async (): Promise<void> => {
+    await expect(service.findAll(1, Number('abc'))).rejects.toBeInstanceOf(BadRequestException);
+    expect(queryBuilder.getMany).not.toHaveBeenCalled();
   });
 });

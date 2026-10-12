@@ -23,17 +23,14 @@ export class SemestersController {
 
   /** GET /api/semesters: the semesters of the session user. */
   @Get()
-  public findAllByUserId(@CurrentUser() user: JwtPayload): Promise<Semester[]> {
-    return this.semestersService.findAllByUserId(user.sub);
+  public findAll(@CurrentUser() user: JwtPayload): Promise<Semester[]> {
+    return this.semestersService.findAll(user.sub);
   }
 
   /** GET /api/semesters/:id: one semester; 404 if it does not exist or is another user's. */
   @Get(':id')
-  public findOneByUserId(
-    @CurrentUser() user: JwtPayload,
-    @Param('id') id: string,
-  ): Promise<Semester> {
-    return this.semestersService.findOneByUserId(Number(id), user.sub);
+  public findOne(@CurrentUser() user: JwtPayload, @Param('id') id: string): Promise<Semester> {
+    return this.semestersService.findOne(Number(id), user.sub);
   }
 
   /** POST /api/semesters: creates a semester for the session user. */

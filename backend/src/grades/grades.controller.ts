@@ -24,11 +24,11 @@ export class GradesController {
 
   /** GET /api/grades: the user's grades; optional ?subjectId filters by subject. */
   @Get()
-  public findAllByUserId(
+  public findAll(
     @CurrentUser() user: JwtPayload,
     @Query('subjectId') subjectId?: string,
   ): Promise<Grade[]> {
-    return this.gradesService.findAllByUserId(
+    return this.gradesService.findAll(
       user.sub,
       subjectId === undefined ? undefined : Number(subjectId),
     );
@@ -36,8 +36,8 @@ export class GradesController {
 
   /** GET /api/grades/:id: one grade; 404 if it does not exist or is another user's. */
   @Get(':id')
-  public findOneByUserId(@CurrentUser() user: JwtPayload, @Param('id') id: string): Promise<Grade> {
-    return this.gradesService.findOneByUserId(Number(id), user.sub);
+  public findOne(@CurrentUser() user: JwtPayload, @Param('id') id: string): Promise<Grade> {
+    return this.gradesService.findOne(Number(id), user.sub);
   }
 
   /** POST /api/grades: creates a grade in a subject the user owns. */

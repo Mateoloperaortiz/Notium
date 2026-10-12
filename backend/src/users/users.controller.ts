@@ -1,9 +1,9 @@
 import { CreateUserDto } from './dto/create-user.dto.js';
 import { UpdateUserDto } from './dto/update-user.dto.js';
 import { User } from './entities/user.entity.js';
+import { Role } from './enums/role.enum.js';
 import { UsersService } from './users.service.js';
 import { Roles } from '../auth/decorators/roles.decorator.js';
-import { Role } from './enums/role.enum.js';
 import {
   Body,
   Controller,
