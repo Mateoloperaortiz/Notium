@@ -1,7 +1,7 @@
-import { SemestersService } from './semesters.service.js';
 import type { CreateSemesterDto } from './dto/create-semester.dto.js';
 import { Semester } from './entities/semester.entity.js';
 import { StatusSemester } from './enums/status-semester.enum.js';
+import { SemestersService } from './semesters.service.js';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import type { Repository } from 'typeorm';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -42,26 +42,26 @@ describe('SemestersService', (): void => {
     const semesters = [ownedSemester()];
     vi.mocked(repository.find).mockResolvedValue(semesters);
 
-    await expect(service.findAllByUserId(1)).resolves.toBe(semesters);
+    await expect(service.findAll(1)).resolves.toBe(semesters);
     expect(repository.find).toHaveBeenCalledWith({ where: { userId: 1 } });
   });
 
   it('returns one semester of the user', async (): Promise<void> => {
     vi.mocked(repository.findOneBy).mockResolvedValue(ownedSemester());
 
-    await expect(service.findOneByUserId(10, 1)).resolves.toMatchObject({ id: 10 });
+    await expect(service.findOne(10, 1)).resolves.toMatchObject({ id: 10 });
   });
 
   it('answers 404 when the semester does not exist', async (): Promise<void> => {
     vi.mocked(repository.findOneBy).mockResolvedValue(null);
 
-    await expect(service.findOneByUserId(10, 1)).rejects.toBeInstanceOf(NotFoundException);
+    await expect(service.findOne(10, 1)).rejects.toBeInstanceOf(NotFoundException);
   });
 
   it('answers 404 when the semester belongs to another user', async (): Promise<void> => {
     vi.mocked(repository.findOneBy).mockResolvedValue(ownedSemester());
 
-    await expect(service.findOneByUserId(10, 2)).rejects.toBeInstanceOf(NotFoundException);
+    await expect(service.findOne(10, 2)).rejects.toBeInstanceOf(NotFoundException);
   });
 
   it('creates a semester for the user', async (): Promise<void> => {
@@ -108,5 +108,20 @@ describe('SemestersService', (): void => {
     await service.remove(10, 1);
 
     expect(repository.remove).toHaveBeenCalledWith(semester);
+  });
+
+  it('answers 400 when the body is missing', async (): Promise<void> => {
+    await expect(service.create(undefined, 1)).rejects.toThrow('Envía los datos del semestre.');
+  });
+
+  it('answers 400 when the name is not text', async (): Promise<void> => {
+    const dto = { ...validDto(), name: 123 } as unknown as CreateSemesterDto;
+
+    await expect(service.create(dto, 1)).rejects.toBeInstanceOf(BadRequestException);
+  });
+
+  it('answers 404 without querying when the id is not a number', async (): Promise<void> => {
+    await expect(service.findOne(Number('abc'), 1)).rejects.toBeInstanceOf(NotFoundException);
+    expect(repository.findOneBy).not.toHaveBeenCalled();
   });
 });

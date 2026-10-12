@@ -11,7 +11,7 @@ Reglas para agentes de código (Claude Code, Codex, Cursor u otros) que trabajen
 ## 1. Contexto del proyecto
 
 - Notium es una SPA para organizar semestres, materias y notas. Actores: **Estudiante** (`Role.User`) y **Administrador** (`Role.Admin`). Entidades: `User`, `Semester`, `Subject`, `Grade`.
-- Etapa actual: Entrega 1 Parte 2, proyecto FullStack. `frontend/` es la SPA en Vue y `backend/` la API REST en Nest.js con SQLite. El login ya usa la API; los seeders y los stores de entidades del frontend se reemplazan por la API en la fase 2 (issues #25 a #28). Mientras tanto, `PiniaConfig` sigue persistiendo el estado en `localStorage` (clave `piniaStateV2`).
+- Etapa actual: Entrega 1 Parte 2, proyecto FullStack. `frontend/` es la SPA en Vue y `backend/` la API REST en Nest.js con SQLite. Todos los datos vienen de la API: el frontend ya no tiene seeders ni stores de entidades, y `PiniaConfig` solo persiste la sesión (`AuthStore`) en `localStorage` (clave `piniaStateV2`).
 - Las secciones 3 a 8 son las reglas del frontend: sus rutas (`src/...`) son relativas a `frontend/`. La sección 10 reúne las reglas del backend y de la conexión entre ambos.
 - Estructura:
 
@@ -24,9 +24,8 @@ Reglas para agentes de código (Claude Code, Codex, Cursor u otros) que trabajen
 │   │   ├── dtos/                   <Entidad>DTOs.ts
 │   │   ├── interfaces/             <Entidad>Interface.ts (con sus enums: Role, StatusSemester)
 │   │   ├── router/                 index.ts (rutas) y accessControl.ts (guards)
-│   │   ├── seeders/                <entidad>seeder.ts (se eliminan en la fase 2)
 │   │   ├── services/               BaseService.ts y <Entidad>Service.ts
-│   │   ├── stores/                 <Entidad>Store.ts
+│   │   ├── stores/                 AuthStore.ts (token y usuario en sesión)
 │   │   ├── utils/                  <Tema>Util.ts
 │   │   ├── views/<dominio>/        <Entidad><Acción>View.vue
 │   │   └── App.vue · main.ts · PiniaConfig.ts
@@ -38,7 +37,9 @@ Reglas para agentes de código (Claude Code, Codex, Cursor u otros) que trabajen
 │   │   ├── auth/                   login con JWT, guards y decoradores
 │   │   ├── database/               configuración de TypeORM, data-source.ts y migrations/
 │   │   └── app.module.ts · main.ts
-│   └── .env.example                variables de entorno de la API
+│   ├── .env.example                variables de entorno de la API
+│   └── Dockerfile                  imagen de la API
+├── docker-compose.yml            frontend y API juntos en la VM
 ├── docs/diagrams/                diagramas de arquitectura y de clases (draw.io)
 └── .github/workflows/cicd.yml    CI de ambos proyectos
 ```
@@ -111,7 +112,7 @@ Una tarea no está terminada hasta que `npm test` y `npm run check` pasan sin er
 
 - Prohibidas las variantes (`// View state`, `// Estado de la vista`, `// Form handlers`, `// Data loading`, `// Imports internos`…) y los comentarios que narran lo que el código ya dice.
 - Los archivos `.ts` no llevan comentarios de sección.
-- Decisión del equipo: los archivos `.ts` de `src/` documentan cada clase, interfaz, `type`, `enum`, store, seeder y método con un comentario TSDoc de una sola línea en inglés (`/** ... */`) que dice para qué sirve o por qué existe, sin repetir el nombre. En las interfaces solo se comentan las propiedades cuya unidad, rango o formato no es obvio (`percentage`, `createdAt`). Dentro de los métodos no se comenta línea por línea.
+- Decisión del equipo: los archivos `.ts` de `src/` documentan cada clase, interfaz, `type`, `enum`, store y método con un comentario TSDoc de una sola línea en inglés (`/** ... */`) que dice para qué sirve o por qué existe, sin repetir el nombre. En las interfaces solo se comentan las propiedades cuya unidad, rango o formato no es obvio (`percentage`, `createdAt`). Dentro de los métodos no se comenta línea por línea.
 - Un comentario `//` fuera de los comentarios de sección solo se usa para explicar un porqué que el código no muestra, como el registro único de librerías en `main.ts`.
 
 ### 3.5 Formato e imports `[P04][P10][P11][T03]`
@@ -130,15 +131,15 @@ Una tarea no está terminada hasta que `npm test` y `npm run check` pasan sin er
 
 ### 3.7 Identificadores `[E1][T04][T05]`
 
-- Los IDs son `number` y se generan con un único mecanismo: el máximo existente más uno, implementado una sola vez en `IdUtil.getNextId()`.
+- Los IDs son `number` y los asigna la base de datos (`@PrimaryGeneratedColumn()`); el frontend nunca genera IDs.
 - Prohibido `crypto.randomUUID()` y cualquier API que exija contexto seguro (HTTPS): el despliegue evaluado corre sobre HTTP y ahí esa API no existe, por eso crear datos falló en producción.
 
-## 4. Datos locales: interfaces, seeders, stores y PiniaConfig
+## 4. Datos del frontend: interfaces, stores y PiniaConfig
 
 ### 4.1 Interfaces `[E1][P06]`
 
-- Una interfaz describe una entidad plana. Las relaciones son solo IDs (`userId`, `semesterId`, `subjectId`): nunca objetos anidados ni arreglos de hijos.
-- Solo tipos que sobreviven a JSON, porque todo termina en `localStorage`: fechas como `string` ISO y marcas de tiempo como `number`.
+- Una interfaz describe el JSON de una entidad que devuelve la API. Las relaciones son solo IDs (`userId`, `semesterId`, `subjectId`): nunca objetos anidados ni arreglos de hijos.
+- Las fechas llegan como `string` ISO, incluidas `createdAt` y `updatedAt`. `UserInterface` no tiene contraseña.
 - Los enums de una entidad viven en su archivo de interfaz.
 
 ```ts
@@ -150,55 +151,36 @@ export interface GradeInterface {
   percentage: number;
   type: string;
   date: string;
-  createdAt: number;
-  updatedAt: number;
+  createdAt: string;
+  updatedAt: string;
 }
 ```
 
-### 4.2 Seeders `[E1][T04]`
+### 4.2 Datos de prueba `[E1][T04][P10]`
 
-- Un archivo por seeder en `src/seeders/<entidad>seeder.ts`, que exporta un arreglo literal tipado con la interfaz. Las relaciones se escriben como IDs literales.
-- Sin funciones, sin imports entre seeders, sin archivos intermedios de datos: `src/data/` no debe existir. "No jugar a ser un ORM de relaciones."
-
-```ts
-import type { SubjectInterface } from "@/interfaces/SubjectInterface.js";
-
-export const subjectSeeder: SubjectInterface[] = [
-  {
-    id: 1,
-    semesterId: 1,
-    code: "SI2001",
-    name: "Desarrollo Web",
-    credits: 3,
-    professor: "Daniel Correa",
-    createdAt: 1768809600000,
-    updatedAt: 1768809600000,
-  },
-];
-```
+- El frontend no tiene seeders: los datos de prueba los crea la migración `SeedDemoData` del backend (sección 10.3). `src/seeders/` y `src/data/` no deben existir.
 
 ### 4.3 Stores `[E1][P06]`
 
-- Setup Stores (`defineStore('<id>', () => { ... })`); el id es el nombre de la entidad en singular y la colección del state va en plural: `users`, `semesters`, `subjects`, `grades`.
-- El store solo guarda estado; la lógica va en los servicios. Sin interfaces auxiliares para tipar el retorno del store.
-- `AuthStore` guarda el token de la API (`token`) y el usuario en sesión (`loggedUser`, sin contraseña). Solo los servicios lo leen o escriben; vistas y guards usan `AuthService.getLoggedUser()`.
+- Setup Stores (`defineStore('<id>', () => { ... })`). El store solo guarda estado; la lógica va en los servicios. Sin interfaces auxiliares para tipar el retorno del store.
+- El único store es `AuthStore`: guarda el token de la API (`token`) y el usuario en sesión (`loggedUser`, sin contraseña). Solo los servicios lo leen o escriben; vistas y guards usan `AuthService.getLoggedUser()`.
+- Semestres, materias, notas y usuarios no se guardan en stores: viven en la API y cada vista los pide al cargar.
 
 ### 4.4 PiniaConfig `[T04]`
 
-- Las claves del estado inicial coinciden con el id del store y el nombre de su colección (`subject: { subjects: subjectSeeder }`).
+- Restaura y persiste el estado de Pinia (solo la sesión) en `localStorage` con la clave `piniaStateV2`.
 - Serializa con `JSON.stringify` y `JSON.parse`; con interfaces planas no se necesita `flatted`.
 
 ## 5. Servicios `[E1][P06][P07]`
 
-- Un servicio por entidad; es la única capa que lee y escribe los stores.
-- Los servicios que leen stores locales son síncronos: sin `async`, `await` ni `Promise`, porque leen memoria. Los que llaman a la API son asíncronos (sección 10.5).
+- Un servicio por entidad (`UserService`, `SemesterService`, `SubjectService`, `GradeService`), más `AuthService` y `PlatformReportService`. Todos extienden `BaseService` y son la única capa que habla con la API (sección 10.5).
+- Son asíncronos y devuelven `Promise<T>`, porque cada método hace una petición HTTP.
 - Nombres de métodos con el patrón del curso: `getGrades()`, `getGradeById(id)`, `getGradesBySubjectId(subjectId)`, `createGrade(dto)`, `updateGrade(id, dto)`, `deleteGrade(id)`. El nombre dice qué entidad devuelve y en qué cantidad.
-- Los servicios no deciden quién puede ver qué: no leen el usuario en sesión para filtrar ni para negar acceso. Reciben lo que necesitan por parámetro (`getSemestersByUserId(userId)`). Los guards del router controlan la autenticación y el rol; las vistas, incluidas las de detalle, buscan los registros solo dentro de los datos del usuario en sesión y muestran el estado "no encontrado" si el registro no le pertenece.
+- Los servicios no filtran por el usuario en sesión ni deciden permisos: la API toma el usuario del token y solo devuelve sus registros (sección 10.4). Los guards del router controlan la autenticación y el rol, y las vistas de detalle muestran el estado "no encontrado" cuando la API responde 404.
 - `AuthService` expone `login(dto)` (asíncrono, contra `POST /api/auth/login`), `logout()` y `getLoggedUser()` (síncrono, lee `AuthStore`). Vistas y componentes obtienen el usuario en sesión con `getLoggedUser()`, nunca importando `AuthStore`.
-- Las relaciones se resuelven consultando por ID, no sincronizando arreglos en ambos lados. Las consultas que cruzan entidades reciben las entidades padre ya obtenidas: `SubjectService.getSubjectsBySemesters(semesters)`, `GradeService.getGradesBySubjects(subjects)`.
-- Las dependencias entre servicios van en una sola dirección, de padre a hijo: `AuthService` → `UserService` → `SemesterService` → `SubjectService` → `GradeService`. Un servicio nunca importa a su padre.
-- Borrar un registro borra sus hijos (usuario → semestres → materias → notas). Sin esto, un ID reutilizado por `máximo + 1` heredaría registros huérfanos.
-- La validación de datos de entrada vive en el servicio (`validateFields`).
+- Los servicios no se importan entre sí: cada uno llama a su recurso de la API. Las relaciones se resuelven en la API con IDs.
+- Borrar un registro borra sus hijos en la base de datos (`onDelete: 'CASCADE'`, sección 10.3); el frontend no borra en cascada.
+- `validateFields(dto)` valida en el navegador los campos de un formulario y devuelve un mensaje por campo. La API vuelve a validar todo.
 - Un servicio accede a datos. Una clase que solo calcula sobre datos que ya recibió (promedios, series, reportes) es un util, no un servicio: por eso esos cálculos viven en `AnalyticsUtil` y `PlatformReportUtil`.
 
 ## 6. Utils `[E1][P07]`
@@ -216,24 +198,38 @@ export const subjectSeeder: SubjectInterface[] = [
 - Estado con `ref` y valores derivados con `computed`, como en clase; no usar `reactive` ni `shallowRef`.
 - `computed` solo deriva valores; `watch` solo para efectos secundarios (validaciones, redirecciones). `[P07]`
 
-### 7.2 Carga de datos `[E1]`
+### 7.2 Carga de datos `[E1][P11]`
 
-- Con servicios síncronos, la vista obtiene los datos al declarar su estado: sin `onMounted`, sin `async`, sin `await`, sin `Promise.all` y sin estados de carga para datos locales.
-- Tras crear, editar o eliminar, la vista vuelve a pedir los datos al servicio y reasigna el `ref`.
-- `onMounted` queda solo para lo que necesita el DOM montado (p. ej. dibujar en un `<canvas>`).
+- La vista carga sus datos en `onMounted` con una función `async` y `try/catch`. Si necesita varios recursos, los pide en paralelo con `Promise.all`, una sola vez por visita.
+- Si la carga falla, guarda `ErrorUtil.getErrorMessage(error)` en `errorMessage` y lo muestra con `<p v-if="errorMessage" class="status-message status-message--error" role="alert">`. Toda vista que guarda `errorMessage` lo muestra en la plantilla; si no, una API caída se ve como una cuenta sin datos.
+- Tras crear, editar o eliminar, la vista vuelve a pedir los datos a la API y reasigna el `ref`.
+- Prohibido `await` en el nivel superior de `<script setup>`.
 
 ```ts
 // State
-const loggedUserId = AuthService.getLoggedUser()?.id ?? 0;
-const semesters = ref<SemesterInterface[]>(
-  SemesterService.getSemestersByUserId(loggedUserId),
-);
+const semesters = ref<SemesterInterface[]>([]);
+const errorMessage = ref<string>("");
 
 // Functions
-function deleteSemester(id: number): void {
-  SemesterService.deleteSemester(id);
-  semesters.value = SemesterService.getSemestersByUserId(loggedUserId);
+async function loadSemesters(): Promise<void> {
+  try {
+    semesters.value = await SemesterService.getSemesters();
+  } catch (error: unknown) {
+    errorMessage.value = ErrorUtil.getErrorMessage(error);
+  }
 }
+
+async function deleteSemester(id: number): Promise<void> {
+  try {
+    await SemesterService.deleteSemester(id);
+    await loadSemesters();
+  } catch (error: unknown) {
+    errorMessage.value = ErrorUtil.getErrorMessage(error);
+  }
+}
+
+// Lifecycle
+onMounted(loadSemesters);
 ```
 
 ### 7.3 Capas `[P06][P11]`
@@ -265,7 +261,7 @@ function deleteSemester(id: number): void {
 
 ## 9. Despliegue `[E1][T08]`
 
-- El despliegue que evalúa el profesor es una VM de GCP que sirve por **HTTP** la imagen del `Dockerfile` (build multietapa y nginx con fallback de SPA). Con el backend, ambos proyectos se levantan con `docker-compose.yml` como en el Tutorial 08 (issue #29). GitHub Pages ya no se usa: la página es HTTPS y el navegador bloquea sus llamadas a una API por HTTP.
+- El despliegue que evalúa el profesor es una VM de GCP que sirve por **HTTP** la imagen del `Dockerfile` (build multietapa y nginx con fallback de SPA). Con el backend, ambos proyectos se levantan con `docker-compose.yml` como en el Tutorial 08. GitHub Pages ya no se usa: la página es HTTPS y el navegador bloquea sus llamadas a una API por HTTP.
 - El código debe funcionar sin HTTPS. `localhost` cuenta como contexto seguro y oculta este tipo de errores: para reproducir la VM, compilar el frontend con `VITE_API_BASE_URL=http://<IP>:3000 npm run build`, servirlo con `npm run preview -- --host`, arrancar la API con `http://<IP>:4173` en `CORS_ORIGIN` y abrir la SPA por la IP de la red.
 - Antes de cerrar cualquier cambio que toque autenticación o CRUDs, probar sobre el build: iniciar sesión, cerrar sesión, crear, editar y eliminar.
 - No cambiar la estrategia de despliegue sin que el equipo lo pida.
@@ -286,6 +282,7 @@ function deleteSemester(id: number): void {
 - El servicio es `@Injectable()`, contiene la lógica y la validación, y accede a los datos con `@InjectRepository(Entidad) private readonly <entidades>Repository: Repository<Entidad>`. Sus métodos son asíncronos y devuelven `Promise<T>`.
 - Nombres de métodos como en los tutoriales: `findAll`, `findOne`, `create`, `update` y `remove`. Los que trabajan con datos de un estudiante reciben su ID: `findAll(userId)`, `findOne(id, userId)`, `create(dto, userId)`, `update(id, dto, userId)`, `remove(id, userId)`.
 - Los DTOs son clases sin decoradores, como en el Tutorial 06. La validación la hace el servicio y responde `BadRequestException` con el mensaje en español.
+- La validación no confía en el tipo del DTO, porque el cuerpo lo escribe el cliente: acepta que el cuerpo no llegue y revisa el tipo de cada campo. Un dato mal formado responde 400, nunca 500. Un ID de ruta que no es número responde 404 y un filtro (`?semesterId=`) que no es número, 400.
 - Errores con las excepciones de Nest: 400 `BadRequestException` (datos inválidos), 401 `UnauthorizedException` (sin sesión), 403 (lo responde `RolesGuard`), 404 `NotFoundException` (no existe o es de otro usuario) y 409 `ConflictException` (correo repetido).
 
 ### 10.3 Entidades, migraciones y datos `[P10][P11][T07]`
@@ -308,9 +305,9 @@ function deleteSemester(id: number): void {
 ### 10.5 Frontend conectado a la API `[P11][T07][T08]`
 
 - Los servicios que llaman a la API extienden `BaseService` y piden el cliente con el `getClient()` heredado (`AuthService.getClient()`), que arma axios con `VITE_API_BASE_URL` + `/api` y el token. Nunca se llama a axios desde un SFC ni se escribe la URL en un servicio.
-- Esos servicios son asíncronos y devuelven `Promise<T>`. Las vistas cargan sus datos dentro de `onMounted(async () => ...)` con `try/catch` y muestran los errores con `ErrorUtil.getErrorMessage()`. Queda prohibido `await` en el nivel superior de `<script setup>`.
-- Los componentes no llaman servicios: la vista carga los datos una vez y se los pasa por props.
-- Al terminar la fase 2 se eliminan los seeders, los stores de entidades, `IdUtil` y las cascadas manuales; `AuthStore` es el único store que queda. Las interfaces describen el JSON de la API, así que `createdAt` y `updatedAt` pasan a ser fechas ISO (`string`).
+- Esos servicios son asíncronos y devuelven `Promise<T>`. Las vistas cargan y muestran errores como dice la sección 7.2.
+- Los componentes no llaman servicios: la vista carga los datos una vez y se los pasa por props. La única excepción son los formularios, que llaman a `validateFields()` del servicio para validar cada campo mientras se escribe: es síncrono, no usa la API y el backend vuelve a validar.
+- El frontend no tiene seeders, stores de entidades, `IdUtil` ni cascadas manuales; `AuthStore` es el único store.
 
 ### 10.6 Contrato de la API `[P10]`
 
@@ -354,19 +351,21 @@ Todas las rutas llevan el prefijo `/api`. Estudiante = cualquier usuario con ses
 
 | No hacer                                                                               | Hacer                                                  | Origen     |
 | -------------------------------------------------------------------------------------- | ------------------------------------------------------ | ---------- |
-| `src/data/seedData.ts` con un grafo de objetos y referencias circulares                | Un seeder plano por entidad con IDs literales          | [E1]       |
+| `src/data/seedData.ts` con un grafo de objetos y referencias circulares                | Datos de prueba en la migración `SeedDemoData`         | [E1]       |
 | `flatted` para serializar el estado                                                    | `JSON.stringify` sobre interfaces planas               | [E1]       |
 | `subject: SubjectInterface`, `grades: GradeInterface[]` en una interfaz                | `subjectId: number`                                    | [E1]       |
 | Colección del store en singular (`subject`, `grade`)                                   | `subjects`, `grades`                                   | [E1]       |
-| `crypto.randomUUID()`                                                                  | Máximo existente + 1                                   | [E1]       |
+| `crypto.randomUUID()`                                                                  | IDs asignados por la base de datos                     | [E1]       |
 | `async`/`await`/`Promise` en servicios que leen Pinia                                  | Métodos síncronos                                      | [E1]       |
-| `findAllByCurrentUser()` que filtra por la sesión                                      | `getSemestersByUserId(userId)` + guards                | [E1]       |
-| `findBySubjectId`, `findAll`, `findById`                                               | `getGradesBySubjectId`, `getGrades`, `getGradeById`    | [E1][T04]  |
+| Servicio del frontend que filtra por la sesión                                         | La API filtra con el usuario del token + guards        | [E1]       |
+| `findBySubjectId`, `findAll`, `findById` en servicios del frontend                     | `getGradesBySubjectId`, `getGrades`, `getGradeById`    | [E1][T04]  |
+| `findAllByUserId`, `findOneByUserId` en servicios del backend                          | `findAll(userId)`, `findOne(id, userId)`               | [T06]      |
 | Vista o componente que importa `AuthStore`                                             | `AuthService.getLoggedUser()`                          | [E1]       |
 | Funciones y constantes sueltas (`generateGradeId`, `EMAIL_PATTERN`, `HTML_ESCAPES`)    | Miembros de la clase o variables dentro del método     | [E1]       |
 | `private constructor() {}` en utils                                                    | Clase sin constructor                                  | [E1]       |
 | Clase de cálculo puro dentro de `services/`                                            | Util                                                   | [E1][P07]  |
-| `onMounted(loadData)` + `Promise.all` para datos locales                               | Inicializar el `ref` con el servicio                   | [E1]       |
+| Vista que guarda `errorMessage` y no lo muestra                                        | `<p v-if="errorMessage" … role="alert">`               | [P11]      |
+| 500 cuando el cuerpo falta o un campo trae otro tipo                                   | `validate` que revisa tipos y responde 400             | [P10]      |
 | `component: () => import(...)` en el router                                            | Import estático                                        | [E1]       |
 | Guards `async`                                                                         | Guards síncronos                                       | [E1]       |
 | Comentarios de sección distintos en cada archivo, en dos idiomas o sin línea en blanco | Vocabulario fijo de la sección 3.4                     | [E1]       |
@@ -395,11 +394,12 @@ Todas las rutas llevan el prefijo `/api`. Estudiante = cualquier usuario con ses
 
 - [ ] `npm test` y `npm run check` pasan en `frontend/` y en `backend/`.
 - [ ] Ningún archivo de clase tiene código suelto; utils sin constructor.
-- [ ] Servicios síncronos, sin filtros por sesión y con nombres `get…`/`create…`/`update…`/`delete…`.
-- [ ] Interfaces con relaciones solo por ID; seeders planos, uno por entidad.
+- [ ] Servicios del frontend asíncronos sobre `BaseService`, sin filtros por sesión y con nombres `get…`/`create…`/`update…`/`delete…`; servicios del backend con `findAll`/`findOne`/`create`/`update`/`remove`.
+- [ ] Interfaces con relaciones solo por ID y fechas como texto ISO; ni seeders ni stores de entidades en el frontend.
 - [ ] Comentarios de sección con el vocabulario fijo y línea en blanco antes de cada uno.
-- [ ] Cada clase, interfaz, DTO, store, seeder y método de los `.ts` tiene su comentario TSDoc de una línea en inglés.
-- [ ] Ninguna vista o componente importa stores, seeders ni `localStorage`.
+- [ ] Cada clase, interfaz, DTO, store y método de los `.ts` tiene su comentario TSDoc de una línea en inglés.
+- [ ] Ninguna vista o componente importa stores, axios ni `localStorage`; toda vista que guarda `errorMessage` lo muestra.
+- [ ] La API responde 400 o 404, nunca 500, a un cuerpo vacío, a un campo con otro tipo o a un ID que no es número.
 - [ ] Nada que exija HTTPS; login, logout y CRUDs probados sobre el build contra la API.
 - [ ] Backend: controladores que solo delegan, usuario tomado del token, sin `synchronize: true` y una migración nueva por cada cambio de entidad.
 - [ ] Ninguna abstracción, archivo o librería que el requisito no pida.

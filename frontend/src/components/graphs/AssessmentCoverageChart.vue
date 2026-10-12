@@ -2,6 +2,7 @@
 // Internal imports
 import type { GradeInterface } from '@/interfaces/GradeInterface.js';
 import type { SubjectInterface } from '@/interfaces/SubjectInterface.js';
+import { AnalyticsUtil } from '@/utils/AnalyticsUtil.js';
 
 // External imports
 import type { ChartData, ChartOptions } from 'chart.js';
@@ -11,27 +12,24 @@ import { Bar } from 'vue-chartjs';
 // Props
 const props = defineProps<{ grades: GradeInterface[]; subjects: SubjectInterface[] }>();
 
+// State
+const chartOptions: ChartOptions<'bar'> = {
+  maintainAspectRatio: false,
+  scales: { y: { beginAtZero: true, max: 100 } },
+};
+
 // Computed
 const chartData = computed<ChartData<'bar'>>((): ChartData<'bar'> => ({
   datasets: [
     {
       backgroundColor: '#e7a547',
       borderRadius: 8,
-      data: props.subjects.map((subject: SubjectInterface): number =>
-        props.grades
-          .filter((grade: GradeInterface): boolean => grade.subjectId === subject.id)
-          .reduce((total: number, grade: GradeInterface): number => total + grade.percentage, 0),
-      ),
+      data: AnalyticsUtil.getCoverageBySubject(props.subjects, props.grades),
       label: 'Porcentaje evaluado',
     },
   ],
   labels: props.subjects.map((subject: SubjectInterface): string => subject.code),
 }));
-
-const chartOptions: ChartOptions<'bar'> = {
-  maintainAspectRatio: false,
-  scales: { y: { beginAtZero: true, max: 100 } },
-};
 </script>
 
 <template>

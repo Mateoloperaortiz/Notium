@@ -24,11 +24,11 @@ export class SubjectsController {
 
   /** GET /api/subjects: the user's subjects; optional ?semesterId filters by semester. */
   @Get()
-  public findAllByUserId(
+  public findAll(
     @CurrentUser() user: JwtPayload,
     @Query('semesterId') semesterId?: string,
   ): Promise<Subject[]> {
-    return this.subjectsService.findAllByUserId(
+    return this.subjectsService.findAll(
       user.sub,
       semesterId === undefined ? undefined : Number(semesterId),
     );
@@ -36,11 +36,8 @@ export class SubjectsController {
 
   /** GET /api/subjects/:id: one subject; 404 if it does not exist or is another user's. */
   @Get(':id')
-  public findOneByUserId(
-    @CurrentUser() user: JwtPayload,
-    @Param('id') id: string,
-  ): Promise<Subject> {
-    return this.subjectsService.findOneByUserId(Number(id), user.sub);
+  public findOne(@CurrentUser() user: JwtPayload, @Param('id') id: string): Promise<Subject> {
+    return this.subjectsService.findOne(Number(id), user.sub);
   }
 
   /** POST /api/subjects: creates a subject in a semester the user owns. */

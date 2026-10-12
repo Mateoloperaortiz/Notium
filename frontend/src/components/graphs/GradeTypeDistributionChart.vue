@@ -11,6 +11,12 @@ import { Doughnut } from 'vue-chartjs';
 // Props
 const props = defineProps<{ grades: GradeInterface[] }>();
 
+// State
+const chartOptions: ChartOptions<'doughnut'> = {
+  maintainAspectRatio: false,
+  plugins: { legend: { position: 'bottom' } },
+};
+
 // Computed
 const chartData = computed<ChartData<'doughnut'>>((): ChartData<'doughnut'> => {
   const colors: string[] = ['#236b56', '#e7a547', '#9ed2bd', '#a53f3f', '#65766f'];
@@ -22,20 +28,12 @@ const chartData = computed<ChartData<'doughnut'>>((): ChartData<'doughnut'> => {
         backgroundColor: gradeTypes.map(
           (_type: string, index: number): string => colors[index % colors.length] ?? '#236b56',
         ),
-        data: gradeTypes.map(
-          (type: string): number =>
-            props.grades.filter((grade: GradeInterface): boolean => grade.type === type).length,
-        ),
+        data: AnalyticsUtil.getGradeTypeCounts(props.grades),
       },
     ],
     labels: gradeTypes,
   };
 });
-
-const chartOptions: ChartOptions<'doughnut'> = {
-  maintainAspectRatio: false,
-  plugins: { legend: { position: 'bottom' } },
-};
 </script>
 
 <template>

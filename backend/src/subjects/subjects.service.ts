@@ -1,5 +1,5 @@
-import { CreateSubjectDto } from './dto/create-subject.dto.js';
-import { UpdateSubjectDto } from './dto/update-subject.dto.js';
+import type { CreateSubjectDto } from './dto/create-subject.dto.js';
+import type { UpdateSubjectDto } from './dto/update-subject.dto.js';
 import { Subject } from './entities/subject.entity.js';
 import { Semester } from '../semesters/entities/semester.entity.js';
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
@@ -16,8 +16,12 @@ export class SubjectsService {
     private readonly semestersRepository: Repository<Semester>,
   ) {}
 
-  /** Returns the users subjects, optionally only those of one of the user's semesters. */
-  public findAllByUserId(userId: number, semesterId?: number): Promise<Subject[]> {
+  /** Returns the user's subjects, optionally only those of one of the user's semesters. */
+  public async findAll(userId: number, semesterId?: number): Promise<Subject[]> {
+    if (semesterId !== undefined && !Number.isInteger(semesterId)) {
+      throw new BadRequestException('El semestre del filtro no es válido.');
+    }
+
     const query = this.subjectsRepository
       .createQueryBuilder('subject')
       .innerJoin('subject.semester', 'semester')
@@ -31,13 +35,15 @@ export class SubjectsService {
   }
 
   /** Returns one subject of the user; throws 404 if it does not exist or is another user's. */
-  public async findOneByUserId(id: number, userId: number): Promise<Subject> {
-    const subject = await this.subjectsRepository
-      .createQueryBuilder('subject')
-      .innerJoin('subject.semester', 'semester')
-      .where('subject.id = :id', { id })
-      .andWhere('semester.userId = :userId', { userId })
-      .getOne();
+  public async findOne(id: number, userId: number): Promise<Subject> {
+    const subject = Number.isInteger(id)
+      ? await this.subjectsRepository
+          .createQueryBuilder('subject')
+          .innerJoin('subject.semester', 'semester')
+          .where('subject.id = :id', { id })
+          .andWhere('semester.userId = :userId', { userId })
+          .getOne()
+      : null;
 
     if (subject === null) {
       throw new NotFoundException('No encontramos la materia que buscas.');
@@ -47,50 +53,47 @@ export class SubjectsService {
   }
 
   /** Validates the data and saves a new subject in a semester the user owns. */
-  public async create(dto: CreateSubjectDto, userId: number): Promise<Subject> {
-    SubjectsService.validate(dto);
-    await this.assertSemesterOwned(dto.semesterId, userId);
+  public async create(dto: CreateSubjectDto | undefined, userId: number): Promise<Subject> {
+    const data = SubjectsService.validate(dto);
 
-    const subject = this.subjectsRepository.create({
-      code: dto.code.trim(),
-      credits: dto.credits,
-      name: dto.name.trim(),
-      professor: dto.professor.trim(),
-      semesterId: dto.semesterId,
-    });
+    await this.assertSemesterOwned(data.semesterId, userId);
+
+    const subject = this.subjectsRepository.create(data);
 
     return this.subjectsRepository.save(subject);
   }
 
   /** Validates and applies the changes to a subject of the user. */
-  public async update(id: number, dto: UpdateSubjectDto, userId: number): Promise<Subject> {
-    const subject = await this.findOneByUserId(id, userId);
-    const merged = {
-      code: dto.code ?? subject.code,
-      credits: dto.credits ?? subject.credits,
-      name: dto.name ?? subject.name,
-      professor: dto.professor ?? subject.professor,
-      semesterId: dto.semesterId ?? subject.semesterId,
-    };
+  public async update(
+    id: number,
+    dto: UpdateSubjectDto | undefined,
+    userId: number,
+  ): Promise<Subject> {
+    const subject = await this.findOne(id, userId);
+    const data = SubjectsService.validate({
+      code: dto?.code ?? subject.code,
+      credits: dto?.credits ?? subject.credits,
+      name: dto?.name ?? subject.name,
+      professor: dto?.professor ?? subject.professor,
+      semesterId: dto?.semesterId ?? subject.semesterId,
+    });
 
-    SubjectsService.validate(merged);
-
-    if (merged.semesterId !== subject.semesterId) {
-      await this.assertSemesterOwned(merged.semesterId, userId);
+    if (data.semesterId !== subject.semesterId) {
+      await this.assertSemesterOwned(data.semesterId, userId);
     }
 
-    subject.code = merged.code.trim();
-    subject.credits = merged.credits;
-    subject.name = merged.name.trim();
-    subject.professor = merged.professor.trim();
-    subject.semesterId = merged.semesterId;
+    subject.code = data.code;
+    subject.credits = data.credits;
+    subject.name = data.name;
+    subject.professor = data.professor;
+    subject.semesterId = data.semesterId;
 
     return this.subjectsRepository.save(subject);
   }
 
   /** Deletes a subject of the user; its grades go in cascade. */
   public async remove(id: number, userId: number): Promise<void> {
-    const subject = await this.findOneByUserId(id, userId);
+    const subject = await this.findOne(id, userId);
 
     await this.subjectsRepository.remove(subject);
   }
@@ -104,13 +107,25 @@ export class SubjectsService {
     }
   }
 
-  /** Throws the first validation message in Spanish; returns nothing when the data is valid. */
-  private static validate(dto: CreateSubjectDto): void {
-    if ((dto.code?.trim() ?? '') === '') {
+  /** Returns the data trimmed, or throws 400 with the first problem; the body may be missing. */
+  private static validate(dto: CreateSubjectDto | undefined): CreateSubjectDto {
+    if (dto === undefined) {
+      throw new BadRequestException('Envía los datos de la materia.');
+    }
+
+    const code = typeof dto.code === 'string' ? dto.code.trim() : '';
+    const name = typeof dto.name === 'string' ? dto.name.trim() : '';
+    const professor = typeof dto.professor === 'string' ? dto.professor.trim() : '';
+
+    if (!Number.isInteger(dto.semesterId)) {
+      throw new BadRequestException('Selecciona un semestre.');
+    }
+
+    if (code === '') {
       throw new BadRequestException('El código es obligatorio.');
     }
 
-    if ((dto.name?.trim() ?? '') === '') {
+    if (name === '') {
       throw new BadRequestException('El nombre es obligatorio.');
     }
 
@@ -118,8 +133,10 @@ export class SubjectsService {
       throw new BadRequestException('Los créditos deben ser un número entero mayor que cero.');
     }
 
-    if ((dto.professor?.trim() ?? '') === '') {
+    if (professor === '') {
       throw new BadRequestException('El profesor es obligatorio.');
     }
+
+    return { code, credits: dto.credits, name, professor, semesterId: dto.semesterId };
   }
 }

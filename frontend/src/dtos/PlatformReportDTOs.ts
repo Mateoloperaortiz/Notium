@@ -1,5 +1,15 @@
-import type { StatusSemester } from '@/interfaces/SemesterInterface.js';
-import type { Role } from '@/interfaces/UserInterface.js';
+import type { GradeInterface } from '@/interfaces/GradeInterface.js';
+import type { SemesterInterface, StatusSemester } from '@/interfaces/SemesterInterface.js';
+import type { SubjectInterface } from '@/interfaces/SubjectInterface.js';
+import type { Role, UserInterface } from '@/interfaces/UserInterface.js';
+
+/** Raw platform data from GET /api/reports/platform; PlatformReportUtil aggregates it. */
+export interface PlatformReportDTO {
+  users: UserInterface[];
+  semesters: SemesterInterface[];
+  subjects: SubjectInterface[];
+  grades: GradeInterface[];
+}
 
 /** Filters chosen on the admin reports page; an undefined field means "all". */
 export interface PlatformReportFilterDTO {

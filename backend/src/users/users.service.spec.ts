@@ -1,7 +1,7 @@
-import { UsersService } from './users.service.js';
 import type { CreateUserDto } from './dto/create-user.dto.js';
 import { User } from './entities/user.entity.js';
 import { Role } from './enums/role.enum.js';
+import { UsersService } from './users.service.js';
 import { ConflictException, NotFoundException } from '@nestjs/common';
 import type { Repository } from 'typeorm';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -101,5 +101,20 @@ describe('UsersService', (): void => {
     await service.remove(1);
 
     expect(repository.remove).toHaveBeenCalledWith(user);
+  });
+
+  it('answers 400 when the body is missing', async (): Promise<void> => {
+    await expect(service.create(undefined)).rejects.toThrow('Envía los datos del usuario.');
+  });
+
+  it('answers 400 when the email is not text', async (): Promise<void> => {
+    const dto = { ...validDto(), email: 42 } as unknown as CreateUserDto;
+
+    await expect(service.create(dto)).rejects.toThrow('Ingresa un correo válido.');
+  });
+
+  it('returns null without querying when the id is not a number', async (): Promise<void> => {
+    await expect(service.findOne(Number('abc'))).resolves.toBeNull();
+    expect(repository.findOneBy).not.toHaveBeenCalled();
   });
 });

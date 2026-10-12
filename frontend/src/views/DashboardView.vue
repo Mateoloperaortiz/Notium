@@ -69,6 +69,10 @@ onMounted(loadData);
       </RouterLink>
     </header>
 
+    <p v-if="errorMessage" class="status-message status-message--error" role="alert">
+      {{ errorMessage }}
+    </p>
+
     <div class="dashboard-page__grid">
       <article class="dashboard-stat dashboard-stat--highlight">
         <span class="dashboard-stat__label">Recorrido académico</span>
@@ -105,6 +109,10 @@ onMounted(loadData);
 </template>
 
 <style scoped>
+.dashboard-page > .status-message {
+  margin-top: 1.5rem;
+}
+
 .dashboard-page__header {
   display: flex;
   align-items: end;
