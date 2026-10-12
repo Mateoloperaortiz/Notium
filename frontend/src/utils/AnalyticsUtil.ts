@@ -67,6 +67,70 @@ export class AnalyticsUtil {
     );
   }
 
+  /** Average grade of each semester, in the order received; 0 when it has no grades. */
+  public static getAverageBySemester(
+    semesters: SemesterInterface[],
+    subjects: SubjectInterface[],
+    grades: GradeInterface[],
+  ): number[] {
+    return semesters.map(
+      (semester: SemesterInterface): number =>
+        AnalyticsUtil.getAverage(
+          AnalyticsUtil.filterGrades(grades, subjects, { semesterId: semester.id }).map(
+            (grade: GradeInterface): number => grade.value,
+          ),
+        ) ?? 0,
+    );
+  }
+
+  /** Average grade of each subject, in the order received; 0 when it has no grades. */
+  public static getAverageBySubject(
+    subjects: SubjectInterface[],
+    grades: GradeInterface[],
+  ): number[] {
+    return subjects.map(
+      (subject: SubjectInterface): number =>
+        AnalyticsUtil.getAverage(
+          AnalyticsUtil.filterGrades(grades, [subject], {}).map(
+            (grade: GradeInterface): number => grade.value,
+          ),
+        ) ?? 0,
+    );
+  }
+
+  /** Sum of the percentages already graded in each subject, in the order received. */
+  public static getCoverageBySubject(
+    subjects: SubjectInterface[],
+    grades: GradeInterface[],
+  ): number[] {
+    return subjects.map((subject: SubjectInterface): number =>
+      AnalyticsUtil.filterGrades(grades, [subject], {}).reduce(
+        (total: number, grade: GradeInterface): number => total + grade.percentage,
+        0,
+      ),
+    );
+  }
+
+  /** Total credits of each semester, in the order received. */
+  public static getCreditsBySemester(
+    semesters: SemesterInterface[],
+    subjects: SubjectInterface[],
+  ): number[] {
+    return semesters.map((semester: SemesterInterface): number =>
+      subjects
+        .filter((subject: SubjectInterface): boolean => subject.semesterId === semester.id)
+        .reduce((total: number, subject: SubjectInterface): number => total + subject.credits, 0),
+    );
+  }
+
+  /** Number of grades of each type, in the order of getGradeTypes. */
+  public static getGradeTypeCounts(grades: GradeInterface[]): number[] {
+    return AnalyticsUtil.getGradeTypes(grades).map(
+      (type: string): number =>
+        grades.filter((grade: GradeInterface): boolean => grade.type === type).length,
+    );
+  }
+
   /** Grades in date order, for the evolution chart. */
   public static getEvolutionSeries(grades: GradeInterface[]): EvolutionPointDTO[] {
     return [...grades]

@@ -129,6 +129,10 @@ onMounted(loadData);
       </p>
     </header>
 
+    <p v-if="errorMessage" class="status-message status-message--error" role="alert">
+      {{ errorMessage }}
+    </p>
+
     <div class="analytics-page__filters">
       <label>
         Semestre
@@ -177,6 +181,10 @@ onMounted(loadData);
 </template>
 
 <style scoped>
+.analytics-page > .status-message {
+  margin-top: 1.5rem;
+}
+
 .analytics-page__filters {
   display: flex;
   gap: 1.25rem;

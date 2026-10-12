@@ -17,37 +17,24 @@ const props = defineProps<{
   subjects: SubjectInterface[];
 }>();
 
+// State
+const chartOptions: ChartOptions<'bar'> = {
+  maintainAspectRatio: false,
+  scales: { y: { beginAtZero: true, max: 5 } },
+};
+
 // Computed
 const chartData = computed<ChartData<'bar'>>((): ChartData<'bar'> => ({
   datasets: [
     {
       backgroundColor: '#236b56',
       borderRadius: 8,
-      data: props.semesters.map((semester: SemesterInterface): number => {
-        const semesterSubjectIds = props.subjects
-          .filter((subject: SubjectInterface): boolean => subject.semesterId === semester.id)
-          .map((subject: SubjectInterface): number => subject.id);
-
-        return (
-          AnalyticsUtil.getAverage(
-            props.grades
-              .filter((grade: GradeInterface): boolean =>
-                semesterSubjectIds.includes(grade.subjectId),
-              )
-              .map((grade: GradeInterface): number => grade.value),
-          ) ?? 0
-        );
-      }),
+      data: AnalyticsUtil.getAverageBySemester(props.semesters, props.subjects, props.grades),
       label: 'Promedio',
     },
   ],
   labels: props.semesters.map((semester: SemesterInterface): string => semester.name),
 }));
-
-const chartOptions: ChartOptions<'bar'> = {
-  maintainAspectRatio: false,
-  scales: { y: { beginAtZero: true, max: 5 } },
-};
 </script>
 
 <template>

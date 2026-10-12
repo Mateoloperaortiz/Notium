@@ -1,4 +1,4 @@
-import type { PlatformReportDTO } from '@/dtos/PlatformReportResponseDTO.js';
+import type { PlatformReportDTO } from '@/dtos/PlatformReportDTOs.js';
 import { BaseService } from '@/services/BaseService.js';
 
 /** Reads the platform-wide report for administrators through the API. */

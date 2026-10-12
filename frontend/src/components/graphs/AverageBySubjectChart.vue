@@ -12,30 +12,24 @@ import { Bar } from 'vue-chartjs';
 // Props
 const props = defineProps<{ grades: GradeInterface[]; subjects: SubjectInterface[] }>();
 
+// State
+const chartOptions: ChartOptions<'bar'> = {
+  maintainAspectRatio: false,
+  scales: { y: { beginAtZero: true, max: 5 } },
+};
+
 // Computed
 const chartData = computed<ChartData<'bar'>>((): ChartData<'bar'> => ({
   datasets: [
     {
       backgroundColor: '#e7a547',
       borderRadius: 8,
-      data: props.subjects.map(
-        (subject: SubjectInterface): number =>
-          AnalyticsUtil.getAverage(
-            props.grades
-              .filter((grade: GradeInterface): boolean => grade.subjectId === subject.id)
-              .map((grade: GradeInterface): number => grade.value),
-          ) ?? 0,
-      ),
+      data: AnalyticsUtil.getAverageBySubject(props.subjects, props.grades),
       label: 'Promedio',
     },
   ],
   labels: props.subjects.map((subject: SubjectInterface): string => subject.code),
 }));
-
-const chartOptions: ChartOptions<'bar'> = {
-  maintainAspectRatio: false,
-  scales: { y: { beginAtZero: true, max: 5 } },
-};
 </script>
 
 <template>

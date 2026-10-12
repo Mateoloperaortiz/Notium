@@ -131,6 +131,10 @@ onMounted(loadReport);
       </p>
     </header>
 
+    <p v-if="errorMessage" class="status-message status-message--error" role="alert">
+      {{ errorMessage }}
+    </p>
+
     <div class="admin-reports-page__filters">
       <label>
         Año
@@ -180,6 +184,10 @@ onMounted(loadReport);
 </template>
 
 <style scoped>
+.admin-reports-page > .status-message {
+  margin-top: 1.5rem;
+}
+
 .admin-reports-page__filters {
   display: flex;
   gap: 1.25rem;

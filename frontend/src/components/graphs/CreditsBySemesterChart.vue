@@ -2,6 +2,7 @@
 // Internal imports
 import type { SemesterInterface } from '@/interfaces/SemesterInterface.js';
 import type { SubjectInterface } from '@/interfaces/SubjectInterface.js';
+import { AnalyticsUtil } from '@/utils/AnalyticsUtil.js';
 
 // External imports
 import type { ChartData, ChartOptions } from 'chart.js';
@@ -11,6 +12,12 @@ import { Bar } from 'vue-chartjs';
 // Props
 const props = defineProps<{ semesters: SemesterInterface[]; subjects: SubjectInterface[] }>();
 
+// State
+const chartOptions: ChartOptions<'bar'> = {
+  maintainAspectRatio: false,
+  scales: { y: { beginAtZero: true, ticks: { precision: 0 } } },
+};
+
 // Computed
 const chartData = computed<ChartData<'bar'>>((): ChartData<'bar'> => ({
   datasets: [
@@ -18,21 +25,12 @@ const chartData = computed<ChartData<'bar'>>((): ChartData<'bar'> => ({
       backgroundColor: '#9ed2bd',
       borderColor: '#236b56',
       borderWidth: 1,
-      data: props.semesters.map((semester: SemesterInterface): number =>
-        props.subjects
-          .filter((subject: SubjectInterface): boolean => subject.semesterId === semester.id)
-          .reduce((total: number, subject: SubjectInterface): number => total + subject.credits, 0),
-      ),
+      data: AnalyticsUtil.getCreditsBySemester(props.semesters, props.subjects),
       label: 'Créditos',
     },
   ],
   labels: props.semesters.map((semester: SemesterInterface): string => semester.name),
 }));
-
-const chartOptions: ChartOptions<'bar'> = {
-  maintainAspectRatio: false,
-  scales: { y: { beginAtZero: true, ticks: { precision: 0 } } },
-};
 </script>
 
 <template>

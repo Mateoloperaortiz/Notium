@@ -21,6 +21,8 @@ const editingGrade = ref<GradeInterface>();
 const selectedSubjectId = ref<number>(0);
 const errorMessage = ref<string>('');
 const isFormOpen = ref<boolean>(false);
+
+// Computed
 const subjectNames = computed<Record<number, string>>((): Record<number, string> =>
   subjects.value.reduce(
     (names: Record<number, string>, subject: SubjectInterface): Record<number, string> => {
@@ -31,6 +33,7 @@ const subjectNames = computed<Record<number, string>>((): Record<number, string>
     {},
   ),
 );
+
 const tableColumns = computed((): unknown[] => [
   {
     data: 'title',
@@ -74,7 +77,6 @@ const tableColumns = computed((): unknown[] => [
   },
 ]);
 
-// Computed
 const filteredGrades = computed<GradeInterface[]>((): GradeInterface[] =>
   selectedSubjectId.value === 0
     ? grades.value
