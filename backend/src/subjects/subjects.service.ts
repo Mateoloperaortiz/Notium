@@ -16,7 +16,7 @@ export class SubjectsService {
     private readonly semestersRepository: Repository<Semester>,
   ) {}
 
-  /** Returns the user's subjects, optionally only those of one of the user's semesters. */
+  /** Returns the users subjects, optionally only those of one of the user's semesters. */
   public findAllByUserId(userId: number, semesterId?: number): Promise<Subject[]> {
     const query = this.subjectsRepository
       .createQueryBuilder('subject')
