@@ -8,11 +8,10 @@ El repositorio tiene dos proyectos:
 - `frontend/`: SPA en Vue 3, TypeScript y Vite.
 - `backend/`: API REST en Nest.js con TypeORM y SQLite.
 
-El inicio de sesión ya funciona contra la API con JWT. Los CRUD de semestres, materias, notas y
-usuarios pasan a la API en la fase 2 de la Entrega 1 Parte 2 (issues #25 a #28); mientras tanto
-siguen leyendo los datos semilla del navegador. Por eso, hasta el issue #27, los usuarios que se
-crean, editan o eliminan en `/admin/users` no cambian quién puede iniciar sesión: el login solo
-reconoce las cuentas de la API.
+El frontend obtiene todos sus datos de la API: el inicio de sesión con JWT, los CRUD de
+semestres, materias y notas del estudiante, y el CRUD de usuarios y los reportes del
+administrador. Ya no tiene seeders ni stores de entidades; en el navegador solo se guarda la
+sesión. Los datos de prueba los crea la migración `SeedDemoData` del backend.
 
 ## Requisitos
 
@@ -88,7 +87,7 @@ frontend/src/
 ├── interfaces/             # Entidades del dominio y enumeraciones
 ├── router/                 # Rutas de la SPA y guards
 ├── services/               # BaseService (axios) y un servicio por entidad
-├── stores/                 # Estado global en Setup Stores
+├── stores/                 # AuthStore: token y usuario en sesión
 ├── utils/                  # Utilidades puras
 └── views/                  # Pantallas asociadas a rutas
 
@@ -96,10 +95,11 @@ backend/src/
 ├── auth/                   # Login con JWT, guards y decoradores
 ├── database/               # Configuración de TypeORM y migraciones
 ├── home/                   # GET /api
-├── users/                  # Entidad y servicio de usuarios
-├── semesters/              # Entidad de semestres (el módulo llega en la fase 2)
-├── subjects/               # Entidad de materias (el módulo llega en la fase 2)
-└── grades/                 # Entidad de notas (el módulo llega en la fase 2)
+├── users/                  # CRUD de usuarios (solo administradores)
+├── semesters/              # CRUD de semestres del estudiante
+├── subjects/               # CRUD de materias del estudiante
+├── grades/                 # CRUD de notas del estudiante
+└── reports/                # GET /api/reports/platform (solo administradores)
 ```
 
 El acceso a datos sigue este flujo:
@@ -111,7 +111,7 @@ Vista → Servicio del frontend → API (/api) → Controlador → Servicio de N
 ## Despliegue
 
 El despliegue evaluado es una máquina virtual de GCP servida por HTTP. Ambos proyectos se
-levantan con `docker-compose.yml` como en el Tutorial 08 (issue #29). GitHub Pages
+levantan con `docker-compose.yml` como en el Tutorial 08. GitHub Pages
 ya no se usa: la página es HTTPS y el navegador bloquea sus llamadas a una API por HTTP.
 
 La imagen del frontend (`frontend/Dockerfile`) se construye en dos etapas: la primera compila la
@@ -163,4 +163,4 @@ gcloud compute instances stop notium-demo --project=notium-demo-20260930 --zone=
 
 Una VM apagada deja de cobrar cómputo y libera su IP temporal. El disco conservado puede
 seguir generando cargos de almacenamiento. El enlace de la presentación será la IP consultada
-después del arranque; los CRUD siguen siendo locales hasta completar los issues #25 a #28.
+después del arranque.
