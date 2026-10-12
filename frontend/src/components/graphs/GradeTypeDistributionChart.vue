@@ -1,37 +1,37 @@
 <script setup lang="ts">
 // Internal imports
 import type { GradeInterface } from '@/interfaces/GradeInterface.js';
-import { AuthService } from '@/services/AuthService.js';
-import { GradeService } from '@/services/GradeService.js';
-import { SemesterService } from '@/services/SemesterService.js';
-import { SubjectService } from '@/services/SubjectService.js';
 import { AnalyticsUtil } from '@/utils/AnalyticsUtil.js';
 
 // External imports
 import type { ChartData, ChartOptions } from 'chart.js';
+import { computed } from 'vue';
 import { Doughnut } from 'vue-chartjs';
 
-// State
-const colors: string[] = ['#236b56', '#e7a547', '#9ed2bd', '#a53f3f', '#65766f'];
-const loggedUserId = AuthService.getLoggedUser()?.id ?? 0;
-const semesters = SemesterService.getSemestersByUserId(loggedUserId);
-const subjects = SubjectService.getSubjectsBySemesters(semesters);
-const grades = GradeService.getGradesBySubjects(subjects);
-const gradeTypes = AnalyticsUtil.getGradeTypes(grades);
-const chartData: ChartData<'doughnut'> = {
-  labels: gradeTypes,
-  datasets: [
-    {
-      backgroundColor: gradeTypes.map(
-        (_type: string, index: number): string => colors[index % colors.length] ?? '#236b56',
-      ),
-      data: gradeTypes.map(
-        (type: string): number =>
-          grades.filter((grade: GradeInterface): boolean => grade.type === type).length,
-      ),
-    },
-  ],
-};
+// Props
+const props = defineProps<{ grades: GradeInterface[] }>();
+
+// Computed
+const chartData = computed<ChartData<'doughnut'>>((): ChartData<'doughnut'> => {
+  const colors: string[] = ['#236b56', '#e7a547', '#9ed2bd', '#a53f3f', '#65766f'];
+  const gradeTypes = AnalyticsUtil.getGradeTypes(props.grades);
+
+  return {
+    datasets: [
+      {
+        backgroundColor: gradeTypes.map(
+          (_type: string, index: number): string => colors[index % colors.length] ?? '#236b56',
+        ),
+        data: gradeTypes.map(
+          (type: string): number =>
+            props.grades.filter((grade: GradeInterface): boolean => grade.type === type).length,
+        ),
+      },
+    ],
+    labels: gradeTypes,
+  };
+});
+
 const chartOptions: ChartOptions<'doughnut'> = {
   maintainAspectRatio: false,
   plugins: { legend: { position: 'bottom' } },

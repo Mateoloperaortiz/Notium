@@ -1,20 +1,13 @@
 <script setup lang="ts">
 // Internal imports
 import type { GradeInterface } from '@/interfaces/GradeInterface.js';
-import { SubjectService } from '@/services/SubjectService.js';
 import { DateFormatUtil } from '@/utils/DateFormatUtil.js';
 
 // External imports
-import { computed } from 'vue';
 import { RouterLink } from 'vue-router';
 
 // Props
-const props = defineProps<{ grade: GradeInterface }>();
-
-// Computed
-const subjectName = computed<string>(
-  (): string => SubjectService.getSubjectById(props.grade.subjectId)?.name ?? '—',
-);
+defineProps<{ grade: GradeInterface; subjectName?: string }>();
 </script>
 
 <template>
@@ -30,7 +23,7 @@ const subjectName = computed<string>(
     <dl class="grade-card__details">
       <div>
         <dt>Materia</dt>
-        <dd>{{ subjectName }}</dd>
+        <dd>{{ subjectName ?? '—' }}</dd>
       </div>
       <div>
         <dt>Porcentaje</dt>

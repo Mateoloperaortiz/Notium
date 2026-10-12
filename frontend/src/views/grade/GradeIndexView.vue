@@ -3,9 +3,8 @@
 import GradeForm from '@/components/grade/GradeForm.vue';
 import type { CreateGradeDTO } from '@/dtos/GradeDTOs.js';
 import type { GradeInterface } from '@/interfaces/GradeInterface.js';
-import { AuthService } from '@/services/AuthService.js';
+import type { SubjectInterface } from '@/interfaces/SubjectInterface.js';
 import { GradeService } from '@/services/GradeService.js';
-import { SemesterService } from '@/services/SemesterService.js';
 import { SubjectService } from '@/services/SubjectService.js';
 import { DateFormatUtil } from '@/utils/DateFormatUtil.js';
 import { ErrorUtil } from '@/utils/ErrorUtil.js';
@@ -13,18 +12,26 @@ import { TableRenderUtil } from '@/utils/TableRenderUtil.js';
 
 // External imports
 import DataTable from 'datatables.net-vue3';
-import { computed, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 
 // State
-const loggedUserId = AuthService.getLoggedUser()?.id ?? 0;
-const semesters = SemesterService.getSemestersByUserId(loggedUserId);
-const subjects = SubjectService.getSubjectsBySemesters(semesters);
-const grades = ref<GradeInterface[]>(GradeService.getGradesBySubjects(subjects));
+const subjects = ref<SubjectInterface[]>([]);
+const grades = ref<GradeInterface[]>([]);
 const editingGrade = ref<GradeInterface>();
 const selectedSubjectId = ref<number>(0);
 const errorMessage = ref<string>('');
 const isFormOpen = ref<boolean>(false);
-const tableColumns = [
+const subjectNames = computed<Record<number, string>>((): Record<number, string> =>
+  subjects.value.reduce(
+    (names: Record<number, string>, subject: SubjectInterface): Record<number, string> => {
+      names[subject.id] = subject.name;
+
+      return names;
+    },
+    {},
+  ),
+);
+const tableColumns = computed((): unknown[] => [
   {
     data: 'title',
     render: (title: string): string => TableRenderUtil.renderText(title),
@@ -38,7 +45,7 @@ const tableColumns = [
   {
     data: 'subjectId',
     render: (subjectId: number): string =>
-      TableRenderUtil.renderText(SubjectService.getSubjectById(subjectId)?.name ?? '—'),
+      TableRenderUtil.renderText(subjectNames.value[subjectId] ?? '—'),
     title: 'Materia',
   },
   { data: 'value', title: 'Nota' },
@@ -65,7 +72,7 @@ const tableColumns = [
     searchable: false,
     title: 'Acciones',
   },
-];
+]);
 
 // Computed
 const filteredGrades = computed<GradeInterface[]>((): GradeInterface[] =>
@@ -87,12 +94,19 @@ const formTitle = computed<string>((): string =>
 );
 
 // Functions
-function loadGrades(): void {
-  grades.value = GradeService.getGradesBySubjects(subjects);
+async function loadData(): Promise<void> {
+  try {
+    [subjects.value, grades.value] = await Promise.all([
+      SubjectService.getSubjects(),
+      GradeService.getGrades(),
+    ]);
+  } catch (error: unknown) {
+    errorMessage.value = ErrorUtil.getErrorMessage(error);
+  }
 }
 
 function openCreateForm(): void {
-  if (subjects.length === 0) {
+  if (subjects.value.length === 0) {
     errorMessage.value = 'Crea una materia antes de registrar una nota.';
     return;
   }
@@ -121,7 +135,7 @@ function handleTableClick(event: MouseEvent): void {
   const action = actionButton?.dataset.action;
 
   if (action === 'edit') {
-    const grade = GradeService.getGradeById(gradeId);
+    const grade = grades.value.find((item: GradeInterface): boolean => item.id === gradeId);
 
     if (grade) {
       openEditForm(grade);
@@ -129,31 +143,29 @@ function handleTableClick(event: MouseEvent): void {
   }
 
   if (action === 'delete') {
-    deleteGrade(gradeId);
+    void deleteGrade(gradeId);
   }
 }
 
-function saveGrade(dto: CreateGradeDTO, subjectId: number): void {
+async function saveGrade(dto: CreateGradeDTO): Promise<void> {
   errorMessage.value = '';
 
   try {
     if (editingGrade.value) {
-      if (!GradeService.updateGrade(editingGrade.value.id, dto)) {
-        throw new Error('La nota que intentas editar ya no existe.');
-      }
+      await GradeService.updateGrade(editingGrade.value.id, dto);
     } else {
-      GradeService.createGrade(dto, subjectId);
+      await GradeService.createGrade(dto);
     }
 
-    loadGrades();
+    await loadData();
     closeForm();
   } catch (error: unknown) {
     errorMessage.value = ErrorUtil.getErrorMessage(error);
   }
 }
 
-function deleteGrade(gradeId: number): void {
-  const grade = GradeService.getGradeById(gradeId);
+async function deleteGrade(gradeId: number): Promise<void> {
+  const grade = grades.value.find((item: GradeInterface): boolean => item.id === gradeId);
 
   if (
     !window.confirm(`¿Eliminar ${grade?.title ?? 'esta nota'}? Esta acción no se puede deshacer.`)
@@ -163,16 +175,20 @@ function deleteGrade(gradeId: number): void {
 
   errorMessage.value = '';
 
-  if (!GradeService.deleteGrade(gradeId)) {
-    errorMessage.value = 'La nota que intentas eliminar ya no existe.';
-  }
+  try {
+    await GradeService.deleteGrade(gradeId);
+    await loadData();
 
-  loadGrades();
-
-  if (editingGrade.value?.id === gradeId) {
-    closeForm();
+    if (editingGrade.value?.id === gradeId) {
+      closeForm();
+    }
+  } catch (error: unknown) {
+    errorMessage.value = ErrorUtil.getErrorMessage(error);
   }
 }
+
+// Lifecycle
+onMounted(loadData);
 </script>
 
 <template>

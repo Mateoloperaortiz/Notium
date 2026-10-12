@@ -8,8 +8,8 @@ export interface SubjectInterface {
   /** Academic credits, a positive integer. */
   credits: number;
   professor: string;
-  /** Creation time as a Unix timestamp in milliseconds. */
-  createdAt: number;
-  /** Last update time as a Unix timestamp in milliseconds. */
-  updatedAt: number;
+  /** Creation time as an ISO date string. */
+  createdAt: string;
+  /** Last update time as an ISO date string. */
+  updatedAt: string;
 }

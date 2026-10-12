@@ -2,34 +2,33 @@
 // Internal imports
 import type { SemesterInterface } from '@/interfaces/SemesterInterface.js';
 import type { SubjectInterface } from '@/interfaces/SubjectInterface.js';
-import { AuthService } from '@/services/AuthService.js';
-import { SemesterService } from '@/services/SemesterService.js';
-import { SubjectService } from '@/services/SubjectService.js';
 
 // External imports
 import type { ChartData, ChartOptions } from 'chart.js';
+import { computed } from 'vue';
 import { Bar } from 'vue-chartjs';
 
-// State
-const loggedUserId = AuthService.getLoggedUser()?.id ?? 0;
-const semesters = SemesterService.getSemestersByUserId(loggedUserId);
-const chartData: ChartData<'bar'> = {
-  labels: semesters.map((semester: SemesterInterface): string => semester.name),
+// Props
+const props = defineProps<{ semesters: SemesterInterface[]; subjects: SubjectInterface[] }>();
+
+// Computed
+const chartData = computed<ChartData<'bar'>>((): ChartData<'bar'> => ({
   datasets: [
     {
       backgroundColor: '#9ed2bd',
       borderColor: '#236b56',
       borderWidth: 1,
-      data: semesters.map((semester: SemesterInterface): number =>
-        SubjectService.getSubjectsBySemesterId(semester.id).reduce(
-          (total: number, subject: SubjectInterface): number => total + subject.credits,
-          0,
-        ),
+      data: props.semesters.map((semester: SemesterInterface): number =>
+        props.subjects
+          .filter((subject: SubjectInterface): boolean => subject.semesterId === semester.id)
+          .reduce((total: number, subject: SubjectInterface): number => total + subject.credits, 0),
       ),
       label: 'Créditos',
     },
   ],
-};
+  labels: props.semesters.map((semester: SemesterInterface): string => semester.name),
+}));
+
 const chartOptions: ChartOptions<'bar'> = {
   maintainAspectRatio: false,
   scales: { y: { beginAtZero: true, ticks: { precision: 0 } } },

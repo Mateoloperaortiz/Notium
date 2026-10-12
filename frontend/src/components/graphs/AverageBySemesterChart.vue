@@ -2,37 +2,48 @@
 // Internal imports
 import type { GradeInterface } from '@/interfaces/GradeInterface.js';
 import type { SemesterInterface } from '@/interfaces/SemesterInterface.js';
-import { AuthService } from '@/services/AuthService.js';
-import { GradeService } from '@/services/GradeService.js';
-import { SemesterService } from '@/services/SemesterService.js';
-import { SubjectService } from '@/services/SubjectService.js';
+import type { SubjectInterface } from '@/interfaces/SubjectInterface.js';
 import { AnalyticsUtil } from '@/utils/AnalyticsUtil.js';
 
 // External imports
 import type { ChartData, ChartOptions } from 'chart.js';
+import { computed } from 'vue';
 import { Bar } from 'vue-chartjs';
 
-// State
-const loggedUserId = AuthService.getLoggedUser()?.id ?? 0;
-const semesters = SemesterService.getSemestersByUserId(loggedUserId);
-const chartData: ChartData<'bar'> = {
-  labels: semesters.map((semester: SemesterInterface): string => semester.name),
+// Props
+const props = defineProps<{
+  grades: GradeInterface[];
+  semesters: SemesterInterface[];
+  subjects: SubjectInterface[];
+}>();
+
+// Computed
+const chartData = computed<ChartData<'bar'>>((): ChartData<'bar'> => ({
   datasets: [
     {
       backgroundColor: '#236b56',
       borderRadius: 8,
-      data: semesters.map(
-        (semester: SemesterInterface): number =>
+      data: props.semesters.map((semester: SemesterInterface): number => {
+        const semesterSubjectIds = props.subjects
+          .filter((subject: SubjectInterface): boolean => subject.semesterId === semester.id)
+          .map((subject: SubjectInterface): number => subject.id);
+
+        return (
           AnalyticsUtil.getAverage(
-            GradeService.getGradesBySubjects(
-              SubjectService.getSubjectsBySemesterId(semester.id),
-            ).map((grade: GradeInterface): number => grade.value),
-          ) ?? 0,
-      ),
+            props.grades
+              .filter((grade: GradeInterface): boolean =>
+                semesterSubjectIds.includes(grade.subjectId),
+              )
+              .map((grade: GradeInterface): number => grade.value),
+          ) ?? 0
+        );
+      }),
       label: 'Promedio',
     },
   ],
-};
+  labels: props.semesters.map((semester: SemesterInterface): string => semester.name),
+}));
+
 const chartOptions: ChartOptions<'bar'> = {
   maintainAspectRatio: false,
   scales: { y: { beginAtZero: true, max: 5 } },

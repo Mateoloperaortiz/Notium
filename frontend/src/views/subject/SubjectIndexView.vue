@@ -3,19 +3,21 @@
 import SubjectCard from '@/components/subject/SubjectCard.vue';
 import SubjectForm from '@/components/subject/SubjectForm.vue';
 import type { CreateSubjectDTO } from '@/dtos/SubjectDTOs.js';
+import type { GradeInterface } from '@/interfaces/GradeInterface.js';
+import type { SemesterInterface } from '@/interfaces/SemesterInterface.js';
 import type { SubjectInterface } from '@/interfaces/SubjectInterface.js';
-import { AuthService } from '@/services/AuthService.js';
+import { GradeService } from '@/services/GradeService.js';
 import { SemesterService } from '@/services/SemesterService.js';
 import { SubjectService } from '@/services/SubjectService.js';
 import { ErrorUtil } from '@/utils/ErrorUtil.js';
 
 // External imports
-import { computed, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 
 // State
-const loggedUserId = AuthService.getLoggedUser()?.id ?? 0;
-const semesters = SemesterService.getSemestersByUserId(loggedUserId);
-const subjects = ref<SubjectInterface[]>(SubjectService.getSubjectsBySemesters(semesters));
+const semesters = ref<SemesterInterface[]>([]);
+const subjects = ref<SubjectInterface[]>([]);
+const grades = ref<GradeInterface[]>([]);
 const editingSubject = ref<SubjectInterface>();
 const selectedSemesterId = ref<number>(0);
 const errorMessage = ref<string>('');
@@ -41,12 +43,25 @@ const formTitle = computed<string>((): string =>
 );
 
 // Functions
-function loadSubjects(): void {
-  subjects.value = SubjectService.getSubjectsBySemesters(semesters);
+function countGrades(subjectId: number): number {
+  return grades.value.filter((grade: GradeInterface): boolean => grade.subjectId === subjectId)
+    .length;
+}
+
+async function loadData(): Promise<void> {
+  try {
+    [semesters.value, subjects.value, grades.value] = await Promise.all([
+      SemesterService.getSemesters(),
+      SubjectService.getSubjects(),
+      GradeService.getGrades(),
+    ]);
+  } catch (error: unknown) {
+    errorMessage.value = ErrorUtil.getErrorMessage(error);
+  }
 }
 
 function openCreateForm(): void {
-  if (semesters.length === 0) {
+  if (semesters.value.length === 0) {
     errorMessage.value = 'Crea un semestre antes de registrar una materia.';
     return;
   }
@@ -65,27 +80,25 @@ function closeForm(): void {
   isFormOpen.value = false;
 }
 
-function saveSubject(dto: CreateSubjectDTO, semesterId: number): void {
+async function saveSubject(dto: CreateSubjectDTO): Promise<void> {
   errorMessage.value = '';
 
   try {
     if (editingSubject.value) {
-      if (!SubjectService.updateSubject(editingSubject.value.id, dto)) {
-        throw new Error('La materia que intentas editar ya no existe.');
-      }
+      await SubjectService.updateSubject(editingSubject.value.id, dto);
     } else {
-      SubjectService.createSubject(dto, semesterId);
+      await SubjectService.createSubject(dto);
     }
 
-    loadSubjects();
+    await loadData();
     closeForm();
   } catch (error: unknown) {
     errorMessage.value = ErrorUtil.getErrorMessage(error);
   }
 }
 
-function deleteSubject(subjectId: number): void {
-  const subject = SubjectService.getSubjectById(subjectId);
+async function deleteSubject(subjectId: number): Promise<void> {
+  const subject = subjects.value.find((item: SubjectInterface): boolean => item.id === subjectId);
 
   if (
     !window.confirm(
@@ -97,16 +110,20 @@ function deleteSubject(subjectId: number): void {
 
   errorMessage.value = '';
 
-  if (!SubjectService.deleteSubject(subjectId)) {
-    errorMessage.value = 'La materia que intentas eliminar ya no existe.';
-  }
+  try {
+    await SubjectService.deleteSubject(subjectId);
+    await loadData();
 
-  loadSubjects();
-
-  if (editingSubject.value?.id === subjectId) {
-    closeForm();
+    if (editingSubject.value?.id === subjectId) {
+      closeForm();
+    }
+  } catch (error: unknown) {
+    errorMessage.value = ErrorUtil.getErrorMessage(error);
   }
 }
+
+// Lifecycle
+onMounted(loadData);
 </script>
 
 <template>
@@ -169,6 +186,7 @@ function deleteSubject(subjectId: number): void {
         v-for="subject in filteredSubjects"
         :key="subject.id"
         :subject="subject"
+        :grade-count="countGrades(subject.id)"
         @delete="deleteSubject"
         @edit="openEditForm"
       />

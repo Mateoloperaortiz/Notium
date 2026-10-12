@@ -1,9 +1,9 @@
 import type { GradeInterface } from '@/interfaces/GradeInterface.js';
 
 /** Fields the service assigns, so the form never sends them. */
-type GradeManagedFields = 'createdAt' | 'id' | 'subjectId' | 'updatedAt';
+type GradeManagedFields = 'createdAt' | 'id' | 'updatedAt';
 
-/** Fields filled in the grade form; the service adds the managed ones. */
+/** Fields the grade form sends; subjectId points to a subject the user owns. */
 export type CreateGradeDTO = Omit<GradeInterface, GradeManagedFields>;
 
 /** Changes to a grade; missing fields keep their current value. */

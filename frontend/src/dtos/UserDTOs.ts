@@ -1,12 +1,14 @@
-import type { UserInterface } from '@/interfaces/UserInterface.js';
+import type { Role, UserInterface } from '@/interfaces/UserInterface.js';
 
-/** Fields the service assigns, so the form never sends them. */
-type UserManagedFields = 'createdAt' | 'id' | 'updatedAt';
+/** Fields an administrator fills to create a user; the password travels only on the way in. */
+export interface CreateUserDTO {
+  name: string;
+  email: string;
+  password: string;
+  role: Role;
+}
 
-/** Fields filled in the user form; the service adds the managed ones. */
-export type CreateUserDTO = Omit<UserInterface, UserManagedFields>;
-
-/** Changes to a user; missing fields keep their current value. */
+/** Changes to a user; missing fields keep their current value and an empty password is ignored. */
 export type UpdateUserDTO = Partial<CreateUserDTO>;
 
 /** Credentials typed in the login form. */

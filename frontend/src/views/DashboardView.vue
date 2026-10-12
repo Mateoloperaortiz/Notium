@@ -5,17 +5,48 @@ import AverageBySemesterChart from '@/components/graphs/AverageBySemesterChart.v
 import AverageBySubjectChart from '@/components/graphs/AverageBySubjectChart.vue';
 import CreditsBySemesterChart from '@/components/graphs/CreditsBySemesterChart.vue';
 import GradeTypeDistributionChart from '@/components/graphs/GradeTypeDistributionChart.vue';
+import type { GradeInterface } from '@/interfaces/GradeInterface.js';
+import type { SemesterInterface } from '@/interfaces/SemesterInterface.js';
+import type { SubjectInterface } from '@/interfaces/SubjectInterface.js';
 import { AuthService } from '@/services/AuthService.js';
+import { GradeService } from '@/services/GradeService.js';
 import { SemesterService } from '@/services/SemesterService.js';
+import { SubjectService } from '@/services/SubjectService.js';
+import { ErrorUtil } from '@/utils/ErrorUtil.js';
 
 // External imports
+import { computed, onMounted, ref } from 'vue';
 import { RouterLink } from 'vue-router';
 
 // State
 const loggedUser = AuthService.getLoggedUser();
-const semesterCount = SemesterService.getSemestersByUserId(loggedUser?.id ?? 0).length;
-const semesterCountLabel =
-  semesterCount === 1 ? '1 semestre registrado' : `${semesterCount} semestres registrados`;
+const semesters = ref<SemesterInterface[]>([]);
+const subjects = ref<SubjectInterface[]>([]);
+const grades = ref<GradeInterface[]>([]);
+const errorMessage = ref<string>('');
+
+// Computed
+const semesterCountLabel = computed<string>((): string =>
+  semesters.value.length === 1
+    ? '1 semestre registrado'
+    : `${semesters.value.length} semestres registrados`,
+);
+
+// Functions
+async function loadData(): Promise<void> {
+  try {
+    [semesters.value, subjects.value, grades.value] = await Promise.all([
+      SemesterService.getSemesters(),
+      SubjectService.getSubjects(),
+      GradeService.getGrades(),
+    ]);
+  } catch (error: unknown) {
+    errorMessage.value = ErrorUtil.getErrorMessage(error);
+  }
+}
+
+// Lifecycle
+onMounted(loadData);
 </script>
 
 <template>
@@ -41,7 +72,7 @@ const semesterCountLabel =
     <div class="dashboard-page__grid">
       <article class="dashboard-stat dashboard-stat--highlight">
         <span class="dashboard-stat__label">Recorrido académico</span>
-        <strong>{{ semesterCount }}</strong>
+        <strong>{{ semesters.length }}</strong>
         <p>{{ semesterCountLabel }}</p>
       </article>
 
@@ -61,13 +92,13 @@ const semesterCountLabel =
       </div>
 
       <div class="dashboard-page__charts dashboard-page__charts--wide">
-        <AverageBySemesterChart />
-        <AverageBySubjectChart />
+        <AverageBySemesterChart :semesters="semesters" :subjects="subjects" :grades="grades" />
+        <AverageBySubjectChart :subjects="subjects" :grades="grades" />
       </div>
       <div class="dashboard-page__charts">
-        <CreditsBySemesterChart />
-        <GradeTypeDistributionChart />
-        <AssessmentCoverageChart />
+        <CreditsBySemesterChart :semesters="semesters" :subjects="subjects" />
+        <GradeTypeDistributionChart :grades="grades" />
+        <AssessmentCoverageChart :subjects="subjects" :grades="grades" />
       </div>
     </section>
   </section>

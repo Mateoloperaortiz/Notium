@@ -1,9 +1,9 @@
 import type { SubjectInterface } from '@/interfaces/SubjectInterface.js';
 
 /** Fields the service assigns, so the form never sends them. */
-type SubjectManagedFields = 'createdAt' | 'id' | 'semesterId' | 'updatedAt';
+type SubjectManagedFields = 'createdAt' | 'id' | 'updatedAt';
 
-/** Fields filled in the subject form; the service adds the managed ones. */
+/** Fields the subject form sends; semesterId points to a semester the user owns. */
 export type CreateSubjectDTO = Omit<SubjectInterface, SubjectManagedFields>;
 
 /** Changes to a subject; missing fields keep their current value. */

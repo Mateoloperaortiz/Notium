@@ -10,11 +10,9 @@ export interface UserInterface {
   name: string;
   /** Unique across users and stored in lowercase. */
   email: string;
-  /** Plain text, acceptable only for demo data while there is no backend. */
-  password: string;
   role: Role;
-  /** Creation time as a Unix timestamp in milliseconds. */
-  createdAt: number;
-  /** Last update time as a Unix timestamp in milliseconds. */
-  updatedAt: number;
+  /** Creation time as an ISO date string. */
+  createdAt: string;
+  /** Last update time as an ISO date string. */
+  updatedAt: string;
 }

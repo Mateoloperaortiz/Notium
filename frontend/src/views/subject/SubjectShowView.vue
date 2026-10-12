@@ -3,33 +3,42 @@
 import GradeCard from '@/components/grade/GradeCard.vue';
 import type { GradeInterface } from '@/interfaces/GradeInterface.js';
 import type { SubjectInterface } from '@/interfaces/SubjectInterface.js';
-import { AuthService } from '@/services/AuthService.js';
 import { GradeService } from '@/services/GradeService.js';
-import { SemesterService } from '@/services/SemesterService.js';
 import { SubjectService } from '@/services/SubjectService.js';
 
 // External imports
-import { computed } from 'vue';
+import { onMounted, ref } from 'vue';
 import { RouterLink } from 'vue-router';
 
 // Props
 const props = defineProps<{ semesterId: string; subjectId: string }>();
 
 // State
-const loggedUserId = AuthService.getLoggedUser()?.id ?? 0;
+const subject = ref<SubjectInterface>();
+const grades = ref<GradeInterface[]>([]);
+const isLoading = ref<boolean>(true);
 
-// Computed
-const subject = computed<SubjectInterface | undefined>((): SubjectInterface | undefined =>
-  SubjectService.getSubjectsBySemesters(SemesterService.getSemestersByUserId(loggedUserId)).find(
-    (userSubject: SubjectInterface): boolean =>
-      userSubject.id === Number(props.subjectId) &&
-      userSubject.semesterId === Number(props.semesterId),
-  ),
-);
+// Functions
+async function loadSubject(): Promise<void> {
+  try {
+    const found = await SubjectService.getSubjectById(Number(props.subjectId));
 
-const grades = computed<GradeInterface[]>((): GradeInterface[] =>
-  subject.value ? GradeService.getGradesBySubjectId(subject.value.id) : [],
-);
+    if (found.semesterId !== Number(props.semesterId)) {
+      subject.value = undefined;
+      return;
+    }
+
+    subject.value = found;
+    grades.value = await GradeService.getGradesBySubjectId(found.id);
+  } catch {
+    subject.value = undefined;
+  } finally {
+    isLoading.value = false;
+  }
+}
+
+// Lifecycle
+onMounted(loadSubject);
 </script>
 
 <template>
@@ -39,7 +48,9 @@ const grades = computed<GradeInterface[]>((): GradeInterface[] =>
       Volver a materias
     </RouterLink>
 
-    <div v-if="subject">
+    <p v-if="isLoading" class="subject-detail__loading">Cargando materia…</p>
+
+    <div v-else-if="subject">
       <header class="subject-detail__hero">
         <div>
           <p class="eyebrow">{{ subject.code }}</p>

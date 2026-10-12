@@ -26,7 +26,7 @@ const fieldOrder: (keyof UserValidationErrorsDTO)[] = ['name', 'email', 'passwor
 const form = ref<CreateUserDTO>({
   email: props.user?.email ?? '',
   name: props.user?.name ?? '',
-  password: props.user?.password ?? '',
+  password: '',
   role: props.user?.role ?? Role.User,
 });
 const errors = ref<UserValidationErrorsDTO>({ email: '', name: '', password: '' });
@@ -47,7 +47,14 @@ const hasValidationErrors = computed<boolean>((): boolean =>
 // Functions
 function validateField(field: keyof UserValidationErrorsDTO): boolean {
   touched.value[field] = true;
-  errors.value[field] = UserService.validateFields(form.value, props.user?.id)[field];
+
+  if (field === 'password' && isEditing.value && form.value.password === '') {
+    errors.value.password = '';
+
+    return true;
+  }
+
+  errors.value[field] = UserService.validateFields(form.value)[field];
 
   return errors.value[field] === '';
 }
@@ -71,7 +78,13 @@ function handleSubmit(): void {
     return;
   }
 
-  emit('submit', { ...form.value });
+  const dto: CreateUserDTO = { ...form.value };
+
+  if (isEditing.value && dto.password === '') {
+    delete (dto as Partial<CreateUserDTO>).password;
+  }
+
+  emit('submit', dto);
 }
 
 function handleCancel(): void {

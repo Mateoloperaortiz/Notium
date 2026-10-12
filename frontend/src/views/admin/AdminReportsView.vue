@@ -6,25 +6,26 @@ import type {
   SemesterStatusCountDTO,
   UserSummaryDTO,
 } from '@/dtos/PlatformReportDTOs.js';
-import { Role } from '@/interfaces/UserInterface.js';
-import { GradeService } from '@/services/GradeService.js';
-import { SemesterService } from '@/services/SemesterService.js';
-import { SubjectService } from '@/services/SubjectService.js';
-import { UserService } from '@/services/UserService.js';
+import type { GradeInterface } from '@/interfaces/GradeInterface.js';
+import type { SemesterInterface } from '@/interfaces/SemesterInterface.js';
+import type { SubjectInterface } from '@/interfaces/SubjectInterface.js';
+import { Role, type UserInterface } from '@/interfaces/UserInterface.js';
+import { PlatformReportService } from '@/services/PlatformReportService.js';
+import { ErrorUtil } from '@/utils/ErrorUtil.js';
 import { PlatformReportUtil } from '@/utils/PlatformReportUtil.js';
 import { TableRenderUtil } from '@/utils/TableRenderUtil.js';
 
 // External imports
 import type { ChartData } from 'chart.js';
 import DataTable from 'datatables.net-vue3';
-import { computed, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 
 // State
-const users = UserService.getUsers();
-const semesters = SemesterService.getSemesters();
-const subjects = SubjectService.getSubjects();
-const grades = GradeService.getGrades();
-const availableYears = PlatformReportUtil.getAvailableYears(semesters);
+const users = ref<UserInterface[]>([]);
+const semesters = ref<SemesterInterface[]>([]);
+const subjects = ref<SubjectInterface[]>([]);
+const grades = ref<GradeInterface[]>([]);
+const errorMessage = ref<string>('');
 const selectedYear = ref<number>(0);
 const selectedPeriod = ref<number>(0);
 const userTableColumns = [
@@ -53,18 +54,28 @@ const userTableColumns = [
 ];
 
 // Computed
+const availableYears = computed<number[]>((): number[] =>
+  PlatformReportUtil.getAvailableYears(semesters.value),
+);
+
 const activeFilter = computed<PlatformReportFilterDTO>((): PlatformReportFilterDTO => ({
   period: selectedPeriod.value === 0 ? undefined : selectedPeriod.value,
   year: selectedYear.value === 0 ? undefined : selectedYear.value,
 }));
 
 const userSummaries = computed<UserSummaryDTO[]>((): UserSummaryDTO[] =>
-  PlatformReportUtil.getUserSummaries(users, semesters, subjects, grades, activeFilter.value),
+  PlatformReportUtil.getUserSummaries(
+    users.value,
+    semesters.value,
+    subjects.value,
+    grades.value,
+    activeFilter.value,
+  ),
 );
 
 const statusChartData = computed<ChartData<'bar' | 'line'>>((): ChartData<'bar' | 'line'> => {
   const distribution = PlatformReportUtil.getSemesterStatusDistribution(
-    semesters,
+    semesters.value,
     activeFilter.value,
   );
 
@@ -91,6 +102,23 @@ const roleChartData = computed<ChartData<'bar' | 'line'>>((): ChartData<'bar' | 
     labels: ['Estudiantes', 'Administradores'],
   };
 });
+
+// Functions
+async function loadReport(): Promise<void> {
+  try {
+    const report = await PlatformReportService.getPlatformReport();
+
+    users.value = report.users;
+    semesters.value = report.semesters;
+    subjects.value = report.subjects;
+    grades.value = report.grades;
+  } catch (error: unknown) {
+    errorMessage.value = ErrorUtil.getErrorMessage(error);
+  }
+}
+
+// Lifecycle
+onMounted(loadReport);
 </script>
 
 <template>

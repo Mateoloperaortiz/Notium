@@ -4,16 +4,14 @@ import SemesterCard from '@/components/semester/SemesterCard.vue';
 import SemesterForm from '@/components/semester/SemesterForm.vue';
 import type { CreateSemesterDTO } from '@/dtos/SemesterDTOs.js';
 import type { SemesterInterface } from '@/interfaces/SemesterInterface.js';
-import { AuthService } from '@/services/AuthService.js';
 import { SemesterService } from '@/services/SemesterService.js';
 import { ErrorUtil } from '@/utils/ErrorUtil.js';
 
 // External imports
-import { computed, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 
 // State
-const loggedUserId = AuthService.getLoggedUser()?.id ?? 0;
-const semesters = ref<SemesterInterface[]>(SemesterService.getSemestersByUserId(loggedUserId));
+const semesters = ref<SemesterInterface[]>([]);
 const editingSemester = ref<SemesterInterface>();
 const errorMessage = ref<string>('');
 const isFormOpen = ref<boolean>(false);
@@ -30,8 +28,12 @@ const formTitle = computed<string>((): string =>
 );
 
 // Functions
-function loadSemesters(): void {
-  semesters.value = SemesterService.getSemestersByUserId(loggedUserId);
+async function loadSemesters(): Promise<void> {
+  try {
+    semesters.value = await SemesterService.getSemesters();
+  } catch (error: unknown) {
+    errorMessage.value = ErrorUtil.getErrorMessage(error);
+  }
 }
 
 function openCreateForm(): void {
@@ -49,27 +51,27 @@ function closeForm(): void {
   isFormOpen.value = false;
 }
 
-function saveSemester(dto: CreateSemesterDTO): void {
+async function saveSemester(dto: CreateSemesterDTO): Promise<void> {
   errorMessage.value = '';
 
   try {
     if (editingSemester.value) {
-      if (!SemesterService.updateSemester(editingSemester.value.id, dto)) {
-        throw new Error('El semestre que intentas editar ya no existe.');
-      }
+      await SemesterService.updateSemester(editingSemester.value.id, dto);
     } else {
-      SemesterService.createSemester(dto, loggedUserId);
+      await SemesterService.createSemester(dto);
     }
 
-    loadSemesters();
+    await loadSemesters();
     closeForm();
   } catch (error: unknown) {
     errorMessage.value = ErrorUtil.getErrorMessage(error);
   }
 }
 
-function deleteSemester(semesterId: number): void {
-  const semester = SemesterService.getSemesterById(semesterId);
+async function deleteSemester(semesterId: number): Promise<void> {
+  const semester = semesters.value.find(
+    (item: SemesterInterface): boolean => item.id === semesterId,
+  );
 
   if (
     !window.confirm(
@@ -81,16 +83,20 @@ function deleteSemester(semesterId: number): void {
 
   errorMessage.value = '';
 
-  if (!SemesterService.deleteSemester(semesterId)) {
-    errorMessage.value = 'El semestre que intentas eliminar ya no existe.';
-  }
+  try {
+    await SemesterService.deleteSemester(semesterId);
+    await loadSemesters();
 
-  loadSemesters();
-
-  if (editingSemester.value?.id === semesterId) {
-    closeForm();
+    if (editingSemester.value?.id === semesterId) {
+      closeForm();
+    }
+  } catch (error: unknown) {
+    errorMessage.value = ErrorUtil.getErrorMessage(error);
   }
 }
+
+// Lifecycle
+onMounted(loadSemesters);
 </script>
 
 <template>

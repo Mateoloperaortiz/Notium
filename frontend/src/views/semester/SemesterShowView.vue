@@ -3,30 +3,35 @@
 import SubjectCard from '@/components/subject/SubjectCard.vue';
 import type { SemesterInterface } from '@/interfaces/SemesterInterface.js';
 import type { SubjectInterface } from '@/interfaces/SubjectInterface.js';
-import { AuthService } from '@/services/AuthService.js';
 import { SemesterService } from '@/services/SemesterService.js';
 import { SubjectService } from '@/services/SubjectService.js';
 
 // External imports
-import { computed } from 'vue';
+import { onMounted, ref } from 'vue';
 import { RouterLink } from 'vue-router';
 
 // Props
 const props = defineProps<{ id: string }>();
 
 // State
-const loggedUserId = AuthService.getLoggedUser()?.id ?? 0;
+const semester = ref<SemesterInterface>();
+const subjects = ref<SubjectInterface[]>([]);
+const isLoading = ref<boolean>(true);
 
-// Computed
-const semester = computed<SemesterInterface | undefined>((): SemesterInterface | undefined =>
-  SemesterService.getSemestersByUserId(loggedUserId).find(
-    (userSemester: SemesterInterface): boolean => userSemester.id === Number(props.id),
-  ),
-);
+// Functions
+async function loadSemester(): Promise<void> {
+  try {
+    semester.value = await SemesterService.getSemesterById(Number(props.id));
+    subjects.value = await SubjectService.getSubjectsBySemesterId(semester.value.id);
+  } catch {
+    semester.value = undefined;
+  } finally {
+    isLoading.value = false;
+  }
+}
 
-const subjects = computed<SubjectInterface[]>((): SubjectInterface[] =>
-  semester.value ? SubjectService.getSubjectsBySemesterId(semester.value.id) : [],
-);
+// Lifecycle
+onMounted(loadSemester);
 </script>
 
 <template>
@@ -36,7 +41,9 @@ const subjects = computed<SubjectInterface[]>((): SubjectInterface[] =>
       Todos los semestres
     </RouterLink>
 
-    <div v-if="semester">
+    <p v-if="isLoading" class="semester-detail__loading">Cargando semestre…</p>
+
+    <div v-else-if="semester">
       <header class="semester-detail__hero">
         <div>
           <p class="eyebrow">Detalle del semestre</p>

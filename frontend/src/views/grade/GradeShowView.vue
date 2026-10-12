@@ -2,36 +2,43 @@
 // Internal imports
 import type { GradeInterface } from '@/interfaces/GradeInterface.js';
 import type { SubjectInterface } from '@/interfaces/SubjectInterface.js';
-import { AuthService } from '@/services/AuthService.js';
 import { GradeService } from '@/services/GradeService.js';
-import { SemesterService } from '@/services/SemesterService.js';
 import { SubjectService } from '@/services/SubjectService.js';
 import { DateFormatUtil } from '@/utils/DateFormatUtil.js';
 
 // External imports
-import { computed } from 'vue';
+import { onMounted, ref } from 'vue';
 import { RouterLink } from 'vue-router';
 
 // Props
 const props = defineProps<{ gradeId: string; subjectId: string }>();
 
 // State
-const loggedUserId = AuthService.getLoggedUser()?.id ?? 0;
+const grade = ref<GradeInterface>();
+const subject = ref<SubjectInterface>();
+const isLoading = ref<boolean>(true);
 
-// Computed
-const subject = computed<SubjectInterface | undefined>((): SubjectInterface | undefined =>
-  SubjectService.getSubjectsBySemesters(SemesterService.getSemestersByUserId(loggedUserId)).find(
-    (userSubject: SubjectInterface): boolean => userSubject.id === Number(props.subjectId),
-  ),
-);
+// Functions
+async function loadGrade(): Promise<void> {
+  try {
+    const found = await GradeService.getGradeById(Number(props.gradeId));
 
-const grade = computed<GradeInterface | undefined>((): GradeInterface | undefined =>
-  subject.value
-    ? GradeService.getGradesBySubjectId(subject.value.id).find(
-        (subjectGrade: GradeInterface): boolean => subjectGrade.id === Number(props.gradeId),
-      )
-    : undefined,
-);
+    if (found.subjectId !== Number(props.subjectId)) {
+      grade.value = undefined;
+      return;
+    }
+
+    grade.value = found;
+    subject.value = await SubjectService.getSubjectById(found.subjectId);
+  } catch {
+    grade.value = undefined;
+  } finally {
+    isLoading.value = false;
+  }
+}
+
+// Lifecycle
+onMounted(loadGrade);
 </script>
 
 <template>
@@ -41,7 +48,9 @@ const grade = computed<GradeInterface | undefined>((): GradeInterface | undefine
       Volver a notas
     </RouterLink>
 
-    <div v-if="grade">
+    <p v-if="isLoading" class="grade-detail__loading">Cargando nota…</p>
+
+    <div v-else-if="grade">
       <header class="grade-detail__hero">
         <div>
           <p class="eyebrow">{{ grade.type }}</p>

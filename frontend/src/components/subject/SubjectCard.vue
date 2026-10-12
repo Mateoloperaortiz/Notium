@@ -1,27 +1,24 @@
 <script setup lang="ts">
 // Internal imports
 import type { SubjectInterface } from '@/interfaces/SubjectInterface.js';
-import { GradeService } from '@/services/GradeService.js';
 
 // External imports
-import { computed } from 'vue';
 import { RouterLink } from 'vue-router';
 
 // Props
-const props = withDefaults(defineProps<{ showActions?: boolean; subject: SubjectInterface }>(), {
-  showActions: true,
-});
+const props = withDefaults(
+  defineProps<{ gradeCount?: number; showActions?: boolean; subject: SubjectInterface }>(),
+  {
+    gradeCount: 0,
+    showActions: true,
+  },
+);
 
 // Emits
 const emit = defineEmits<{
   delete: [subjectId: number];
   edit: [subject: SubjectInterface];
 }>();
-
-// Computed
-const gradeCount = computed<number>(
-  (): number => GradeService.getGradesBySubjectId(props.subject.id).length,
-);
 
 // Functions
 function handleDelete(): void {

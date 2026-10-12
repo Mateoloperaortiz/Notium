@@ -12,8 +12,8 @@ export interface GradeInterface {
   type: string;
   /** Assessment date as an ISO string (YYYY-MM-DD). */
   date: string;
-  /** Creation time as a Unix timestamp in milliseconds. */
-  createdAt: number;
-  /** Last update time as a Unix timestamp in milliseconds. */
-  updatedAt: number;
+  /** Creation time as an ISO date string. */
+  createdAt: string;
+  /** Last update time as an ISO date string. */
+  updatedAt: string;
 }

@@ -2,35 +2,32 @@
 // Internal imports
 import type { GradeInterface } from '@/interfaces/GradeInterface.js';
 import type { SubjectInterface } from '@/interfaces/SubjectInterface.js';
-import { AuthService } from '@/services/AuthService.js';
-import { GradeService } from '@/services/GradeService.js';
-import { SemesterService } from '@/services/SemesterService.js';
-import { SubjectService } from '@/services/SubjectService.js';
 
 // External imports
 import type { ChartData, ChartOptions } from 'chart.js';
+import { computed } from 'vue';
 import { Bar } from 'vue-chartjs';
 
-// State
-const loggedUserId = AuthService.getLoggedUser()?.id ?? 0;
-const semesters = SemesterService.getSemestersByUserId(loggedUserId);
-const subjects = SubjectService.getSubjectsBySemesters(semesters);
-const chartData: ChartData<'bar'> = {
-  labels: subjects.map((subject: SubjectInterface): string => subject.code),
+// Props
+const props = defineProps<{ grades: GradeInterface[]; subjects: SubjectInterface[] }>();
+
+// Computed
+const chartData = computed<ChartData<'bar'>>((): ChartData<'bar'> => ({
   datasets: [
     {
       backgroundColor: '#e7a547',
       borderRadius: 8,
-      data: subjects.map((subject: SubjectInterface): number =>
-        GradeService.getGradesBySubjectId(subject.id).reduce(
-          (total: number, grade: GradeInterface): number => total + grade.percentage,
-          0,
-        ),
+      data: props.subjects.map((subject: SubjectInterface): number =>
+        props.grades
+          .filter((grade: GradeInterface): boolean => grade.subjectId === subject.id)
+          .reduce((total: number, grade: GradeInterface): number => total + grade.percentage, 0),
       ),
       label: 'Porcentaje evaluado',
     },
   ],
-};
+  labels: props.subjects.map((subject: SubjectInterface): string => subject.code),
+}));
+
 const chartOptions: ChartOptions<'bar'> = {
   maintainAspectRatio: false,
   scales: { y: { beginAtZero: true, max: 100 } },

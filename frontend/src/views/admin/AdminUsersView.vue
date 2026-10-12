@@ -10,11 +10,11 @@ import { TableRenderUtil } from '@/utils/TableRenderUtil.js';
 
 // External imports
 import DataTable from 'datatables.net-vue3';
-import { computed, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 
 // State
 const loggedUserId = AuthService.getLoggedUser()?.id ?? 0;
-const users = ref<UserInterface[]>([...UserService.getUsers()]);
+const users = ref<UserInterface[]>([]);
 const editingUser = ref<UserInterface>();
 const errorMessage = ref<string>('');
 const isFormOpen = ref<boolean>(false);
@@ -60,8 +60,12 @@ const formTitle = computed<string>((): string =>
 );
 
 // Functions
-function loadUsers(): void {
-  users.value = [...UserService.getUsers()];
+async function loadUsers(): Promise<void> {
+  try {
+    users.value = await UserService.getUsers();
+  } catch (error: unknown) {
+    errorMessage.value = ErrorUtil.getErrorMessage(error);
+  }
 }
 
 function openCreateForm(): void {
@@ -89,7 +93,7 @@ function handleTableClick(event: MouseEvent): void {
   const action = actionButton?.dataset.action;
 
   if (action === 'edit') {
-    const user = UserService.getUserById(userId);
+    const user = users.value.find((item: UserInterface): boolean => item.id === userId);
 
     if (user) {
       openEditForm(user);
@@ -97,36 +101,34 @@ function handleTableClick(event: MouseEvent): void {
   }
 
   if (action === 'delete') {
-    deleteUser(userId);
+    void deleteUser(userId);
   }
 }
 
-function saveUser(dto: CreateUserDTO): void {
+async function saveUser(dto: CreateUserDTO): Promise<void> {
   errorMessage.value = '';
 
   try {
     if (editingUser.value) {
-      if (!UserService.updateUser(editingUser.value.id, dto)) {
-        throw new Error('El usuario que intentas editar ya no existe.');
-      }
+      await UserService.updateUser(editingUser.value.id, dto);
     } else {
-      UserService.createUser(dto);
+      await UserService.createUser(dto);
     }
 
-    loadUsers();
+    await loadUsers();
     closeForm();
   } catch (error: unknown) {
     errorMessage.value = ErrorUtil.getErrorMessage(error);
   }
 }
 
-function deleteUser(userId: number): void {
+async function deleteUser(userId: number): Promise<void> {
   if (userId === loggedUserId) {
     errorMessage.value = 'No puedes eliminar tu propia cuenta mientras tienes la sesión abierta.';
     return;
   }
 
-  const user = UserService.getUserById(userId);
+  const user = users.value.find((item: UserInterface): boolean => item.id === userId);
 
   if (
     !window.confirm(
@@ -138,16 +140,20 @@ function deleteUser(userId: number): void {
 
   errorMessage.value = '';
 
-  if (!UserService.deleteUser(userId)) {
-    errorMessage.value = 'El usuario que intentas eliminar ya no existe.';
-  }
+  try {
+    await UserService.deleteUser(userId);
+    await loadUsers();
 
-  loadUsers();
-
-  if (editingUser.value?.id === userId) {
-    closeForm();
+    if (editingUser.value?.id === userId) {
+      closeForm();
+    }
+  } catch (error: unknown) {
+    errorMessage.value = ErrorUtil.getErrorMessage(error);
   }
 }
+
+// Lifecycle
+onMounted(loadUsers);
 </script>
 
 <template>

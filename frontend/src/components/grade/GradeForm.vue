@@ -15,7 +15,7 @@ const props = defineProps<{ grade?: GradeInterface; subjects: SubjectInterface[]
 // Emits
 const emit = defineEmits<{
   cancel: [];
-  submit: [grade: CreateGradeDTO, subjectId: number];
+  submit: [grade: CreateGradeDTO];
 }>();
 
 // State
@@ -35,11 +35,11 @@ const fieldOrder: (keyof GradeValidationErrorsDTO)[] = [
 const form = ref<CreateGradeDTO>({
   date: props.grade?.date ?? DateFormatUtil.getTodayIsoDate(),
   percentage: props.grade?.percentage ?? 20,
+  subjectId: props.grade?.subjectId ?? 0,
   title: props.grade?.title ?? '',
   type: props.grade?.type ?? '',
   value: props.grade?.value ?? 0,
 });
-const subjectId = ref<number>(props.grade?.subjectId ?? 0);
 const associationError = ref<string>('');
 const errors = ref<GradeValidationErrorsDTO>({
   date: '',
@@ -85,14 +85,14 @@ function validateForm(): boolean {
 }
 
 function handleSubmit(): void {
-  associationError.value = subjectId.value ? '' : 'Selecciona una materia.';
+  associationError.value = form.value.subjectId ? '' : 'Selecciona una materia.';
   submissionAttempted.value = true;
 
   if (!validateForm() || associationError.value) {
     return;
   }
 
-  emit('submit', { ...form.value }, subjectId.value);
+  emit('submit', { ...form.value });
 }
 
 function handleCancel(): void {
@@ -108,7 +108,7 @@ function handleCancel(): void {
 
     <label class="grade-form__field">
       <span>Materia</span>
-      <select v-model="subjectId" required :disabled="isEditing">
+      <select v-model.number="form.subjectId" required :disabled="isEditing">
         <option :value="0">Selecciona una materia</option>
         <option v-for="subject in subjects" :key="subject.id" :value="subject.id">
           {{ subject.code }} · {{ subject.name }}

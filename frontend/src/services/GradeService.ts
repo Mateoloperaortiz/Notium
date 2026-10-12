@@ -1,94 +1,49 @@
 import type { CreateGradeDTO, GradeValidationErrorsDTO, UpdateGradeDTO } from '@/dtos/GradeDTOs.js';
 import type { GradeInterface } from '@/interfaces/GradeInterface.js';
-import type { SubjectInterface } from '@/interfaces/SubjectInterface.js';
-import { useGradeStore } from '@/stores/GradeStore.js';
-import { IdUtil } from '@/utils/IdUtil.js';
+import { BaseService } from '@/services/BaseService.js';
 
-/** Reads and writes grades in GradeStore and validates their data. */
-export class GradeService {
-  /** Returns the grades of every user. */
-  public static getGrades(): GradeInterface[] {
-    return useGradeStore().grades;
+/** Reads and writes the grades of the session user through the API. */
+export class GradeService extends BaseService {
+  /** Returns every grade of the session user. */
+  public static async getGrades(): Promise<GradeInterface[]> {
+    const { data } = await GradeService.getClient().get<GradeInterface[]>('/grades');
+
+    return data;
   }
 
-  /** Returns the grade with the given ID, or undefined if it does not exist. */
-  public static getGradeById(id: number): GradeInterface | undefined {
-    return GradeService.getGrades().find((grade: GradeInterface): boolean => grade.id === id);
-  }
-
-  /** Returns the grades of one subject. */
-  public static getGradesBySubjectId(subjectId: number): GradeInterface[] {
-    return GradeService.getGrades().filter(
-      (grade: GradeInterface): boolean => grade.subjectId === subjectId,
-    );
-  }
-
-  /** Returns the grades of the given subjects, such as those of one user. */
-  public static getGradesBySubjects(subjects: SubjectInterface[]): GradeInterface[] {
-    const subjectIds = subjects.map((subject: SubjectInterface): number => subject.id);
-
-    return GradeService.getGrades().filter((grade: GradeInterface): boolean =>
-      subjectIds.includes(grade.subjectId),
-    );
-  }
-
-  /** Validates the data and saves a new grade in the subject; throws if invalid. */
-  public static createGrade(dto: CreateGradeDTO, subjectId: number): GradeInterface {
-    const validatedDto = GradeService.validate(dto);
-    const timestamp = Date.now();
-    const grade: GradeInterface = {
-      ...validatedDto,
-      createdAt: timestamp,
-      id: IdUtil.getNextId(GradeService.getGrades()),
-      subjectId,
-      updatedAt: timestamp,
-    };
-
-    useGradeStore().grades.push(grade);
-
-    return grade;
-  }
-
-  /** Validates and applies the changes; undefined if the grade does not exist. */
-  public static updateGrade(id: number, dto: UpdateGradeDTO): GradeInterface | undefined {
-    const grade = GradeService.getGradeById(id);
-
-    if (grade === undefined) {
-      return undefined;
-    }
-
-    const validatedDto = GradeService.validate({
-      date: dto.date ?? grade.date,
-      percentage: dto.percentage ?? grade.percentage,
-      title: dto.title ?? grade.title,
-      type: dto.type ?? grade.type,
-      value: dto.value ?? grade.value,
+  /** Returns the grades of one subject of the session user. */
+  public static async getGradesBySubjectId(subjectId: number): Promise<GradeInterface[]> {
+    const { data } = await GradeService.getClient().get<GradeInterface[]>('/grades', {
+      params: { subjectId },
     });
 
-    Object.assign(grade, validatedDto, { updatedAt: Date.now() });
-
-    return grade;
+    return data;
   }
 
-  /** Deletes the grade with the given ID; false if it does not exist. */
-  public static deleteGrade(id: number): boolean {
-    const grades = GradeService.getGrades();
-    const gradeIndex = grades.findIndex((grade: GradeInterface): boolean => grade.id === id);
+  /** Returns one grade of the session user. */
+  public static async getGradeById(id: number): Promise<GradeInterface> {
+    const { data } = await GradeService.getClient().get<GradeInterface>(`/grades/${id}`);
 
-    if (gradeIndex === -1) {
-      return false;
-    }
-
-    grades.splice(gradeIndex, 1);
-
-    return true;
+    return data;
   }
 
-  /** Deletes every grade of a subject; called when the subject is deleted. */
-  public static deleteGradesBySubjectId(subjectId: number): void {
-    GradeService.getGradesBySubjectId(subjectId).forEach((grade: GradeInterface): void => {
-      GradeService.deleteGrade(grade.id);
-    });
+  /** Creates a grade in a subject the session user owns. */
+  public static async createGrade(dto: CreateGradeDTO): Promise<GradeInterface> {
+    const { data } = await GradeService.getClient().post<GradeInterface>('/grades', dto);
+
+    return data;
+  }
+
+  /** Applies changes to a grade of the session user. */
+  public static async updateGrade(id: number, dto: UpdateGradeDTO): Promise<GradeInterface> {
+    const { data } = await GradeService.getClient().patch<GradeInterface>(`/grades/${id}`, dto);
+
+    return data;
+  }
+
+  /** Deletes a grade of the session user. */
+  public static async deleteGrade(id: number): Promise<void> {
+    await GradeService.getClient().delete(`/grades/${id}`);
   }
 
   /** One message per invalid field; empty strings mean the data is valid. */
@@ -105,25 +60,6 @@ export class GradeService {
         Number.isFinite(dto.value) && dto.value >= 0 && dto.value <= 5
           ? ''
           : 'La nota debe estar entre 0 y 5.',
-    };
-  }
-
-  /** Throws the first validation message, or returns the trimmed data. */
-  private static validate(dto: CreateGradeDTO): CreateGradeDTO {
-    const errors = GradeService.validateFields(dto);
-    const firstError =
-      errors.title || errors.type || errors.value || errors.percentage || errors.date;
-
-    if (firstError !== '') {
-      throw new Error(firstError);
-    }
-
-    return {
-      date: dto.date,
-      percentage: dto.percentage,
-      title: dto.title.trim(),
-      type: dto.type.trim(),
-      value: dto.value,
     };
   }
 }

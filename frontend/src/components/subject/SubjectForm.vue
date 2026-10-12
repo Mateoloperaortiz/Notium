@@ -14,7 +14,7 @@ const props = defineProps<{ semesters: SemesterInterface[]; subject?: SubjectInt
 // Emits
 const emit = defineEmits<{
   cancel: [];
-  submit: [subject: CreateSubjectDTO, semesterId: number];
+  submit: [subject: CreateSubjectDTO];
 }>();
 
 // State
@@ -29,8 +29,8 @@ const form = ref<CreateSubjectDTO>({
   credits: props.subject?.credits ?? 3,
   name: props.subject?.name ?? '',
   professor: props.subject?.professor ?? '',
+  semesterId: props.subject?.semesterId ?? 0,
 });
-const semesterId = ref<number>(props.subject?.semesterId ?? 0);
 const associationError = ref<string>('');
 const errors = ref<SubjectValidationErrorsDTO>({ code: '', credits: '', name: '', professor: '' });
 const touched = ref<Record<keyof SubjectValidationErrorsDTO, boolean>>({
@@ -69,14 +69,14 @@ function validateForm(): boolean {
 }
 
 function handleSubmit(): void {
-  associationError.value = semesterId.value ? '' : 'Selecciona un semestre.';
+  associationError.value = form.value.semesterId ? '' : 'Selecciona un semestre.';
   submissionAttempted.value = true;
 
   if (!validateForm() || associationError.value) {
     return;
   }
 
-  emit('submit', { ...form.value }, semesterId.value);
+  emit('submit', { ...form.value });
 }
 
 function handleCancel(): void {
@@ -97,7 +97,7 @@ function handleCancel(): void {
 
     <label class="subject-form__field">
       <span>Semestre</span>
-      <select v-model="semesterId" required :disabled="isEditing">
+      <select v-model.number="form.semesterId" required :disabled="isEditing">
         <option :value="0">Selecciona un semestre</option>
         <option v-for="semester in semesters" :key="semester.id" :value="semester.id">
           {{ semester.name }}
