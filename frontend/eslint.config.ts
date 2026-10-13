@@ -1,8 +1,8 @@
-import { defineConfigWithVueTs, vueTsConfigs } from '@vue/eslint-config-typescript';
 import type { Rule } from 'eslint';
 import skipFormatting from 'eslint-config-prettier/flat';
 import pluginVue from 'eslint-plugin-vue';
-import { globalIgnores } from 'eslint/config';
+import { defineConfig, globalIgnores } from 'eslint/config';
+import tseslint from 'typescript-eslint';
 
 const explicitTypeRestrictions = [
   {
@@ -63,7 +63,7 @@ const alphabeticalImports: Rule.RuleModule = {
   },
 };
 
-export default defineConfigWithVueTs(
+export default defineConfig(
   {
     name: 'app/files-to-lint',
     files: ['**/*.{vue,ts,mts,tsx}'],
@@ -71,8 +71,20 @@ export default defineConfigWithVueTs(
 
   globalIgnores(['**/dist/**', '**/dist-ssr/**', '**/coverage/**']),
 
+  ...tseslint.configs.recommended,
   ...pluginVue.configs['flat/essential'],
-  vueTsConfigs.recommended,
+
+  {
+    ...tseslint.configs.eslintRecommended,
+    files: ['**/*.vue'],
+    languageOptions: {
+      parserOptions: {
+        parser: tseslint.parser,
+        ecmaVersion: 2024,
+        extraFileExtensions: ['.vue'],
+      },
+    },
+  },
 
   {
     name: 'app/course-conventions',
