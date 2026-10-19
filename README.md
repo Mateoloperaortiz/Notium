@@ -3,10 +3,12 @@
 Aplicación académica para organizar semestres, materias y calificaciones, con autenticación por
 roles, analítica visual y un panel de administración.
 
-El repositorio tiene dos proyectos:
+El repositorio tiene tres proyectos:
 
 - `frontend/`: SPA en Vue 3, TypeScript y Vite.
 - `backend/`: API REST en Nest.js con TypeORM y SQLite.
+- `nuxt/`: mini versión híbrida de Notium para el Entregable 2, con blog SSG,
+  materias SSR y herramientas CSR. Incluye su propia API de demostración.
 
 El frontend obtiene todos sus datos de la API: el inicio de sesión con JWT, los CRUD de
 semestres, materias y notas del estudiante, y el CRUD de usuarios y los reportes del
@@ -108,7 +110,30 @@ El acceso a datos sigue este flujo:
 Vista → Servicio del frontend → API (/api) → Controlador → Servicio de Nest → TypeORM → SQLite
 ```
 
-## Despliegue
+## Entregable 2
+
+Aplicación publicada en GCP: [Notium Entregable 2](http://136.71.163.71).
+
+La implementación y la guía de ejecución, pruebas y sustentación están en
+[`nuxt/README.md`](nuxt/README.md). Se ejecuta de forma independiente de los proyectos del
+Entregable 1:
+
+```bash
+cd nuxt
+npm ci
+npm run check
+npm test
+NITRO_PORT=3001 npm start
+```
+
+Abra <http://localhost:3001>. El blog y sus tres artículos se generan durante el build;
+las materias se consultan a la API de Nuxt y se renderizan en el servidor; las herramientas
+se renderizan en el navegador. La carpeta `nuxt/` contiene un Dockerfile y un Compose propios.
+
+La nueva sección debe incorporarse manualmente al diagrama de arquitectura de draw.io.
+No cambia las entidades ni las relaciones del diagrama de clases.
+
+## Despliegue del Entregable 1
 
 El despliegue evaluado es una máquina virtual de GCP servida por HTTP. Ambos proyectos se
 levantan con `docker-compose.yml` como en el Tutorial 08. GitHub Pages
@@ -147,7 +172,12 @@ borra la base de datos y solo se usa cuando se desea reiniciar los datos de prue
 El CI verifica ambos proyectos y además construye y levanta las imágenes, comprueba el login
 y el perfil autenticado a través de nginx, y elimina sus contenedores y volumen de prueba.
 
-Para una presentación, encienda la VM, consulte su nueva IP temporal y abra `http://<IP>/`:
+Los comandos siguientes corresponden al despliegue histórico del Entregable 1. Al verificar
+GCP el 19 de octubre de 2026, la instancia `notium-demo` ya no existía; para volver a ejecutar
+estos comandos es necesario crear nuevamente ese destino. El despliegue independiente del
+Entregable 2 se documenta en `nuxt/README.md`.
+
+Para una presentación con esa VM creada, enciéndala, consulte su nueva IP temporal y abra `http://<IP>/`:
 
 ```bash
 gcloud compute instances start notium-demo --project=notium-demo-20260930 --zone=us-central1-c

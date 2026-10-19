@@ -1,0 +1,19 @@
+name: notium-entregable2
+
+services:
+  app:
+    image: notium-entregable2:latest
+    build: .
+    restart: unless-stopped
+    ports:
+      - '80:3000'
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - "fetch('http://127.0.0.1:3000/subjects').then(response => { if (!response.ok) process.exit(1); }).catch(() => process.exit(1))"
+      interval: 10s
+      timeout: 5s
+      start_period: 30s
+      retries: 6

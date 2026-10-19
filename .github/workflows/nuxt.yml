@@ -1,0 +1,27 @@
+name: Nuxt híbrido
+
+on:
+  push:
+    branches: ["main", "codex/entregable-2-nuxt"]
+    paths: ["nuxt/**", ".github/workflows/nuxt.yml"]
+  pull_request:
+    branches: ["main"]
+    paths: ["nuxt/**", ".github/workflows/nuxt.yml"]
+
+jobs:
+  nuxt:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: nuxt
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: nuxt/package-lock.json
+      - run: npm ci
+      - run: npm run check
+      - run: npm test
+      - run: npm run audit:runtime
