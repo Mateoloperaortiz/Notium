@@ -134,10 +134,10 @@ Referencias: [renderizado híbrido](https://nuxt.com/docs/4.x/guide/concepts/ren
 
 ## Despliegue en GCP Compute Engine
 
-El destino previsto es una VM separada `notium-entregable2`, proyecto
-`dw-mateo-lopera-2026`, zona `us-central1-c`. Los siguientes comandos preparan ese despliegue;
-la presencia de esta guía no confirma que ya esté publicado. Usa siempre los parámetros de
-proyecto y zona para no depender de la configuración activa del CLI.
+La VM actual es `notium-entregable2`, proyecto `dw-mateo-lopera-2026`, zona
+`us-central1-c`, publicada en el enlace anterior. Los comandos siguientes documentan cómo
+reproducir el despliegue en una VM nueva; no deben repetirse sobre una instancia existente.
+Usa siempre los parámetros de proyecto y zona para no depender de la configuración activa del CLI.
 
 **Es necesario ejecutar el servidor de Nitro. No uses `nuxt generate` ni publiques solamente
 `.output/public` con nginx:** esas opciones no mantienen los endpoints y el renderizado SSR
