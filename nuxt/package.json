@@ -1,0 +1,36 @@
+{
+  "name": "notium-nuxt",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "nuxt dev --port 3001",
+    "build": "nuxt build",
+    "start": "node .output/server/index.mjs",
+    "postinstall": "nuxt prepare",
+    "type-check": "nuxt typecheck",
+    "lint": "oxlint app/ server/ shared/ nuxt.config.ts --deny-warnings",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "audit:runtime": "npm --prefix .output/server install --package-lock-only --ignore-scripts --no-audit --no-fund && npm --prefix .output/server audit --omit=dev",
+    "check": "npm run lint && npm run format:check && npm run type-check && npm run build",
+    "test": "node --test tests/*.test.mjs"
+  },
+  "dependencies": {
+    "nuxt": "4.6.2",
+    "vue": "^3.5.44",
+    "vue-router": "^5.4.0"
+  },
+  "devDependencies": {
+    "oxlint": "^1.58.0",
+    "prettier": "3.9.5",
+    "typescript": "~6.0.2",
+    "vue-tsc": "^3.3.7"
+  },
+  "engines": {
+    "node": "^22.22.3 || ^24.15.0 || >=26.0.0"
+  },
+  "allowScripts": {
+    "esbuild@0.28.2": true
+  }
+}
