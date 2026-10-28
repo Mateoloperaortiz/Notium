@@ -5,6 +5,7 @@ import { PostService } from '~/services/PostService.js';
 // State
 const posts = PostService.getPosts();
 
+// Lifecycle
 useSeoMeta({ title: 'Blog académico' });
 </script>
 

@@ -1,8 +1,3 @@
-<script setup lang="ts">
-// External imports
-import { NuxtLink, NuxtPage } from '#components';
-</script>
-
 <template>
   <div class="app-shell">
     <a class="skip-link" href="#main-content">Saltar al contenido</a>

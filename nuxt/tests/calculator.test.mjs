@@ -135,3 +135,28 @@ test('the numeric API raises RangeError for nonfinite or out-of-domain values', 
     assert.throws(() => GradeCalculatorUtil.getRequiredGrade(...inputs), RangeError);
   }
 });
+
+test('the required grade is shown rounded up to two decimals with a decimal comma', () => {
+  assert.equal(
+    GradeCalculatorUtil.formatGrade(GradeCalculatorUtil.getRequiredGrade(4, 60, 3)),
+    '1,50',
+  );
+  assert.equal(GradeCalculatorUtil.formatGrade(2.333333), '2,34');
+  assert.equal(GradeCalculatorUtil.formatGrade(0), '0,00');
+  assert.equal(GradeCalculatorUtil.formatGrade(5), '5,00');
+});
+
+test('the remaining percentage is shown without floating-point noise', () => {
+  assert.equal(
+    GradeCalculatorUtil.formatPercentage(GradeCalculatorUtil.getRemainingPercentage(70.1)),
+    '29,9',
+  );
+  assert.equal(
+    GradeCalculatorUtil.formatPercentage(GradeCalculatorUtil.getRemainingPercentage(60)),
+    '40',
+  );
+  assert.equal(
+    GradeCalculatorUtil.formatPercentage(GradeCalculatorUtil.getRemainingPercentage(66.66)),
+    '33,34',
+  );
+});

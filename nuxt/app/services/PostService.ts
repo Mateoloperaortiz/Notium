@@ -1,5 +1,5 @@
-import { posts } from '../data/posts.js';
-import type { PostInterface } from '../interfaces/PostInterface.js';
+import { posts } from '~/data/posts.js';
+import type { PostInterface } from '~/interfaces/PostInterface.js';
 
 /** Reads the three local articles shared by static generation and navigation. */
 export class PostService {

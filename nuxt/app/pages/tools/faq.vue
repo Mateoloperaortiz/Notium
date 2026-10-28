@@ -1,9 +1,5 @@
 <script setup lang="ts">
-// External imports
-import { NuxtLink } from '#components';
-import { useSeoMeta } from '#imports';
-
-// Functions
+// Lifecycle
 useSeoMeta({
   title: 'Preguntas frecuentes',
   description:

@@ -5,12 +5,13 @@ import { PostService } from '~/services/PostService.js';
 // State
 const route = useRoute();
 
+// Computed
+const post = computed(() => PostService.getPostBySlug(String(route.params.slug)));
+
+// Lifecycle
 definePageMeta({
   validate: (route) => Boolean(PostService.getPostBySlug(String(route.params.slug))),
 });
-
-// Computed
-const post = computed(() => PostService.getPostBySlug(String(route.params.slug)));
 
 useSeoMeta({
   title: () => post.value?.title ?? 'Artículo',

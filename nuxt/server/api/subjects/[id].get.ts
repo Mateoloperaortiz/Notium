@@ -1,3 +1,5 @@
-import { SubjectsService } from '../../services/SubjectsService.js';
+import { SubjectsService } from '#server/services/SubjectsService.js';
 
-export default defineEventHandler((event) => SubjectsService.findOne(getRouterParam(event, 'id')));
+export default defineEventHandler((event) =>
+  SubjectsService.findOne(Number(getRouterParam(event, 'id'))),
+);

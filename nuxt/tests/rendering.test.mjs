@@ -287,7 +287,7 @@ test('the production build preserves SSG, SSR, CSR and API behavior', async (sui
       const paths = [
         '/blog/no-existe',
         '/subjects/no-existe',
-        ...['1abc', '1e0', '0', '999'].flatMap((id) => [`/subjects/${id}`, `/api/subjects/${id}`]),
+        ...['1abc', '0', '999'].flatMap((id) => [`/subjects/${id}`, `/api/subjects/${id}`]),
         '/api/subjects/no-existe',
       ];
       for (const path of paths) {

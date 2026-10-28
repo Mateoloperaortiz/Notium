@@ -7,11 +7,9 @@ const route = useRoute();
 
 const request = useAsyncData(
   () => `subject-${String(route.params.id)}`,
-  () => SubjectService.getSubjectById(String(route.params.id)),
+  () => SubjectService.getSubjectById(Number(route.params.id)),
 );
 const { data: subject, error, status } = request;
-
-useSeoMeta({ title: () => subject.value?.name ?? 'Materia' });
 
 // Functions
 async function validateResponse(): Promise<void> {
@@ -38,6 +36,8 @@ watch(error, (value) => {
 });
 
 // Lifecycle
+useSeoMeta({ title: () => subject.value?.name ?? 'Materia' });
+
 onServerPrefetch(validateResponse);
 </script>
 

@@ -1,8 +1,3 @@
-<script setup lang="ts">
-// External imports
-import { NuxtLink, NuxtPage } from '#components';
-</script>
-
 <template>
   <div>
     <nav class="tools-navigation" aria-label="Herramientas académicas">

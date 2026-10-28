@@ -1,10 +1,6 @@
 <script setup lang="ts">
 // Internal imports
-import { GradeCalculatorUtil } from '../../utils/GradeCalculatorUtil.js';
-
-// External imports
-import { useSeoMeta } from '#imports';
-import { computed, ref } from 'vue';
+import { GradeCalculatorUtil } from '~/utils/GradeCalculatorUtil.js';
 
 // State
 const currentAverage = ref<string>('4,0');
@@ -14,27 +10,22 @@ const requiredGrade = ref<number | null>(null);
 const errorMessage = ref<string>('');
 
 // Computed
-const remainingPercentage = computed<number>(
-  (): number => 100 - GradeCalculatorUtil.parseValue(evaluatedPercentage.value),
+const formattedRemainingPercentage = computed<string>((): string =>
+  GradeCalculatorUtil.formatPercentage(
+    GradeCalculatorUtil.getRemainingPercentage(
+      GradeCalculatorUtil.parseValue(evaluatedPercentage.value),
+    ),
+  ),
 );
 
 const isTargetPossible = computed<boolean>(
-  (): boolean => requiredGrade.value !== null && requiredGrade.value <= 5,
+  (): boolean =>
+    requiredGrade.value !== null && GradeCalculatorUtil.isTargetPossible(requiredGrade.value),
 );
 
-const formattedGrade = computed<string>((): string => {
-  if (requiredGrade.value === null) {
-    return '';
-  }
-
-  const hundredths = requiredGrade.value * 100;
-  const roundingTolerance = Number.EPSILON * Math.abs(hundredths) * 8;
-
-  return new Intl.NumberFormat('es-CO', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(Math.ceil(hundredths - roundingTolerance) / 100);
-});
+const formattedGrade = computed<string>((): string =>
+  requiredGrade.value === null ? '' : GradeCalculatorUtil.formatGrade(requiredGrade.value),
+);
 
 // Functions
 function clearResult(): void {
@@ -61,6 +52,7 @@ function calculate(): void {
   );
 }
 
+// Lifecycle
 useSeoMeta({
   title: 'Calculadora de notas',
   description:
@@ -155,18 +147,18 @@ useSeoMeta({
             <h2>{{ isTargetPossible ? 'Promedio que necesitas' : 'La meta supera la escala' }}</h2>
             <p class="calculator-result__value">{{ formattedGrade }}<span> / 5</span></p>
             <p v-if="!isTargetPossible" class="calculator-result__message">
-              Necesitarías más de 5 en el {{ remainingPercentage }} % restante. Esa meta no se puede
-              alcanzar con estos resultados; prueba una meta menor o revisa las opciones de tu
-              curso.
+              Necesitarías más de 5 en el {{ formattedRemainingPercentage }} % restante. Esa meta no
+              se puede alcanzar con estos resultados; prueba una meta menor o revisa las opciones de
+              tu curso.
             </p>
             <p v-else-if="requiredGrade === 0" class="calculator-result__message">
               El aporte que ya ganaste alcanza tu meta, incluso con 0 en el
-              {{ remainingPercentage }} % restante. Revisa también los requisitos de asistencia y
-              entrega de tu curso.
+              {{ formattedRemainingPercentage }} % restante. Revisa también los requisitos de
+              asistencia y entrega de tu curso.
             </p>
             <p v-else class="calculator-result__message">
-              Necesitas al menos este promedio ponderado en el {{ remainingPercentage }} % que
-              falta. El resultado se redondea hacia arriba a dos decimales.
+              Necesitas al menos este promedio ponderado en el {{ formattedRemainingPercentage }} %
+              que falta. El resultado se redondea hacia arriba a dos decimales.
             </p>
           </template>
           <template v-else>

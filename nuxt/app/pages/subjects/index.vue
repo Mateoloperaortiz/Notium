@@ -5,6 +5,7 @@ import { SubjectService } from '~/services/SubjectService.js';
 // State
 const { data: subjects, error, status } = useAsyncData('subjects', SubjectService.getSubjects);
 
+// Lifecycle
 useSeoMeta({ title: 'Materias' });
 </script>
 
